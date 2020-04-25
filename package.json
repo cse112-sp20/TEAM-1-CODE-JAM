@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "main": "helloWorld.test.js",
   "scripts": {
-    "test": "mocha"
+    "test": "jest"
+  },
+  "devDependencies": {
+      "jest": "^25.1.0"
   },
   "repository": {
     "type": "git",
