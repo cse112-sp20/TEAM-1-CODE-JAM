@@ -2,12 +2,12 @@
   "name": "TEAM-1-CODE-JAM",
   "version": "1.0.0",
   "main": "helloWorld.test.js",
-  "scripts": {
-    "test": "jest"
-  },
-  "devDependencies": {
-      "jest": "^25.1.0"
-  },
+  
+  "scripts": {    "test": "jest",    "build": "webpack hallowWorld.test.js", 
+              "deploy": "firebase deploy --token \"$FIREBASE_TOKEN\" --only hosting"  },
+  
+  "devDependencies": {    "jest": "^25.1.0",    "webpack": "^4.42.0",    "webpack-cli": "^3.3.11"  },
+  
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cse112-sp20/TEAM-1-CODE-JAM.git"
