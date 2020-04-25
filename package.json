@@ -1,7 +1,7 @@
 {
   "name": "TEAM-1-CODE-JAM",
   "version": "1.0.0",
-  "main": "helloWorld.js",
+  "main": "helloWorld.test.js",
   "scripts": {
     "test": "mocha"
   },
