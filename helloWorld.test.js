@@ -1,5 +1,10 @@
-import helloWorld from './helloWorld';
+function helloWorld() {
+    console.log("Hello World!");
+    return "Hello World!";
+}
 
-it('sum numbers', () => {
-    expect(helloWorld()).toEqual("Hello World!");
+const assert = require('assert');
+
+it('sums numbers', () => {
+    assert.equal(helloWorld(), "Hello World!");
 });
