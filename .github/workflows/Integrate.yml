@@ -16,6 +16,6 @@ jobs:
     - uses: actions/setup-node@master
       with:
         node-version: 12
-    - run: npm install
+    - run: npm install --global mocha
     - run: npm run build --if-present
     - run: npm test
