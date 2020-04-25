@@ -1,0 +1,23 @@
+{
+  "name": "TEAM-1-CODE-JAM",
+  "version": "1.0.0",
+  "main": "helloWorld.test.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+      "jest": "^25.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cse112-sp20/TEAM-1-CODE-JAM.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cse112-sp20/TEAM-1-CODE-JAM/issues"
+  },
+  "homepage": "https://github.com/cse112-sp20/TEAM-1-CODE-JAM#readme",
+  "description": ""
+}
