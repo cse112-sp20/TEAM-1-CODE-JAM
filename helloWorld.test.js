@@ -1,10 +1,5 @@
-function helloWorld() {
-    console.log("Hello World!");
-    return "Hello World!";
-}
+const {helloWorld} = require('./helloWorld');
 
-const assert = require('assert');
-
-it('sums numbers', () => {
-    assert.equal(helloWorld(), "Hello World!");
+test('Test HelloWorld', () => {
+    expect(helloWorld()).toBe("Hello World!");
 });
