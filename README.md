@@ -34,7 +34,7 @@
 3. In **App.js**, first import the component, create a new route under <Switch> tag. 
 
    ```react
-   import Example from ./components/Example.js
+   import Example from "./components/Example.js"
    ...
    ...
    <Switch>
