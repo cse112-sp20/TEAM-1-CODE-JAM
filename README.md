@@ -31,7 +31,7 @@
    
    ```
 
-3. In **App.js**, first import the component, create a new route under <Switch> tag. 
+3. In **App.js**, first import the component, create a new route under \<Switch> tag. 
 
    ```react
    import Example from "./components/Example.js"
@@ -44,7 +44,7 @@
    </Switch>
    ```
 
-4. Then go to **SideNav.js** in components folder, add your <Link> tag in the div.
+4. Then go to **SideNav.js** in components folder, add your \<Link> tag in the div.
 
    ```react
    <Link className="grey darken-3 waves-effect waves-light card-panel center-align" to="/yoururl">
