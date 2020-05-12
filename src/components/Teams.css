@@ -1,0 +1,31 @@
+.rounded-btn {
+  width: 100%;
+  padding-top: 100%;
+  position: relative;
+  border-radius: 10px;
+  background-color: #5d5d5d;
+}
+
+.inside-btn {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  text-align: center;
+}
+.flexbox-centering {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#add-btn {
+  background-color: #3c9040;
+}
+
+.col {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
