@@ -20,6 +20,7 @@ export default class Home extends Component {
     if (!"prevTeam" in data) {
       return;
     }
+    console.log(data);
     let msg = {
       for: "background",
       message: "get team info",

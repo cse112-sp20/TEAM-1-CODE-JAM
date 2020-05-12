@@ -96,6 +96,7 @@ class CreateJoinTeam extends Component {
    */
   onJoinTeam = () => {
     let teamCode = document.querySelector("#teamCode").value;
+    teamCode = teamCode.toUpperCase();
     if (teamCode.length != 5) {
       M.toast({
         html: "Team code should be 5 characters!",
@@ -116,7 +117,7 @@ class CreateJoinTeam extends Component {
     let msg = {
       for: "background",
       message: "join team",
-      teamCode: teamCode.toUpperCase(),
+      teamCode: teamCode,
     };
     chrome.runtime.sendMessage(msg, (response) => {
       if (response === "team code not found") {
@@ -126,10 +127,14 @@ class CreateJoinTeam extends Component {
         });
         return;
       } else if (response === "success") {
-        chrome.storage.local.set({
-          prevTeam: teamCode,
-        });
-        this.props.history.push("/");
+        chrome.storage.local.set(
+          {
+            prevTeam: teamCode,
+          },
+          () => {
+            this.props.history.push("/");
+          }
+        );
         return;
       } else if (response === "already joined the group") {
         M.toast({

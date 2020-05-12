@@ -41,14 +41,14 @@ function getAllTabs() {
   return new Promise((resolve, reject) => {
     chrome.windows.getAll({ populate: true }, function (windows) {
       let tabs = [];
-      let coutner = 0;
+      let counter = 0;
       for (win of windows) {
         for (tab of win.tabs) {
           let url = getHostname(tab.url);
           let time = Date.now() + counter;
           if (url != "invalid" && black_listed.includes(url)) {
             tabs.push({ url: url, time: time });
-            coutner += 10;
+            counter += 10;
           }
         }
       }
