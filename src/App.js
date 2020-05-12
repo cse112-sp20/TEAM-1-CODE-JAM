@@ -8,6 +8,7 @@ import SideNav from "./components/SideNav";
 import "./App.css";
 import Teams from "./components/Teams";
 import Home from "./components/Home";
+import Timeline from "./components/Timeline";
 
 class App extends Component {
   render() {
@@ -27,6 +28,7 @@ class App extends Component {
                   component={CreateJoinTeam}
                 ></Route>
                 <Route exact path="/teams" component={Teams}></Route>
+                <Route exact path="/timeline" component={Timeline}></Route>
                 <Route path="/" component={Home}></Route>
               </Switch>
             </div>

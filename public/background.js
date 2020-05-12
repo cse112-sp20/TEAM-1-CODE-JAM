@@ -2,6 +2,61 @@ let db;
 let userEmail;
 let userProfile;
 let teams;
+let counter = 0;
+// let tabs_dict = {};
+let tabs = [];
+
+let black_listed = [
+  "www.youtube.com",
+  "www.facebook.com",
+  "twitter.com",
+  "myspace.com",
+];
+
+/**
+ *  Gets the host name of a URL
+ *
+ * @param {string} url: URL of a tab
+ * @returns {URL} Host name of the tab
+ *
+ */
+
+function getHostname(url) {
+  // Handle Chrome URLs
+  if (/^chrome:\/\//.test(url)) {
+    return "invalid";
+  }
+  // Handle Files opened in chrome browser
+  if (/file:\/\//.test(url)) {
+    return "invalid";
+  }
+  try {
+    var newUrl = new URL(url);
+    return newUrl.hostname;
+  } catch (err) {
+    console.log(err);
+  }
+}
+function getAllTabs() {
+  return new Promise((resolve, reject) => {
+    chrome.windows.getAll({ populate: true }, function (windows) {
+      let tabs = [];
+      let coutner = 0;
+      for (win of windows) {
+        for (tab of win.tabs) {
+          let url = getHostname(tab.url);
+          let time = Date.now() + counter;
+          if (url != "invalid" && black_listed.includes(url)) {
+            tabs.push({ url: url, time: time });
+            coutner += 10;
+          }
+        }
+      }
+      resolve(tabs);
+    });
+  });
+}
+
 /**
  * setupListener listens for request coming from popup,
  * it then sends the response that the popup need
@@ -45,6 +100,10 @@ function setupListener() {
       } else if (request.message === "get team info") {
         getTeamInformation(request.teamCode).then(function (doc) {
           sendResponse(doc.data());
+        });
+      } else if (request.message === "get timeline") {
+        getAllTabs().then((tabs) => {
+          sendResponse(tabs);
         });
       }
     }

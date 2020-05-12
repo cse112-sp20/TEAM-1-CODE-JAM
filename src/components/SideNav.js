@@ -21,6 +21,12 @@ export default class SideNav extends Component {
         >
           <span>Teams</span>
         </Link>
+        <Link
+          className="grey darken-3 waves-effect waves-light card-panel center-align"
+          to="/timeline"
+        >
+          <span>Timeline</span>
+        </Link>
       </div>
     );
   }
