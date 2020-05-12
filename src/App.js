@@ -20,7 +20,7 @@ class App extends Component {
             <div className="col s2" id="side">
               <SideNav></SideNav>
             </div>
-            <div className="col s10">
+            <div className="col s10" id="component">
               <Switch>
                 <Route
                   exact
@@ -29,6 +29,7 @@ class App extends Component {
                 ></Route>
                 <Route exact path="/teams" component={Teams}></Route>
                 <Route exact path="/timeline" component={Timeline}></Route>
+
                 <Route path="/" component={Home}></Route>
               </Switch>
             </div>

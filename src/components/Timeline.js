@@ -1,5 +1,6 @@
 /*global chrome*/
 import React, { Component } from "react";
+import "./Timeline.css";
 
 export default class Timeline extends Component {
   constructor(props) {
@@ -36,10 +37,7 @@ export default class Timeline extends Component {
     let newElement = (
       <div className="row">
         <div className="col s6">
-          {/* indigo lighten-5 */}
           <div className="card blue-grey lighten-5">
-            {/* <div className="card blue-grey darken-1"> */}
-
             <div className="card-content white-text">
               <span style={{ color: "black" }} className="card-title">
                 {innerHTML}
@@ -48,7 +46,7 @@ export default class Timeline extends Component {
           </div>
         </div>
         <div className="col s6">
-          <div className="valign-wrapper center-align">
+          <div>
             <h4 style={{ color: "#6886c5" }}>{time}</h4>
           </div>
         </div>
@@ -66,12 +64,7 @@ export default class Timeline extends Component {
     let newElement = (
       <div className="row">
         <div className="col s6 ">
-          <h4
-            style={{ color: "#fa9191" }}
-            className="valign-wrapper center-align"
-          >
-            {time}
-          </h4>
+          <h4 style={{ color: "#fa9191" }}>{time}</h4>
         </div>
         <div className="col s6">
           <div className="card blue-grey lighten-5">
@@ -116,6 +109,6 @@ export default class Timeline extends Component {
   };
 
   render() {
-    return <div>{this.state.leftRightBranch}</div>;
+    return <div id="timeline">{this.state.leftRightBranch}</div>;
   }
 }
