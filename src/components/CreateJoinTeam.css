@@ -1,0 +1,10 @@
+#createTeam,
+#joinTeam {
+  padding-top: 10px;
+}
+button {
+  width: 150px;
+}
+#teamCode {
+  text-transform: uppercase;
+}
