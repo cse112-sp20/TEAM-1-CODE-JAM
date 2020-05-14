@@ -20,7 +20,6 @@ let black_listed = [
  * @returns {URL} Host name of the tab
  *
  */
-
 function getHostname(url) {
   // Handle Chrome URLs
   if (/^chrome:\/\//.test(url)) {
