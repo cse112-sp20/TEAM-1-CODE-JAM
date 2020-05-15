@@ -3,12 +3,12 @@ var lastTabUrl;
 var updateInterval = 1000;
 
 var flip = false;
-let black_listed = [
-  "www.youtube.com",
-  "www.facebook.com",
-  "twitter.com",
-  "myspace.com",
-];
+// let black_listed = [
+//   "www.youtube.com",
+//   "www.facebook.com",
+//   "twitter.com",
+//   "myspace.com",
+// ];
 /**
  *  Gets the host name of a URL
  *
@@ -16,22 +16,22 @@ let black_listed = [
  * @returns {URL} Host name of the tab
  *
  */
-function getHostname(url) {
-  // Handle Chrome URLs
-  if (/^chrome:\/\//.test(url)) {
-    return "invalid";
-  }
-  // Handle Files opened in chrome browser
-  if (/file:\/\//.test(url)) {
-    return "invalid";
-  }
-  try {
-    var newUrl = new URL(url);
-    return newUrl.hostname;
-  } catch (err) {
-    console.log(err);
-  }
-}
+// function getHostname(url) {
+//   // Handle Chrome URLs
+//   if (/^chrome:\/\//.test(url)) {
+//     return "invalid";
+//   }
+//   // Handle Files opened in chrome browser
+//   if (/file:\/\//.test(url)) {
+//     return "invalid";
+//   }
+//   try {
+//     var newUrl = new URL(url);
+//     return newUrl.hostname;
+//   } catch (err) {
+//     console.log(err);
+//   }
+// }
 
 function updateLocalStorage(tabUrl, timeSpend) {
   if (localStorage.getItem(tabUrl) == undefined) {
@@ -49,11 +49,11 @@ function newTab(currTabUrl) {
     if (currTabUrl === lastTabUrl) return;
     let currTime = new Date().toLocaleTimeString();
     let msg = {
-      for: "timeline",
-      message: "newTab",
+      for: "popup",
+      message: "timeline",
       url: currTabUrl,
       time: currTime,
-      flip_flag: flip,
+      flip: flip,
     };
     flip = !flip;
     lastTabUrl = currTabUrl;

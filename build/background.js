@@ -15,8 +15,6 @@ let black_listed = [
 //have a current url and only stop timer if u remove or go thru updated
 let current_url;
 
-
-
 /**
  *  Gets the host name of a URL
  *
@@ -49,8 +47,10 @@ function getAllTabs() {
         for (tab of win.tabs) {
           let url = getHostname(tab.url);
           let time = Date.now() + counter;
+          let id = tab.id;
           if (url != "invalid" && black_listed.includes(url)) {
-            tabs.push({ url: url, time: time });
+            tabs.push({ url: url, time: time, id: id, flip: flip });
+            flip = !flip;
             counter += 10;
           }
         }
@@ -106,6 +106,8 @@ function setupListener() {
         });
       } else if (request.message === "get timeline") {
         getAllTabs().then((tabs) => {
+          console.log(tabs);
+          // console.log(flip);
           sendResponse(tabs);
         });
       }
