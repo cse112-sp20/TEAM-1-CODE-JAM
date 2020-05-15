@@ -12,6 +12,10 @@ let black_listed = [
   "twitter.com",
   "myspace.com",
 ];
+//have a current url and only stop timer if u remove or go thru updated
+let current_url;
+
+
 
 /**
  *  Gets the host name of a URL

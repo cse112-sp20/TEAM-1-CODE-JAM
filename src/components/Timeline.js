@@ -28,9 +28,13 @@ export default class Timeline extends Component {
       leftRightBranch: [],
       urls: [],
     };
+
+    this.createLeftCard = this.createLeftCard.bind(this);
   }
   componentDidMount = () => {
-    this.timeline();
+    // this.timeline();
+    // this.newMessage();
+    chrome.runtime.onMessage.addListener(this.handleMessage);
   };
 
   createLeftCard = (innerHTML, time) => {
@@ -82,6 +86,18 @@ export default class Timeline extends Component {
     this.setState({
       leftRightBranch: this.state.leftRightBranch,
     });
+  };
+
+  handleMessage = (msg) => {
+    console.log(msg);
+    let url = msg.url;
+    let time = msg.time;
+    msg.flip_flag
+      ? this.createLeftCard(url, time)
+      : this.createRightCard(url, time);
+
+    // sendResponse(msg);
+    return true;
   };
 
   timeline = async () => {
