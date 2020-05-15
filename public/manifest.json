@@ -1,0 +1,16 @@
+{
+  "name": "react merged code",
+  "description": "",
+  "version": "1",
+  "manifest_version": 2,
+  "background": {
+    "persistent": false,
+    "page": "background.html"
+  },
+  "browser_action": {
+    "default_popup": "index.html"
+  },
+  "permissions": ["identity", "identity.email", "tabs", "storage"],
+  "web_accessible_resources": ["index.html", "/static/*"],
+  "content_security_policy": "script-src 'self' https://www.gstatic.com/ https://*.firebaseio.com https://www.googleapis.com; object-src 'self'"
+}

@@ -1,27 +1,38 @@
 {
-  "name": "TEAM-1-CODE-JAM",
-  "version": "1.0.0",
-  "main": "helloWorld.js",
+  "name": "chrome_extension_react",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.3.2",
+    "@testing-library/user-event": "^7.1.2",
+    "materialize-css": "^1.0.0-rc.2",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-event-timeline": "^1.6.3",
+    "react-materialize": "^3.9.0",
+    "react-router-dom": "^5.1.2",
+    "react-scripts": "3.4.1"
+  },
   "scripts": {
-    "test": "mocha",
-    "build": "webpack helloWorld.js -o public/bundle.js",
-    "deploy": "firebase deploy --token \"$FIREBASE_TOKEN\" --only hosting"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
-  "devDependencies": {
-    "mocha": "^3.3.0",
-    "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.11"
+  "eslintConfig": {
+    "extends": "react-app"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/cse112-sp20/TEAM-1-CODE-JAM.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/cse112-sp20/TEAM-1-CODE-JAM/issues"
-  },
-  "homepage": "https://github.com/cse112-sp20/TEAM-1-CODE-JAM#readme",
-  "description": ""
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
 }
