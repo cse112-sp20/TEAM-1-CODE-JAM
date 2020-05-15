@@ -1,3 +1,5 @@
+
+var lastTab;
 let db;
 let userEmail;
 let userProfile;
@@ -5,7 +7,7 @@ let teams;
 let counter = 0;
 // let tabs_dict = {};
 let tabs = [];
-
+let test = "Hey hey hey";
 let black_listed = [
   "www.youtube.com",
   "www.facebook.com",
@@ -33,7 +35,7 @@ function getHostname(url) {
   }
   try {
     var newUrl = new URL(url);
-    return newUrl.hostname;
+    return newUrl.hostname.toString();
   } catch (err) {
     console.log(err);
   }
@@ -59,6 +61,8 @@ function getAllTabs() {
     });
   });
 }
+
+
 
 /**
  * setupListener listens for request coming from popup,
