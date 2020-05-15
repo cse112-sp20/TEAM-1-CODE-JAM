@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import "./Teams.css";
 import M from "materialize-css";
 import CreateJoinTeam from "./CreateJoinTeam";
-import { Redirect, Link, withRouter } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 
 class Teams extends Component {
   constructor(props) {
@@ -14,9 +14,13 @@ class Teams extends Component {
   }
   componentDidMount = () => {
     M.AutoInit();
-    this.getTeam();
+    this.getTeams();
   };
-  getTeam = () => {
+  /**
+   * getTeams asks the background js for all the teams of the current user
+   * @author Karl Wang
+   */
+  getTeams = () => {
     let msg = { for: "background", message: "get teams" };
     chrome.runtime.sendMessage(msg, (response) => {
       this.setState({
@@ -24,6 +28,11 @@ class Teams extends Component {
       });
     });
   };
+  /**
+   * This will redirect the page to home team with the clicked team information.
+   * @author Karl Wang
+   * @param {Object} team the team that was clicked
+   */
   onClickTeam = (team) => {
     chrome.storage.local.set({ prevTeam: team.teamCode });
     this.props.history.push("/" + team.teamCode);
@@ -35,6 +44,7 @@ class Teams extends Component {
         {this.state.teams.map((team) => {
           return (
             <div className="col s3">
+              {/* This is the button of each team */}
               <a
                 onClick={this.onClickTeam.bind(this, team)}
                 teamCode={team.teamCode}
@@ -48,6 +58,7 @@ class Teams extends Component {
           );
         })}
         <div className="col s3">
+          {/* This is the button for adding new team */}
           <a
             href="#modal-createjoin"
             className="rounded-btn waves-effect waves-light btn tooltipped modal-trigger"
@@ -56,12 +67,14 @@ class Teams extends Component {
           >
             <div className="inside-btn">
               <text className="flexbox-centering">
+                {/* using icon add */}
                 <i className="material-icons">add</i>
               </text>
             </div>
           </a>
           <div id="modal-createjoin" className="modal">
             <div className="modal-content">
+              {/* render modal when clicked on add Button */}
               <CreateJoinTeam></CreateJoinTeam>
             </div>
             <div className="modal-footer">
