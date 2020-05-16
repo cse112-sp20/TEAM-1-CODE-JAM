@@ -1,6 +1,7 @@
 var currTabUrl;
 var updateInterval = 1000;
 
+//Test
 
 
 /*
@@ -56,10 +57,6 @@ function testFirebase(){
         "time"
       );
 }
-
-
-
-
 
 
 
