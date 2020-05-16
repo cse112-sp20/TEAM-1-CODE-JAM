@@ -60,7 +60,7 @@ function getAllTabs() {
         tabs.push(tab);
         flip = !flip;
       });
-      tabs = oldElements;
+      // tabs = oldElements;
     }
     resolve(tabs);
   });
