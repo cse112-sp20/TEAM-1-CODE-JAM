@@ -34,6 +34,7 @@ export default class Timeline extends Component {
   componentDidMount = () => {
     this.timeline();
     chrome.runtime.onMessage.addListener(this.handleMessage);
+    // console.log("dfadfda");
   };
 
   createLeftCard = (innerHTML, time, update) => {
@@ -98,8 +99,8 @@ export default class Timeline extends Component {
         let url = msg.url;
         let time = msg.time;
         msg.flip
-          ? this.createRightCard(url, time, 1)
-          : this.createLeftCard(url, time, 1);
+          ? this.createLeftCard(url, time, 1)
+          : this.createRightCard(url, time, 1);
       }
     }
     console.log(msg);
@@ -121,7 +122,7 @@ export default class Timeline extends Component {
     let data = await task;
     data.map((tab) => {
       let url = tab.url;
-      let time = new Date(tab.time).toLocaleTimeString();
+      let time = tab.time;
       let flip = tab.flip;
       flip
         ? this.createLeftCard(url, time, 0)

@@ -1,4 +1,3 @@
-
 var lastTab;
 let db;
 let userEmail;
@@ -40,29 +39,32 @@ function getHostname(url) {
     console.log(err);
   }
 }
+/**
+ * Returns the logged events of time spent on a blacklisted site longer than the
+ * threshold time.
+ *
+ * @author Brian Aguirre
+ * @return {Array} array of objects
+ */
 function getAllTabs() {
   return new Promise((resolve, reject) => {
-    chrome.windows.getAll({ populate: true }, function (windows) {
-      let tabs = [];
-      let counter = 0;
-      for (win of windows) {
-        for (tab of win.tabs) {
-          let url = getHostname(tab.url);
-          let time = Date.now() + counter;
-          let id = tab.id;
-          if (url != "invalid" && black_listed.includes(url)) {
-            tabs.push({ url: url, time: time, id: id, flip: flip });
-            flip = !flip;
-            counter += 10;
-          }
-        }
-      }
-      resolve(tabs);
-    });
+    tabs = [];
+    if (localStorage["oldElements"] != undefined) {
+      let oldElements = JSON.parse(
+        localStorage.getItem("oldElements")
+      ).reverse();
+
+      oldElements.map((obj) => {
+        let tab = obj;
+        tab.flip = flip;
+        tabs.push(tab);
+        flip = !flip;
+      });
+      tabs = oldElements;
+    }
+    resolve(tabs);
   });
 }
-
-
 
 /**
  * setupListener listens for request coming from popup,
