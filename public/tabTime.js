@@ -13,6 +13,7 @@ function updateLocalStorage(tabUrl, timeSpend) {
 =======
 var updateInterval = 1000;
 
+//Test
 
 
 /*
@@ -164,10 +165,6 @@ function testFirebase(){
         "time"
       );
 }
-
-
-
-
 
 
 
