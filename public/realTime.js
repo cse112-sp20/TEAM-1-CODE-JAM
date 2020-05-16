@@ -16,13 +16,15 @@ function millisecondToMin(millisecond) {
 
 function updateLocalStorage(tabUrl, timeSpend) {
   if (localStorage.getItem(tabUrl) == undefined) {
-    localStorage.setItem(tabUrl, timeSpend);
+    localStorage.setItem(tabUrl, 0);
+    console.log(localStorage.getItem(tabUrl));
   } else {
     let time = localStorage.getItem(tabUrl);
     var newTime = parseInt(time) + parseInt(timeSpend);
-    if (newTime >= threshold) {
+    if (newTime % threshold == 0) {
       updateTimeline(tabUrl);
-      localStorage.setItem(tabUrl, 0); // reset timer
+      localStorage.setItem(tabUrl, newTime);
+      //localStorage.setItem(tabUrl, 0); // reset timer
     } else {
       localStorage.setItem(tabUrl, newTime);
     }
@@ -37,8 +39,10 @@ function updateLocalStorage(tabUrl, timeSpend) {
 function updateTimeline(currTabUrl) {
   return new Promise((resolve, reject) => {
     let currTime = new Date().toLocaleTimeString(); // needs to be local storage time
-    let seconds = threshold / 1000;
-    let time = `${currTabUrl}: ${seconds} minutes`;
+
+    let seconds = localStorage.getItem(currTabUrl) / 1000;
+    //threshold / 1000;
+    let time = `${currTabUrl}: ${seconds} seconds`;
     let msg = {
       for: "popup",
       message: "timeline",
@@ -50,11 +54,11 @@ function updateTimeline(currTabUrl) {
 
     if (localStorage["oldElements"] == undefined) {
       // localStorage["oldElements"] = [];
-      let firstItem = [{ url: currTabUrl, time: currTime }];
+      let firstItem = [{ url: currTabUrl, time: time }];
       localStorage.setItem("oldElements", JSON.stringify(firstItem));
     } else {
       let oldElements = JSON.parse(localStorage.getItem("oldElements"));
-      oldElements.push({ url: currTabUrl, time: currTime });
+      oldElements.push({ url: currTabUrl, time: time });
       localStorage.setItem("oldElements", JSON.stringify(oldElements));
     }
     chrome.runtime.sendMessage(msg, function (response) {
