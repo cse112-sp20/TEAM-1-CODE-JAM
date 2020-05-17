@@ -11,12 +11,12 @@ on:
 jobs:
   integrate:
     runs-on: ubuntu-latest
-
+    
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@master
       with:
         node-version: 12
     - run: npm install
-    - run: npm run build --if-present
+    - run: CI=false npm run build 
     - run: npm test

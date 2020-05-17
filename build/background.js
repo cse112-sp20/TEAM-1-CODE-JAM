@@ -1,10 +1,8 @@
+/*global chrome*/
 let db;
 let userEmail;
 let userProfile;
 let teams;
-let counter = 0;
-// let tabs_dict = {};
-let tabs = [];
 
 let black_listed = [
   "www.youtube.com",
@@ -16,7 +14,7 @@ let black_listed = [
 /**
  *  Gets the host name of a URL
  *
- * @param {string} url: URL of a tab
+ * @param {string} url URL of a tab
  * @returns {URL} Host name of the tab
  *
  */
@@ -113,9 +111,16 @@ function setupListener() {
     return true;
   });
 }
+/**
+ * Return the team information on database 
+ * @param {string} teamCode The team code to be checked on database
+ */
 function getTeamInformation(teamCode) {
   return db.collection("teams").doc(teamCode).get();
 }
+/**
+ * Get all the team names of current user from database
+ */
 function getTeamNames() {
   let promises = [];
   for (let key in userProfile.joined_teams) {
@@ -125,6 +130,10 @@ function getTeamNames() {
     teams = result;
   });
 }
+/**
+ * Get the team name with such team code
+ * @param {string} teamCode The team code to be checked on database
+ */
 function getTeamName(teamCode) {
   return new Promise(function (resolve, reject) {
     db.collection("teams")
