@@ -13,7 +13,7 @@ export default class Home extends Component {
   /**
    * Get the information of the current selected team
    * @author Karl Wang
-   * 
+   *
    */
   componentDidMount = async () => {
     // ask chrome storage for the current team
@@ -38,7 +38,7 @@ export default class Home extends Component {
       this.setState({
         teamCode: data.prevTeam,
         teamName: response.teamName,
-        teamMembers: Object.keys(response.members),
+        teamMembers: response.members,
       });
     });
   };

@@ -1,5 +1,10 @@
 import React, { Component } from "react";
-import { Route, Switch, BrowserRouter as Router } from "react-router-dom";
+import {
+  Route,
+  Switch,
+  BrowserRouter as Router,
+  withRouter,
+} from "react-router-dom";
 import CreateJoinTeam from "./components/CreateJoinTeam";
 import NavBar from "./components/NavBar";
 import "./components/materialize.min.css";
@@ -9,6 +14,7 @@ import Teams from "./components/Teams";
 import Home from "./components/Home";
 import Timeline from "./components/Timeline";
 
+// for Testing purpose
 class App extends Component {
   render() {
     return (
