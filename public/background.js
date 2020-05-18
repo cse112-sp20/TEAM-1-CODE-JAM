@@ -10,7 +10,7 @@ let black_listed = [
 let userProfile = {
   joined_teams: [],
 };
-let teams = [];
+let teams;
 let userEmail;
 
 /**
@@ -129,14 +129,20 @@ function getTeamInformation(teamCode) {
  * @param teams The global variable to be assigned to
  * @param userProfile Contains all the team user has joined
  */
-function getTeamNames(teams, userProfile) {
-  let promises = [];
-  for (let key in userProfile.joined_teams) {
-    promises.push(getTeamName(key, userProfile));
-  }
-  Promise.all(promises).then((result) => {
-    teams = result;
+function getTeamNames(userProfile) {
+  return new Promise(async (resolve) => {
+    let promises = [];
+    for (let key in userProfile.joined_teams) {
+      promises.push(getTeamName(key, userProfile));
+    }
+    // Promise.all(promises).then((result) => {
+    //   teams = result;
+    // });
+    resolve(await Promise.all(promises));
   });
+}
+function printTeams() {
+  console.log(teams);
 }
 /**
  * Get the team name with such team code
@@ -436,9 +442,9 @@ function getUserProfile(userEmail) {
   return new Promise(function (resolve, reject) {
     db.collection("users")
       .doc(userEmail)
-      .onSnapshot(function (doc) {
+      .onSnapshot(async function (doc) {
         userProfile = doc.data();
-        getTeamNames(teams, userProfile);
+        teams = await getTeamNames(userProfile);
         resolve();
       });
   });
@@ -454,7 +460,7 @@ async function main() {
   initializeFirebase();
   userEmail = await getUserEmail();
   await validUserEmail(userEmail, createUser);
-  await getUserProfile(userEmail, userProfile, teams);
+  await getUserProfile(userEmail);
 
   setupListener();
 }

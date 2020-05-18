@@ -15,9 +15,6 @@ import Home from "./components/Home";
 import Timeline from "./components/Timeline";
 
 // for Testing purpose
-const DisplayRouter = withRouter(({ location }) => (
-  <div data-testid="location-display">{location.pathname}</div>
-));
 class App extends Component {
   render() {
     return (

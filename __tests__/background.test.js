@@ -1,5 +1,6 @@
-const chrome = require("sinon-chrome/extensions");
+const chrome = require("sinon-chrome");
 global.chrome = chrome;
+
 const {
   randomTeamCode,
   getHostname,

@@ -30,6 +30,7 @@ class Teams extends Component {
   getTeams = () => {
     let msg = { for: "background", message: "get teams" };
     chrome.runtime.sendMessage(msg, (response) => {
+      console.log(response);
       this.setState({
         teams: response,
       });
