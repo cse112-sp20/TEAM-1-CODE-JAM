@@ -10,7 +10,7 @@ let black_listed = [
 let userProfile = {
   joined_teams: [],
 };
-let teams = [];
+let teams;
 let userEmail;
 
 /**
@@ -129,14 +129,20 @@ function getTeamInformation(teamCode) {
  * @param teams The global variable to be assigned to
  * @param userProfile Contains all the team user has joined
  */
-function getTeamNames(teams, userProfile) {
-  let promises = [];
-  for (let key in userProfile.joined_teams) {
-    promises.push(getTeamName(key, userProfile));
-  }
-  Promise.all(promises).then((result) => {
-    teams = result;
+function getTeamNames(userProfile) {
+  return new Promise(async (resolve) => {
+    let promises = [];
+    for (let key in userProfile.joined_teams) {
+      promises.push(getTeamName(key, userProfile));
+    }
+    // Promise.all(promises).then((result) => {
+    //   teams = result;
+    // });
+    resolve(await Promise.all(promises));
   });
+}
+function printTeams() {
+  console.log(teams);
 }
 /**
  * Get the team name with such team code
@@ -253,20 +259,29 @@ async function createTeamOnFirebase(teamName, userEmail) {
   });
 }
 
-async function deleteEverythingAboutAUser(userEmail) {
-  let query = db
-    .collection("teams")
-    .where("creator", "==", "kwkarlwang@gmail.com");
-  await Promise.all([
-    query.get().then(function (querySnapshot) {
-      querySnapshot.forEach(function (doc) {
-        console.log(doc.id);
-        deleteTeamFromUser(userEmail, doc.id);
-        deleteTeamEntirely(doc.id);
-      });
-    }),
-    db.collection("users").doc(userEmail).delete(),
-  ]);
+function deleteEverythingAboutAUser(userEmail) {
+  return new Promise(async (resolve, reject) => {
+    let queryCreatedTeam = db
+      .collection("teams")
+      .where("creator", "==", userEmail);
+    let queryJoinedTeam = db
+      .collection("teams")
+      .where("members", "array-contains", userEmail);
+    await Promise.all([
+      queryCreatedTeam.get().then(function (querySnapshot) {
+        querySnapshot.forEach(function (doc) {
+          deleteTeamEntirely(doc.id);
+        });
+      }),
+      queryJoinedTeam.get().then(function (querySnapshot) {
+        querySnapshot.forEach(function (doc) {
+          deleteTeamFromUser(userEmail, doc.id);
+        });
+      }),
+      db.collection("users").doc(userEmail).delete(),
+    ]);
+    resolve();
+  });
 }
 
 function deleteTeamFromUser(userEmail, teamCode) {
@@ -276,13 +291,15 @@ function deleteTeamFromUser(userEmail, teamCode) {
       .doc(userEmail)
       .update({
         ["joined_teams." + teamCode]: firebase.firestore.FieldValue.delete(),
-      }),
+      })
+      .catch((err) => {}),
     db
       .collection("teams")
       .doc(teamCode)
       .update({
         members: firebase.firestore.FieldValue.arrayRemove(userEmail),
-      }),
+      })
+      .catch((err) => {}),
   ]);
 }
 function deleteTeamEntirely(teamCode) {
@@ -425,9 +442,9 @@ function getUserProfile(userEmail) {
   return new Promise(function (resolve, reject) {
     db.collection("users")
       .doc(userEmail)
-      .onSnapshot(function (doc) {
+      .onSnapshot(async function (doc) {
         userProfile = doc.data();
-        getTeamNames(teams, userProfile);
+        teams = await getTeamNames(userProfile);
         resolve();
       });
   });
@@ -443,17 +460,9 @@ async function main() {
   initializeFirebase();
   userEmail = await getUserEmail();
   await validUserEmail(userEmail, createUser);
-  await getUserProfile(userEmail, userProfile, teams);
+  await getUserProfile(userEmail);
 
   setupListener();
-  let query = db
-    .collection("teams")
-    .where("members", "array-contains", "test@gmail.com");
-  query.get().then(function (querySnapshot) {
-    querySnapshot.forEach(function (doc) {
-      console.log(doc.id, " => ", doc.data());
-    });
-  });
 }
 main();
 
@@ -472,5 +481,6 @@ try {
     deleteTeamEntirely,
     setupListener,
     createUser,
+    deleteEverythingAboutAUser,
   };
 } catch {}
