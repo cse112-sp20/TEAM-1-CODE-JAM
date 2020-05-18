@@ -24,6 +24,12 @@ export default class SideNav extends Component {
         >
           <span>Timeline</span>
         </Link>
+        <Link
+          className="grey darken-3 waves-effect waves-light card-panel center-align"
+          to="/charts"
+        >
+          <span>Charts</span>
+        </Link>
       </div>
     );
   }
