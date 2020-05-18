@@ -2,8 +2,8 @@
 import React, { Component } from "react";
 import M from "materialize-css";
 import { withRouter } from "react-router-dom";
-import "./materialize.min.css";
 import "./CreateJoinTeam.css";
+// var $ = require("jquery");
 
 class CreateJoinTeam extends Component {
   /**
@@ -11,31 +11,30 @@ class CreateJoinTeam extends Component {
    * @author Karl Wang
    */
   componentDidMount = () => {
-    M.AutoInit();
     this.setupButtonListener();
   };
-  /**
-   * Get the email from background page and update the html
-   * @author : Karl Wang
-   * @param {function} setEmailCallback Send the email to the html
-   */
-  getEmail = (setEmailCallback) => {
-    // the message to be sent
-    let msg = { for: "background", message: "get email" };
-    chrome.runtime.sendMessage(msg, function (response) {
-      // set the email on html
-      setEmailCallback(response.email);
-    });
-  };
-  /**
-   * Get the prefix of the email and show it on html
-   * @author : Karl Wang
-   * @param {string} email The email to be shown on html
-   */
-  setHeaderEmail = (email) => {
-    let insertEmail = document.querySelector("#insertEmail");
-    insertEmail.textContent = email.substr(0, email.indexOf("@"));
-  };
+  // /**
+  //  * Get the email from background page and update the html
+  //  * @author : Karl Wang
+  //  * @param {function} setEmailCallback Send the email to the html
+  //  */
+  // getEmail = (setEmailCallback) => {
+  //   // the message to be sent
+  //   let msg = { for: "background", message: "get email" };
+  //   chrome.runtime.sendMessage(msg, function (response) {
+  //     // set the email on html
+  //     setEmailCallback(response.email);
+  //   });
+  // };
+  // /**
+  //  * Get the prefix of the email and show it on html
+  //  * @author : Karl Wang
+  //  * @param {string} email The email to be shown on html
+  //  */
+  // setHeaderEmail = (email) => {
+  //   let insertEmail = document.querySelector("#insertEmail");
+  //   insertEmail.textContent = email.substr(0, email.indexOf("@"));
+  // };
 
   /**
    * Setup the listener for create team and join team button
@@ -81,7 +80,7 @@ class CreateJoinTeam extends Component {
   onJoinTeam = () => {
     let teamCode = document.querySelector("#teamCode").value;
     teamCode = teamCode.toUpperCase();
-    if (teamCode.length != 5) {
+    if (teamCode.length !== 5) {
       M.toast({
         html: "Team code should be 5 characters!",
         displayLength: 2000,
@@ -145,9 +144,7 @@ class CreateJoinTeam extends Component {
               </li>
               <li className="tab col s6">
                 {/* <!-- Second Tab --> */}
-                <a className="active" href="#joinTeam">
-                  Join Team
-                </a>
+                <a href="#joinTeam">Join Team</a>
               </li>
             </ul>
           </div>
