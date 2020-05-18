@@ -13,7 +13,7 @@ import "./App.css";
 import Teams from "./components/Teams";
 import Home from "./components/Home";
 import Timeline from "./components/Timeline";
-import Chart from "./components/Charts";
+import Charts from "./components/Charts";
 
 // for Testing purpose
 class App extends Component {
