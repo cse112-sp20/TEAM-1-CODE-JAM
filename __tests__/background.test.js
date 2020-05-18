@@ -1,4 +1,4 @@
-const chrome = require("sinon-chrome");
+import chrome from "sinon-chrome";
 global.chrome = chrome;
 
 const {

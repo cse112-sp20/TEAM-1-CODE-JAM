@@ -135,14 +135,8 @@ function getTeamNames(userProfile) {
     for (let key in userProfile.joined_teams) {
       promises.push(getTeamName(key, userProfile));
     }
-    // Promise.all(promises).then((result) => {
-    //   teams = result;
-    // });
     resolve(await Promise.all(promises));
   });
-}
-function printTeams() {
-  console.log(teams);
 }
 /**
  * Get the team name with such team code
@@ -368,8 +362,9 @@ function isTeamCodeUnique(id) {
  */
 function initializeFirebase() {
   try {
-    firebase = require("firebase");
+    global.firebase = require("firebase");
   } catch {}
+
   const firebaseConfig = {
     apiKey: "AIzaSyCJYc-PMIXdQxE2--bQI6Z1FGMKwMulEyc",
     authDomain: "chrome-extension-cse-112.firebaseapp.com",
