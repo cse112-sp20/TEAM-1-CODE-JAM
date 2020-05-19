@@ -1,3 +1,4 @@
+/*global chrome*/
 var currTabUrl;
 var lastTabUrl;
 var updateInterval = 1000;

@@ -16,6 +16,10 @@ import Timeline from "./components/Timeline";
 
 // for Testing purpose
 class App extends Component {
+  componentDidMount = ()=>{
+
+  }
+  
   render() {
     return (
       <div className="app">

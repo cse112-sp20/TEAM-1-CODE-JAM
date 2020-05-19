@@ -12,6 +12,10 @@ class Teams extends Component {
       teams: [],
     };
   }
+  componentWillUnmount = () => {
+    M.Toast.dismissAll();
+  };
+
   componentDidMount = () => {
     M.AutoInit();
     this.getTeams();
@@ -31,11 +35,19 @@ class Teams extends Component {
     document.querySelector("body").addEventListener("click", (e) => {
       if (e.target.classList.contains("undo")) {
         let teamCode = e.target.value;
+        let msg = {
+          for: "background",
+          message: "clear timeout",
+          teamCode: teamCode,
+        };
+        chrome.runtime.sendMessage(msg);
         let team = this.state.teams.find((team) => team.teamCode === teamCode);
-        team.visable = true;
-        this.setState({
-          teams: this.state.teams,
-        });
+        if (team) {
+          team.visable = true;
+          this.setState({
+            teams: this.state.teams,
+          });
+        }
         let toastElement = document.querySelector("." + teamCode);
         let toastInstance = M.Toast.getInstance(toastElement);
         toastInstance.dismiss();
@@ -72,16 +84,15 @@ class Teams extends Component {
 
     M.toast({
       html: toastHTML,
-      completeCallback: () => {
-        this.removeTeamOnBackend(team);
-      },
       classes: team.teamCode,
       // displayLength: 4000,
     });
-  };
-  removeTeamOnBackend = (team) => {
-    // let undo = document.querySelector("#undo");
-    // console.log(undo);
+    let msg = {
+      for: "background",
+      message: "set timeout to delete team",
+      teamCode: team.teamCode,
+    };
+    chrome.runtime.sendMessage(msg);
   };
 
   render() {
