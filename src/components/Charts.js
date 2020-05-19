@@ -8,7 +8,7 @@ export default class Charts extends Component {
             chartOptions: {
                 title: {
                     display: true,
-                    text: 'My Team vs Me',
+                    text: 'Team 1 vs Me',
                     fontSize: 20
                 },
                 legend: {
@@ -26,6 +26,30 @@ export default class Charts extends Component {
                     }],
                     xAxes: [{
                         stacked: true
+                    }]
+                 }
+            },
+            chartOptions2: {
+                title: {
+                    display: true,
+                    text: 'Team X vs Me',
+                    fontSize: 20
+                },
+                legend: {
+                    display: true,
+                    position: 'bottom'
+                },
+                maintainAspectRatio: true,
+                scales: {
+                    yAxes: [{
+                       // stacked: true,
+                        ticks: {
+                            suggestedMin: 0,
+                            suggestedMax: 100
+                        }
+                    }],
+                    xAxes: [{
+                        //stacked: true
                     }]
                  }
             }
@@ -68,6 +92,10 @@ export default class Charts extends Component {
                 <Bar
                     data={this.state.chartData}
                     options={this.state.chartOptions}
+                    />
+                <Bar
+                    data={this.state.chartData}
+                    options={this.state.chartOptions2}
                     />
             </div>
         )
