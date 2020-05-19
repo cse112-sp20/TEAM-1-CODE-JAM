@@ -13,6 +13,7 @@ import "./App.css";
 import Teams from "./components/Teams";
 import Home from "./components/Home";
 import Timeline from "./components/Timeline";
+import Charts from "./components/Charts";
 
 // for Testing purpose
 class App extends Component {
@@ -38,6 +39,7 @@ class App extends Component {
                 ></Route>
                 <Route exact path="/teams" component={Teams}></Route>
                 <Route exact path="/timeline" component={Timeline}></Route>
+                <Route exact path="/charts" component={Charts}></Route>
                 <Route path="/" component={Home}></Route>
               </Switch>
             </div>
