@@ -28,12 +28,16 @@ export default class Timeline extends Component {
       leftRightBranch: [],
       urls: [],
     };
+
+    this.createLeftCard = this.createLeftCard.bind(this);
   }
   componentDidMount = () => {
     this.timeline();
+    chrome.runtime.onMessage.addListener(this.handleMessage);
+    // console.log("dfadfda");
   };
 
-  createLeftCard = (innerHTML, time) => {
+  createLeftCard = (innerHTML, time, update) => {
     let newElement = (
       <div className="row">
         <div className="col s6">
@@ -52,14 +56,16 @@ export default class Timeline extends Component {
         </div>
       </div>
     );
-
-    this.state.leftRightBranch.push(newElement);
+    // Differentiate if first time opening timeline
+    update
+      ? this.state.leftRightBranch.unshift(newElement) // queue
+      : this.state.leftRightBranch.push(newElement); // stack
     this.setState({
       leftRightBranch: this.state.leftRightBranch,
     });
   };
 
-  createRightCard = (innerHTML, time) => {
+  createRightCard = (innerHTML, time, update) => {
     // date.
     let newElement = (
       <div className="row">
@@ -77,16 +83,32 @@ export default class Timeline extends Component {
         </div>
       </div>
     );
-
-    this.state.leftRightBranch.push(newElement);
+    // Differentiate if first time opening timeline
+    update
+      ? this.state.leftRightBranch.unshift(newElement) // queue
+      : this.state.leftRightBranch.push(newElement); // stack
     this.setState({
       leftRightBranch: this.state.leftRightBranch,
     });
   };
 
+  handleMessage = (msg) => {
+    // new element for timeline
+    if (msg.for === "popup") {
+      if (msg.message === "timeline") {
+        let url = msg.url;
+        let time = msg.time;
+        msg.flip
+          ? this.createLeftCard(url, time, 1)
+          : this.createRightCard(url, time, 1);
+      }
+    }
+    console.log(msg);
+    return true;
+  };
+
   timeline = async () => {
     //   team name is empty
-
     let msg = {
       for: "background",
       message: "get timeline",
@@ -94,17 +116,17 @@ export default class Timeline extends Component {
 
     let task = new Promise((resolve, reject) => {
       chrome.runtime.sendMessage(msg, function (response) {
-        // let data = response.data;
         resolve(response);
       });
     });
     let data = await task;
-    let flip = false;
     data.map((tab) => {
       let url = tab.url;
-      let time = new Date(tab.time).toLocaleTimeString();
-      flip ? this.createLeftCard(url, time) : this.createRightCard(url, time);
-      flip = !flip;
+      let time = tab.time;
+      let flip = tab.flip;
+      flip
+        ? this.createLeftCard(url, time, 0)
+        : this.createRightCard(url, time, 0);
     });
   };
 
