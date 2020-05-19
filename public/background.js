@@ -16,10 +16,11 @@ let userEmail;
 /**
  *  Gets the host name of a URL
  *
- * @param {string} url: URL of a tab
+ * @param {string} url URL of a tab
  * @returns {URL} Host name of the tab
  *
  */
+
 function getHostname(url) {
   // Handle Chrome URLs
   if (/^chrome:\/\//.test(url)) {
@@ -36,43 +37,36 @@ function getHostname(url) {
     console.log(err);
   }
 }
-/**
- * Returns the logged events of time spent on a blacklisted site longer than the
- * threshold time.
- *
- * @author Brian Aguirre
- * @return {Array} array of objects
- */
 function getAllTabs() {
   return new Promise((resolve, reject) => {
-    tabs = [];
-    if (localStorage["oldElements"] != undefined) {
-      let oldElements = JSON.parse(
-        localStorage.getItem("oldElements")
-      ).reverse();
-
-      oldElements.map((obj) => {
-        let tab = obj;
-        tab.flip = flip;
-        tabs.push(tab);
-        flip = !flip;
-      });
-      // tabs = oldElements;
-    }
-    resolve(tabs);
+    chrome.windows.getAll({ populate: true }, function (windows) {
+      let tabs = [];
+      let counter = 0;
+      for (let win of windows) {
+        for (let tab of win.tabs) {
+          let url = getHostname(tab.url);
+          let time = Date.now() + counter;
+          if (url !== "invalid" && black_listed.includes(url)) {
+            tabs.push({ url: url, time: time });
+            counter += 10;
+          }
+        }
+      }
+      resolve(tabs);
+    });
   });
 }
 
 /**
  * setupListener listens for request coming from popup,
  * it then sends the response that the popup need
- * @author : Karl Wang
+ * @author Karl Wang
  */
 function setupListener() {
   /**
    * reqeust is the message from popup
    * sendResponse sends a response to the sender(popup)
-   * @author : Karl Wang
+   * @author Karl Wang
    *  */
   chrome.runtime.onMessage.addListener(function (
     request,

@@ -55,12 +55,3 @@
 5. Everytime you want to reflect changes on chrome extension, you have to run **npm run build**, do that.
 
 6. Your new component should be on the side navbar, you can click it to see your component
-
-### Edit Background.js
-
-Background.js needs to be edited in public folder. How npm run build works is bundle everything in src folder and move the public folder into build folder.
-
-### Testing
-
-All tests should be written under **\__tests__** folder. Preferbably with the  ***example.test.js*** naming scheme. To run test simply run **npm test**. To run a individual test, run **npm test -- example**
-
