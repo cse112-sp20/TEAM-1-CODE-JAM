@@ -17,10 +17,8 @@ import Charts from "./components/Charts";
 
 // for Testing purpose
 class App extends Component {
-  componentDidMount = ()=>{
+  componentDidMount = () => {};
 
-  }
-  
   render() {
     return (
       <div className="app">
@@ -29,11 +27,11 @@ class App extends Component {
           <NavBar></NavBar>
           <div className="row">
             {/* save spaces for the side navbar */}
-            <div className="col s2" id="side">
+            <div className="col s1" id="side">
               <SideNav></SideNav>
             </div>
             {/* This is where the real component is at */}
-            <div className="col s10" id="component">
+            <div className="col s11" id="component">
               <Switch>
                 {/* follow the following examples for adding new component */}
                 <Route

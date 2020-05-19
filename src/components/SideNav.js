@@ -1,35 +1,47 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import "./SideNav.css";
 
 export default class SideNav extends Component {
   render() {
     return (
       <div className="SideNav">
-        <Link
-          className="grey darken-3 waves-effect waves-light card-panel center-align"
+        <NavLink
+          className="btn tooltipped grey darken-3 waves-effect waves-light card-panel center-align"
+          data-position="right"
+          data-tooltip="Home"
           to="/"
         >
-          <span>Home</span>
-        </Link>
-        <Link
-          className="grey darken-3 waves-effect waves-light card-panel center-align"
+          {/* <span>Home</span> */}
+          <i className="white-text material-icons">home</i>
+        </NavLink>
+        <NavLink
+          className="btn tooltipped grey darken-3 waves-effect waves-light card-panel center-align"
+          data-position="right"
+          data-tooltip="Teams"
           to="/teams"
         >
-          <span>Teams</span>
-        </Link>
-        <Link
-          className="grey darken-3 waves-effect waves-light card-panel center-align"
+          {/* <span>Teams</span> */}
+          <i className="white-text material-icons">group_add</i>
+        </NavLink>
+        <NavLink
+          className="btn tooltipped grey darken-3 waves-effect waves-light card-panel center-align"
+          data-position="right"
+          data-tooltip="Timeline"
           to="/timeline"
         >
-          <span>Timeline</span>
-        </Link>
-        <Link
-          className="grey darken-3 waves-effect waves-light card-panel center-align"
+          {/* <span>Timeline</span> */}
+          <i className="white-text material-icons">access_time</i>
+        </NavLink>
+        <NavLink
+          className="btn tooltipped grey darken-3 waves-effect waves-light card-panel center-align"
+          data-position="right"
+          data-tooltip="Charts"
           to="/charts"
         >
-          <span>Charts</span>
-        </Link>
+          {/* <span>Charts</span> */}
+          <i className="white-text material-icons">insert_chart</i>
+        </NavLink>
       </div>
     );
   }

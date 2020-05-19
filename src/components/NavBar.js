@@ -3,7 +3,6 @@ import M from "materialize-css";
 import "./materialize.min.css";
 import "./NavBar.css";
 
-
 export default class NavBar extends Component {
   componentDidMount() {
     M.AutoInit();
@@ -16,17 +15,11 @@ export default class NavBar extends Component {
         <nav>
           <div className="nav-wrapper">
             <a href="#" className="brand-logo">
-              Logo
+              Team 1
             </a>
-            <ul id="nav-mobile" className="right hide-on-med-and-down">
+            <ul className="right">
               <li>
-                <a href="sass.html">Sass</a>
-              </li>
-              <li>
-                <a href="badges.html">Components</a>
-              </li>
-              <li>
-                <a href="collapsible.html">JavaScript</a>
+                <a href="#">About</a>
               </li>
             </ul>
           </div>
