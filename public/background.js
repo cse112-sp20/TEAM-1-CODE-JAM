@@ -1,4 +1,4 @@
-/*global chrome firebase*/
+/*global chrome firebase flip*/
 let db;
 
 let black_listed = [
@@ -12,6 +12,7 @@ let userProfile = {
 };
 let teams;
 let userEmail;
+let tabs;
 
 /**
  *  Gets the host name of a URL
@@ -37,26 +38,32 @@ function getHostname(url) {
     console.log(err);
   }
 }
+/**
+ * Returns the logged events of time spent on a blacklisted site longer than the
+ * threshold time.
+ *
+ * @author Brian Aguirre
+ * @return {Array} array of objects
+ */
 function getAllTabs() {
   return new Promise((resolve, reject) => {
-    chrome.windows.getAll({ populate: true }, function (windows) {
-      let tabs = [];
-      let counter = 0;
-      for (let win of windows) {
-        for (let tab of win.tabs) {
-          let url = getHostname(tab.url);
-          let time = Date.now() + counter;
-          if (url !== "invalid" && black_listed.includes(url)) {
-            tabs.push({ url: url, time: time });
-            counter += 10;
-          }
-        }
-      }
-      resolve(tabs);
-    });
+    tabs = [];
+    if (localStorage["oldElements"] != undefined) {
+      let oldElements = JSON.parse(
+        localStorage.getItem("oldElements")
+      ).reverse();
+
+      oldElements.map((obj) => {
+        let tab = obj;
+        tab.flip = flip;
+        tabs.push(tab);
+        flip = !flip;
+      });
+      // tabs = oldElements;
+    }
+    resolve(tabs);
   });
 }
-
 /**
  * setupListener listens for request coming from popup,
  * it then sends the response that the popup need
