@@ -10,27 +10,35 @@ export default class Home extends Component {
       teamMembers: [],
     };
   }
+  /**
+   * Get the information of the current selected team
+   * @author Karl Wang
+   *
+   */
   componentDidMount = async () => {
+    // ask chrome storage for the current team
+    // The api is async
     let task = new Promise((resolve, reject) => {
       chrome.storage.local.get("prevTeam", function (data) {
         resolve(data);
       });
     });
     let data = await task;
-    if (!"prevTeam" in data) {
+    // First time logging in
+    if (!("prevTeam" in data)) {
       return;
     }
-    console.log(data);
     let msg = {
       for: "background",
       message: "get team info",
       teamCode: data.prevTeam,
     };
+    // ask the background for team information
     chrome.runtime.sendMessage(msg, (response) => {
       this.setState({
         teamCode: data.prevTeam,
         teamName: response.teamName,
-        teamMembers: Object.keys(response.members),
+        teamMembers: response.members,
       });
     });
   };

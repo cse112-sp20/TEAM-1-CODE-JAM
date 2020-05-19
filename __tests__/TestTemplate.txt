@@ -1,0 +1,16 @@
+import React from 'react';
+import "babel-polyfill";
+import YOUR TEST COMPONENT from WHEREVER';
+import renderer from 'react-test-renderer';
+
+/* Uncomment this in your file
+test('ENTER YOUR TEST MESSAGE', () => {
+  const component = renderer.create(
+    <YOUR TEST COMPONENT />,
+  );
+
+  let tree = component.toJSON();
+  expect(tree).toMatchSnapshot();
+});
+
+*/
