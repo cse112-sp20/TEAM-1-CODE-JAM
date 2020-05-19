@@ -18,7 +18,8 @@ const {
   createUser,
 } = require("../public/background");
 
-// let userEmail = createUser("test@gmail.com");
+jest.setTimeout(30000);
+
 let userEmail = "test@gmail.com";
 let dummyEmail = "test2@gmail.com";
 
@@ -182,9 +183,7 @@ describe("deleteTeamFromUser", () => {
 });
 
 afterAll(async () => {
-  await Promise.all([
-    deleteEverythingAboutAUser(userEmail),
-    deleteEverythingAboutAUser(dummyEmail),
-  ]);
+  await deleteEverythingAboutAUser(dummyEmail);
+  await deleteEverythingAboutAUser(userEmail);
   global.firebase.app().delete();
 });
