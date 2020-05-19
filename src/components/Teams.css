@@ -22,26 +22,10 @@
 }
 
 #add-btn {
-  font-size: 50px;
+  background-color: #3c9040;
 }
 
 .col {
-  margin-top: 20px;
+  margin-top: 10px;
   margin-bottom: 10px;
-}
-
-#team-and-delete {
-  position: relative;
-  /* float: left; */
-}
-#delete {
-  position: absolute;
-  left: 79%;
-  top: -15%;
-  opacity: 0;
-  visibility: hidden;
-}
-#team-and-delete:hover #delete {
-  opacity: 1;
-  visibility: visible;
 }

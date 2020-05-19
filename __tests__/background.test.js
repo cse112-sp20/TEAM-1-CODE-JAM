@@ -108,7 +108,7 @@ describe("joinTeamOnFirebase", () => {
     let userInformation = data[1].data();
     expect(teamCode in userInformation.joined_teams).toBe(true);
     expect(teamInformation.members.includes(userEmail)).toBe(true);
-    await deleteTeamFromUser(userEmail, teamCode);
+    deleteTeamFromUser(userEmail, teamCode);
   });
 });
 describe("getTeamName", () => {
@@ -184,5 +184,4 @@ afterAll(async () => {
     deleteEverythingAboutAUser(userEmail),
     deleteEverythingAboutAUser(dummyEmail),
   ]);
-  global.firebase.app().delete();
 });
