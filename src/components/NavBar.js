@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import M from "materialize-css";
-import "./materialize.min.css";
 import "./NavBar.css";
 
 export default class NavBar extends Component {
@@ -12,7 +11,7 @@ export default class NavBar extends Component {
     return (
       <div>
         {/* <!-- Navbar goes here --> */}
-        <nav>
+        <nav id="nav-background">
           <div className="nav-wrapper">
             <a href="#" className="brand-logo">
               Team 1
