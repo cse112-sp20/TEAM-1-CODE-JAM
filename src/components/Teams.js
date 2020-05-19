@@ -48,7 +48,8 @@ class Teams extends Component {
             teams: this.state.teams,
           });
         }
-        let toastElement = document.querySelector("." + teamCode);
+        let toastElement = document.querySelector(".toast" + teamCode);
+        console.log(toastElement);
         let toastInstance = M.Toast.getInstance(toastElement);
         toastInstance.dismiss();
       }
@@ -84,7 +85,7 @@ class Teams extends Component {
 
     M.toast({
       html: toastHTML,
-      classes: team.teamCode,
+      classes: "toast" + team.teamCode,
       // displayLength: 4000,
     });
     let msg = {
