@@ -5,7 +5,9 @@ exports[`App is set up correctly 1`] = `
   className="app"
 >
   <div>
-    <nav>
+    <nav
+      id="nav-background"
+    >
       <div
         className="nav-wrapper"
       >
@@ -41,10 +43,11 @@ exports[`App is set up correctly 1`] = `
       >
         <a
           aria-current="page"
-          className="btn tooltipped grey darken-3 waves-effect waves-light card-panel center-align active"
+          className="btn tooltipped waves-effect waves-light card-panel center-align active"
           data-position="right"
           data-tooltip="Home"
           href="/"
+          id="sidenav-background"
           onClick={[Function]}
           style={Object {}}
         >
@@ -56,10 +59,11 @@ exports[`App is set up correctly 1`] = `
         </a>
         <a
           aria-current={null}
-          className="btn tooltipped grey darken-3 waves-effect waves-light card-panel center-align"
+          className="btn tooltipped waves-effect waves-light card-panel center-align"
           data-position="right"
           data-tooltip="Teams"
           href="/teams"
+          id="sidenav-background"
           onClick={[Function]}
         >
           <i
@@ -70,10 +74,11 @@ exports[`App is set up correctly 1`] = `
         </a>
         <a
           aria-current={null}
-          className="btn tooltipped grey darken-3 waves-effect waves-light card-panel center-align"
+          className="btn tooltipped waves-effect waves-light card-panel center-align"
           data-position="right"
           data-tooltip="Timeline"
           href="/timeline"
+          id="sidenav-background"
           onClick={[Function]}
         >
           <i
@@ -84,10 +89,11 @@ exports[`App is set up correctly 1`] = `
         </a>
         <a
           aria-current={null}
-          className="btn tooltipped grey darken-3 waves-effect waves-light card-panel center-align"
+          className="btn tooltipped waves-effect waves-light card-panel center-align"
           data-position="right"
           data-tooltip="Charts"
           href="/charts"
+          id="sidenav-background"
           onClick={[Function]}
         >
           <i
