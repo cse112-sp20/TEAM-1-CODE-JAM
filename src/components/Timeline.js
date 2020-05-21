@@ -34,7 +34,6 @@ export default class Timeline extends Component {
   componentDidMount = () => {
     this.timeline();
     chrome.runtime.onMessage.addListener(this.handleMessage);
-    // console.log("dfadfda");
   };
 
   createLeftCard = (innerHTML, time, update) => {

@@ -131,6 +131,7 @@ class Teams extends Component {
             className="rounded-btn waves-effect waves-light btn tooltipped modal-trigger"
             data-position="bottom"
             data-tooltip="Create or join a new team"
+            data-testid="Teams-createjoin"
           >
             <div className="inside-btn">
               <text className="flexbox-centering">

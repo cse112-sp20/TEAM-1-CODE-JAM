@@ -122,6 +122,8 @@ function setupListener() {
         }, 4000);
       } else if (request.message === "clear timeout") {
         clearTimeout(timeoutVars[request.teamCode]);
+      } else if (request.message === "get timeline array") {
+        // sendResponse(timelineArray)
       }
     }
     // return true here is important, it makes sure that
@@ -381,28 +383,28 @@ function isTeamCodeUnique(id) {
     });
   });
 }
-/**
- * Init Firebase configuration
- * @author Karl Wang
- */
-function initializeFirebase() {
-  try {
-    global.firebase = require("firebase");
-  } catch {}
+// /**
+//  * Init Firebase configuration
+//  * @author Karl Wang
+//  */
+// function initializeFirebase() {
+//   try {
+//     global.firebase = require("firebase");
+//   } catch {}
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyCJYc-PMIXdQxE2--bQI6Z1FGMKwMulEyc",
-    authDomain: "chrome-extension-cse-112.firebaseapp.com",
-    databaseURL: "https://chrome-extension-cse-112.firebaseio.com",
-    projectId: "chrome-extension-cse-112",
-    storageBucket: "chrome-extension-cse-112.appspot.com",
-    messagingSenderId: "275891630155",
-    appId: "1:275891630155:web:f238da778112200c815dce",
-  };
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  db = firebase.firestore();
-}
+//   const firebaseConfig = {
+//     apiKey: "AIzaSyCJYc-PMIXdQxE2--bQI6Z1FGMKwMulEyc",
+//     authDomain: "chrome-extension-cse-112.firebaseapp.com",
+//     databaseURL: "https://chrome-extension-cse-112.firebaseio.com",
+//     projectId: "chrome-extension-cse-112",
+//     storageBucket: "chrome-extension-cse-112.appspot.com",
+//     messagingSenderId: "275891630155",
+//     appId: "1:275891630155:web:f238da778112200c815dce",
+//   };
+//   // Initialize Firebase
+//   firebase.initializeApp(firebaseConfig);
+//   db = firebase.firestore();
+// }
 /**
  * Get the user email from chrome api
  * @author Karl Wang
@@ -469,6 +471,27 @@ function getUserProfile(userEmail) {
       });
   });
 }
+function trackTimeWasted(teamCode) {
+  return new Promise(function (resolve, reject) {
+    db.collection("teams")
+      .doc(teamCode)
+      .onSnapshot(async function (doc) {
+        let teamData = doc.data();
+        let timeWasted = teamData.timeWasted;
+        // if(timeWasted !== prevTimeWasted){
+
+        // }
+        resolve();
+      });
+  });
+}
+function getTeamCode() {
+  return new Promise(function (resolve) {
+    chrome.storage.local.get("prevTeam", function (data) {
+      resolve(data.prevTeam);
+    });
+  });
+}
 // .then(function (userProfile) {});
 
 // main
@@ -477,8 +500,9 @@ function getUserProfile(userEmail) {
  * @author Karl Wang
  */
 async function main() {
-  initializeFirebase();
+  db = initializeFirebase();
   userEmail = await getUserEmail();
+  if (userEmail === "") userEmail = "agent@gmail.com";
   await validUserEmail(userEmail, createUser);
   await getUserProfile(userEmail);
 

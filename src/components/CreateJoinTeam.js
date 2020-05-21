@@ -153,7 +153,12 @@ class CreateJoinTeam extends Component {
         <!-- Row for Team Name --> */}
             <div className="row">
               <div className="input-field col s12">
-                <input id="teamName" type="text" className="validate" />
+                <input
+                  id="teamName"
+                  type="text"
+                  className="validate"
+                  data-testid="CreateJoinTeam-createinput"
+                />
                 <label for="teamName">Team Name</label>
               </div>
             </div>
@@ -163,6 +168,7 @@ class CreateJoinTeam extends Component {
                 <button
                   id="createButton"
                   className="waves-effect waves-light btn-large red accent-1"
+                  data-testid="CreateJoinTeam-createbutton"
                 >
                   Create
                 </button>
