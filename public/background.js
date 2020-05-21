@@ -1,4 +1,4 @@
-/*global chrome firebase flip*/
+/*global chrome firebase flip initializeFirebase*/
 let db;
 
 let black_listed = [
@@ -471,36 +471,35 @@ function getUserProfile(userEmail) {
       });
   });
 }
-function trackTimeWasted(teamCode) {
-  return new Promise(function (resolve, reject) {
-    db.collection("teams")
-      .doc(teamCode)
-      .onSnapshot(async function (doc) {
-        let teamData = doc.data();
-        let timeWasted = teamData.timeWasted;
-        // if(timeWasted !== prevTimeWasted){
+/**
+ * Init Firebase configuration
+ * @author Karl Wang
+ */
+function initializeFirebase() {
+  try {
+    global.firebase = require("firebase");
+  } catch {}
 
-        // }
-        resolve();
-      });
-  });
+  const firebaseConfig = {
+    apiKey: "AIzaSyCJYc-PMIXdQxE2--bQI6Z1FGMKwMulEyc",
+    authDomain: "chrome-extension-cse-112.firebaseapp.com",
+    databaseURL: "https://chrome-extension-cse-112.firebaseio.com",
+    projectId: "chrome-extension-cse-112",
+    storageBucket: "chrome-extension-cse-112.appspot.com",
+    messagingSenderId: "275891630155",
+    appId: "1:275891630155:web:f238da778112200c815dce",
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  return firebase;
 }
-function getTeamCode() {
-  return new Promise(function (resolve) {
-    chrome.storage.local.get("prevTeam", function (data) {
-      resolve(data.prevTeam);
-    });
-  });
-}
-// .then(function (userProfile) {});
-
 // main
 /**
  * The main of background script
  * @author Karl Wang
  */
 async function main() {
-  db = initializeFirebase();
+  db = firebase.firestore();
   userEmail = await getUserEmail();
   if (userEmail === "") userEmail = "agent@gmail.com";
   await validUserEmail(userEmail, createUser);

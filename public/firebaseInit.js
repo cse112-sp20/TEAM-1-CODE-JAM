@@ -19,5 +19,10 @@ function initializeFirebase() {
   };
   // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
-  return firebase.firestore();
 }
+initializeFirebase();
+try {
+  module.exports = {
+    initializeFirebase,
+  };
+} catch {}
