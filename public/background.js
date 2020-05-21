@@ -48,9 +48,9 @@ function getHostname(url) {
 function getAllTabs() {
   return new Promise((resolve, reject) => {
     tabs = [];
-    if (localStorage["oldElements"] != undefined) {
+    if (timelineArray != undefined) {
       let oldElements = JSON.parse(
-        localStorage.getItem("oldElements")
+        timelineArray
       ).reverse();
 
       oldElements.map((obj) => {
@@ -252,6 +252,7 @@ async function createTeamOnFirebase(teamName, userEmail) {
             createdTime: currentTime,
             creator: userEmail,
             members: [userEmail],
+            timeWasted : [],
           },
           { merge: true }
         ),
@@ -463,7 +464,8 @@ async function main() {
   userEmail = await getUserEmail();
   await validUserEmail(userEmail, createUser);
   await getUserProfile(userEmail);
-
+  updateTimelineFB();
+  //console.log("Userporfile is: ", userProfile);
   setupListener();
 }
 main();
