@@ -96,8 +96,11 @@ export default class Timeline extends Component {
     // new element for timeline
     if (msg.for === "popup") {
       if (msg.message === "timeline") {
-        let url = msg.url;
+        // let url = msg.url;
         let time = msg.time;
+
+        let innerHTML = `Anonymous beaver visited ${msg.url}`;
+        let url = innerHTML;
         msg.flip
           ? this.createLeftCard(url, time, 1)
           : this.createRightCard(url, time, 1);
@@ -121,7 +124,9 @@ export default class Timeline extends Component {
     });
     let data = await task;
     data.map((tab) => {
-      let url = tab.url;
+      // let url = tab.url;
+      let innerHTML = `Anonymous beaver visited ${tab.url}`;
+      let url = innerHTML;
       let time = tab.time;
       let flip = tab.flip;
       flip

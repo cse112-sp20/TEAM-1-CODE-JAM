@@ -21,13 +21,9 @@ function updateLocalStorage(tabUrl, timeSpend) {
   } else {
     let time = localStorage.getItem(tabUrl);
     var newTime = parseInt(time) + parseInt(timeSpend);
-    if (newTime % threshold == 0) {
-      updateTimeline(tabUrl);
-      localStorage.setItem(tabUrl, newTime);
-      //localStorage.setItem(tabUrl, 0); // reset timer
-    } else {
-      localStorage.setItem(tabUrl, newTime);
-    }
+    localStorage.setItem(tabUrl, newTime);
+
+    if (newTime % threshold == 0) updateTimeline(tabUrl);
   }
 }
 /**
@@ -41,8 +37,9 @@ function updateTimeline(currTabUrl) {
     let currTime = new Date().toLocaleTimeString(); // needs to be local storage time
 
     let seconds = localStorage.getItem(currTabUrl) / 1000;
+    // let seconds = newTime / 1000;
     //threshold / 1000;
-    let time = `${currTabUrl}: ${seconds} seconds`;
+    let time = `Total Time: ${seconds} minutes`;
     let msg = {
       for: "popup",
       message: "timeline",

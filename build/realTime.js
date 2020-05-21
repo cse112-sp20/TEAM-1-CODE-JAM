@@ -22,7 +22,7 @@ function updateLocalStorage(tabUrl, timeSpend) {
     let time = localStorage.getItem(tabUrl);
     var newTime = parseInt(time) + parseInt(timeSpend);
     if (newTime % threshold == 0) {
-      updateTimeline(tabUrl);
+      updateTimeline(tabUrl, newTime);
       localStorage.setItem(tabUrl, newTime);
       //localStorage.setItem(tabUrl, 0); // reset timer
     } else {
@@ -36,13 +36,14 @@ function updateLocalStorage(tabUrl, timeSpend) {
  * @author Brian Aguirre
  * @param {URL} currTabUrl url of blacklisted site
  */
-function updateTimeline(currTabUrl) {
+function updateTimeline(currTabUrl, newTime) {
   return new Promise((resolve, reject) => {
     let currTime = new Date().toLocaleTimeString(); // needs to be local storage time
 
-    let seconds = localStorage.getItem(currTabUrl) / 1000;
+    // let seconds = localStorage.getItem(currTabUrl) / 1000;
+    let seconds = newTime / 1000;
     //threshold / 1000;
-    let time = `${currTabUrl}: ${seconds} seconds`;
+    let time = `Total Time: ${seconds} minutes`;
     let msg = {
       for: "popup",
       message: "timeline",
