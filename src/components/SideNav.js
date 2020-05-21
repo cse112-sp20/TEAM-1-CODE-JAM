@@ -3,12 +3,9 @@ import { Link } from "react-router-dom";
 import "./SideNav.css";
 
 export default class SideNav extends Component {
-  constructor(props) {
-    super(props);
-  }
   render() {
     return (
-      <div>
+      <div className="SideNav">
         <Link
           className="grey darken-3 waves-effect waves-light card-panel center-align"
           to="/"

@@ -1,28 +1,27 @@
-var lastTab;
+/*global chrome firebase flip*/
 let db;
-let userEmail;
-let userProfile;
-let teams;
-let counter = 0;
-// let tabs_dict = {};
-let tabs = [];
-let test = "Hey hey hey";
+
 let black_listed = [
   "www.youtube.com",
   "www.facebook.com",
   "twitter.com",
   "myspace.com",
 ];
-//have a current url and only stop timer if u remove or go thru updated
-let current_url;
+let userProfile = {
+  joined_teams: [],
+};
+let teams;
+let userEmail;
+let tabs;
 
 /**
  *  Gets the host name of a URL
  *
- * @param {string} url: URL of a tab
+ * @param {string} url URL of a tab
  * @returns {URL} Host name of the tab
  *
  */
+
 function getHostname(url) {
   // Handle Chrome URLs
   if (/^chrome:\/\//.test(url)) {
@@ -34,7 +33,7 @@ function getHostname(url) {
   }
   try {
     var newUrl = new URL(url);
-    return newUrl.hostname.toString();
+    return newUrl.hostname;
   } catch (err) {
     console.log(err);
   }
@@ -65,17 +64,16 @@ function getAllTabs() {
     resolve(tabs);
   });
 }
-
 /**
  * setupListener listens for request coming from popup,
  * it then sends the response that the popup need
- * @author : Karl Wang
+ * @author Karl Wang
  */
 function setupListener() {
   /**
    * reqeust is the message from popup
    * sendResponse sends a response to the sender(popup)
-   * @author : Karl Wang
+   * @author Karl Wang
    *  */
   chrome.runtime.onMessage.addListener(function (
     request,
@@ -96,14 +94,16 @@ function setupListener() {
       // }
       else if (request.message === "create team") {
         // create the team on database
-        createTeamOnFirebase(request.teamName).then((response) => {
+        createTeamOnFirebase(request.teamName, userEmail).then((response) => {
           sendResponse(response);
         });
       } else if (request.message === "join team") {
         // join the team and update the database
-        joinTeamOnFirebase(request.teamCode).then((response) => {
-          sendResponse(response);
-        });
+        joinTeamOnFirebase(request.teamCode, userProfile, userEmail).then(
+          (response) => {
+            sendResponse(response);
+          }
+        );
       } else if (request.message === "get teams") {
         sendResponse(teams);
       } else if (request.message === "get team info") {
@@ -112,8 +112,6 @@ function setupListener() {
         });
       } else if (request.message === "get timeline") {
         getAllTabs().then((tabs) => {
-          console.log(tabs);
-          // console.log(flip);
           sendResponse(tabs);
         });
       }
@@ -124,19 +122,36 @@ function setupListener() {
     return true;
   });
 }
+/**
+ * Return the team information on database
+ * @author Karl Wang
+ * @param {string} teamCode The team code to be checked on database
+ */
 function getTeamInformation(teamCode) {
   return db.collection("teams").doc(teamCode).get();
 }
-function getTeamNames() {
-  let promises = [];
-  for (let key in userProfile.joined_teams) {
-    promises.push(getTeamName(key));
-  }
-  Promise.all(promises).then((result) => {
-    teams = result;
+/**
+ * Get all the team names of current user from database
+ * @author Karl Wang
+ * @param teams The global variable to be assigned to
+ * @param userProfile Contains all the team user has joined
+ */
+function getTeamNames(userProfile) {
+  return new Promise(async (resolve) => {
+    let promises = [];
+    for (let key in userProfile.joined_teams) {
+      promises.push(getTeamName(key, userProfile));
+    }
+    resolve(await Promise.all(promises));
   });
 }
-function getTeamName(teamCode) {
+/**
+ * Get the team name with such team code
+ * @author Karl Wang
+ * @param {string} teamCode The team code to be checked on database
+ * @param {object} userProfile The user data from database
+ */
+function getTeamName(teamCode, userProfile) {
   return new Promise(function (resolve, reject) {
     db.collection("teams")
       .doc(teamCode)
@@ -161,7 +176,7 @@ function getTeamName(teamCode) {
  * "already joined the group" if user has joined the group already,
  * "team code not found" if the team code does not exist
  */
-function joinTeamOnFirebase(teamCode) {
+function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
   return new Promise(async function (resolve, reject) {
     //   user already join the group
     if (teamCode in userProfile.joined_teams) {
@@ -182,14 +197,9 @@ function joinTeamOnFirebase(teamCode) {
       db
         .collection("teams")
         .doc(teamCode)
-        .set(
-          {
-            members: {
-              [userEmail]: userEmail,
-            },
-          },
-          { merge: true }
-        ),
+        .update({
+          members: firebase.firestore.FieldValue.arrayUnion(userEmail),
+        }),
       // add the team code to the user
       db
         .collection("users")
@@ -208,10 +218,11 @@ function joinTeamOnFirebase(teamCode) {
 }
 /**
  * Create the team on the database
- * @author : Karl Wang
+ * @author Karl Wang
  * @param {string} teamName The name of the team to be created
+ * @param {string} userEmail current user email
  */
-async function createTeamOnFirebase(teamName) {
+async function createTeamOnFirebase(teamName, userEmail) {
   return new Promise(async (resolve, reject) => {
     // first generate a random length 5 id
     let teamCode = await generateRandomTeamCode(5);
@@ -240,9 +251,7 @@ async function createTeamOnFirebase(teamName) {
             teamName: teamName,
             createdTime: currentTime,
             creator: userEmail,
-            members: {
-              [userEmail]: userEmail,
-            },
+            members: [userEmail],
           },
           { merge: true }
         ),
@@ -250,9 +259,57 @@ async function createTeamOnFirebase(teamName) {
     resolve(teamCode);
   });
 }
+
+function deleteEverythingAboutAUser(userEmail) {
+  return new Promise(async (resolve, reject) => {
+    let queryCreatedTeam = db
+      .collection("teams")
+      .where("creator", "==", userEmail);
+    let queryJoinedTeam = db
+      .collection("teams")
+      .where("members", "array-contains", userEmail);
+    await Promise.all([
+      queryCreatedTeam.get().then(function (querySnapshot) {
+        querySnapshot.forEach(function (doc) {
+          deleteTeamEntirely(doc.id);
+        });
+      }),
+      queryJoinedTeam.get().then(function (querySnapshot) {
+        querySnapshot.forEach(function (doc) {
+          deleteTeamFromUser(userEmail, doc.id);
+        });
+      }),
+      db.collection("users").doc(userEmail).delete(),
+    ]);
+    resolve();
+  });
+}
+
+function deleteTeamFromUser(userEmail, teamCode) {
+  return Promise.all([
+    db
+      .collection("users")
+      .doc(userEmail)
+      .update({
+        ["joined_teams." + teamCode]: firebase.firestore.FieldValue.delete(),
+      })
+      .catch((err) => {}),
+    db
+      .collection("teams")
+      .doc(teamCode)
+      .update({
+        members: firebase.firestore.FieldValue.arrayRemove(userEmail),
+      })
+      .catch((err) => {}),
+  ]);
+}
+function deleteTeamEntirely(teamCode) {
+  db.collection("teams").doc(teamCode).delete();
+}
+
 /**
  * This generates a random team code, it makes sure the team code is unique
- * @author : Karl Wang
+ * @author Karl Wang
  * @param {int} length Specifies the length of the team code, should be 5
  * @returns {string} The randomly generated unique team code
  */
@@ -270,10 +327,13 @@ function generateRandomTeamCode(length) {
 }
 /**
  * Generate a random team code
- * @author : Karl Wang
+ * @author Karl Wang
  * @param {int} length Specifies the length of the team code
  * @returns {string} The randomly generated teamcode
  */
+function getUserInformation(userEmail) {
+  return db.collection("users").doc(userEmail).get();
+}
 function randomTeamCode(length) {
   let result = "";
   let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -285,7 +345,7 @@ function randomTeamCode(length) {
 }
 /**
  * Check if there exists such team code on the database
- * @author : Karl Wang
+ * @author Karl Wang
  * @param {string} id The team code to be checked
  * @returns {boolean} True if the team code is unique, else False
  */
@@ -305,9 +365,13 @@ function isTeamCodeUnique(id) {
 }
 /**
  * Init Firebase configuration
- * @author : Karl Wang
+ * @author Karl Wang
  */
 function initializeFirebase() {
+  try {
+    global.firebase = require("firebase");
+  } catch {}
+
   const firebaseConfig = {
     apiKey: "AIzaSyCJYc-PMIXdQxE2--bQI6Z1FGMKwMulEyc",
     authDomain: "chrome-extension-cse-112.firebaseapp.com",
@@ -323,7 +387,7 @@ function initializeFirebase() {
 }
 /**
  * Get the user email from chrome api
- * @author : Karl Wang
+ * @author Karl Wang
  */
 function getUserEmail() {
   return new Promise(function (resolve, reject) {
@@ -336,7 +400,7 @@ function getUserEmail() {
 /**
  * Check if the user email is valid, if invalid(new user), create the
  * user on database
- * @author : Karl Wang
+ * @author Karl Wang
  * @param {string} userEmail The email of the current chrome user
  * @param {function} createUser The function that creates a new user on database
  */
@@ -355,7 +419,7 @@ function validUserEmail(userEmail, createUser) {
 }
 /**
  * Create a user entry on the database
- * @author : Karl Wang
+ * @author Karl Wang
  * @param {string} userEmail The id of the new document on database
  */
 function createUser(userEmail) {
@@ -371,16 +435,18 @@ function createUser(userEmail) {
 /**
  * This listens for any changes of the user then update it to
  * local variable userProfile
- * @author : Karl Wang
+ * @author Karl Wang
  * @param {string} userEmail The id of the user
+//  * @param {object} userProfile The user profile to assign to
+//  * @param {teams} teams The team names of all the joined teams
  */
 function getUserProfile(userEmail) {
   return new Promise(function (resolve, reject) {
     db.collection("users")
       .doc(userEmail)
-      .onSnapshot(function (doc) {
+      .onSnapshot(async function (doc) {
         userProfile = doc.data();
-        getTeamNames();
+        teams = await getTeamNames(userProfile);
         resolve();
       });
   });
@@ -390,7 +456,7 @@ function getUserProfile(userEmail) {
 // main
 /**
  * The main of background script
- * @author : Karl Wang
+ * @author Karl Wang
  */
 async function main() {
   initializeFirebase();
@@ -401,3 +467,22 @@ async function main() {
   setupListener();
 }
 main();
+
+try {
+  module.exports = {
+    randomTeamCode,
+    getHostname,
+    isTeamCodeUnique,
+    joinTeamOnFirebase,
+    getTeamName,
+    validUserEmail,
+    createTeamOnFirebase,
+    deleteTeamFromUser,
+    getTeamInformation,
+    getUserInformation,
+    deleteTeamEntirely,
+    setupListener,
+    createUser,
+    deleteEverythingAboutAUser,
+  };
+} catch {}
