@@ -5,7 +5,10 @@
   margin-bottom: 10px;
 }
 
-span{
-    color:white;
-    font-size: medium;
+span {
+  color: white;
+  font-size: medium;
+}
+#sidenav-background {
+  background-color: rgba(139, 143, 163, 0.3); 
 }

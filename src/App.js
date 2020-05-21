@@ -13,9 +13,12 @@ import "./App.css";
 import Teams from "./components/Teams";
 import Home from "./components/Home";
 import Timeline from "./components/Timeline";
+import Charts from "./components/Charts";
 
 // for Testing purpose
 class App extends Component {
+  componentDidMount = () => {};
+
   render() {
     return (
       <div className="app">
@@ -24,11 +27,11 @@ class App extends Component {
           <NavBar></NavBar>
           <div className="row">
             {/* save spaces for the side navbar */}
-            <div className="col s2" id="side">
+            <div className="col s1" id="side">
               <SideNav></SideNav>
             </div>
             {/* This is where the real component is at */}
-            <div className="col s10" id="component">
+            <div className="col s11" id="component">
               <Switch>
                 {/* follow the following examples for adding new component */}
                 <Route
@@ -38,6 +41,7 @@ class App extends Component {
                 ></Route>
                 <Route exact path="/teams" component={Teams}></Route>
                 <Route exact path="/timeline" component={Timeline}></Route>
+                <Route exact path="/charts" component={Charts}></Route>
                 <Route path="/" component={Home}></Route>
               </Switch>
             </div>

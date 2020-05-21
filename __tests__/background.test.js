@@ -18,7 +18,8 @@ const {
   createUser,
 } = require("../public/background");
 
-// let userEmail = createUser("test@gmail.com");
+jest.setTimeout(30000);
+
 let userEmail = "test@gmail.com";
 let dummyEmail = "test2@gmail.com";
 
@@ -108,7 +109,6 @@ describe("joinTeamOnFirebase", () => {
     let userInformation = data[1].data();
     expect(teamCode in userInformation.joined_teams).toBe(true);
     expect(teamInformation.members.includes(userEmail)).toBe(true);
-    await deleteTeamFromUser(userEmail, teamCode);
   });
 });
 describe("getTeamName", () => {
@@ -158,14 +158,18 @@ describe("createTeamOnFirebase", () => {
     expect(teamInformation.members.includes(userEmail)).toBe(true);
     expect(teamInformation.creator).toBe(userEmail);
     expect(teamCode in userInformation.joined_teams).toBe(true);
-    await deleteTeamFromUser(userEmail, teamCode);
-    await deleteTeamEntirely(teamCode);
   });
 });
 
 describe("deleteTeamFromUser", () => {
   test("create a team then delete from user", async () => {
-    let teamCode = await createTeamOnFirebase("jest testing 2", userEmail);
+    let userProfile = {
+      joined_teams: {
+        12345: "yesterday",
+      },
+    };
+    let teamCode = await createTeamOnFirebase("jest testing", dummyEmail);
+    await joinTeamOnFirebase(teamCode, userProfile, userEmail);
     await deleteTeamFromUser(userEmail, teamCode);
     let result = await Promise.all([
       getTeamInformation(teamCode),
@@ -175,14 +179,11 @@ describe("deleteTeamFromUser", () => {
     let userInformation = result[1].data();
     expect(teamInformation.members.includes(userEmail)).toBe(false);
     expect(teamCode in userInformation.joined_teams).toBe(false);
-    await deleteTeamEntirely(teamCode);
   });
 });
 
 afterAll(async () => {
-  await Promise.all([
-    deleteEverythingAboutAUser(userEmail),
-    deleteEverythingAboutAUser(dummyEmail),
-  ]);
+  await deleteEverythingAboutAUser(dummyEmail);
+  await deleteEverythingAboutAUser(userEmail);
   global.firebase.app().delete();
 });

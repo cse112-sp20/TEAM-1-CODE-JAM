@@ -75,6 +75,7 @@ function setupListener() {
    * sendResponse sends a response to the sender(popup)
    * @author Karl Wang
    *  */
+  let timeoutVars = {};
   chrome.runtime.onMessage.addListener(function (
     request,
     sender,
@@ -114,6 +115,13 @@ function setupListener() {
         getAllTabs().then((tabs) => {
           sendResponse(tabs);
         });
+      } else if (request.message === "set timeout to delete team") {
+        timeoutVars[request.teamCode] = setTimeout(async () => {
+          await deleteTeamFromUser(userEmail, request.teamCode);
+          await deleteIfNoMembers(request.teamCode);
+        }, 4000);
+      } else if (request.message === "clear timeout") {
+        clearTimeout(timeoutVars[request.teamCode]);
       }
     }
     // return true here is important, it makes sure that
@@ -211,9 +219,19 @@ function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
           { merge: true }
         ),
     ]);
-
     resolve("success");
     return;
+  });
+}
+function deleteIfNoMembers(teamCode) {
+  return new Promise(async (resolve) => {
+    let data = await getTeamInformation(teamCode);
+    data = data.data();
+    if (data.members.length === 0) {
+      await deleteTeamEntirely(teamCode);
+      resolve();
+    }
+    resolve();
   });
 }
 /**
