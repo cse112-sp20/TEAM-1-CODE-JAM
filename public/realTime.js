@@ -3,6 +3,7 @@ var currTabUrl;
 var lastTabUrl;
 var updateInterval = 1000;
 var flip = false;
+var animal = 0;
 
 // limit of how long you can be on blacklisted site
 var threshold = 5000;
@@ -46,17 +47,20 @@ function updateTimeline(currTabUrl) {
       message: "timeline",
       url: currTabUrl,
       time: time,
+      timestamp: currTime,
       flip: flip,
+      animal: animal,
     };
+    animal = (animal + 1) % 11;
     flip = !flip;
 
     if (localStorage["oldElements"] == undefined) {
       // localStorage["oldElements"] = [];
-      let firstItem = [{ url: currTabUrl, time: time }];
+      let firstItem = [{ url: currTabUrl, time: currTime }];
       localStorage.setItem("oldElements", JSON.stringify(firstItem));
     } else {
       let oldElements = JSON.parse(localStorage.getItem("oldElements"));
-      oldElements.push({ url: currTabUrl, time: time });
+      oldElements.push({ url: currTabUrl, time: currTime });
       localStorage.setItem("oldElements", JSON.stringify(oldElements));
     }
     chrome.runtime.sendMessage(msg, function (response) {

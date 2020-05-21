@@ -37,6 +37,68 @@ export default class Timeline extends Component {
     // console.log("dfadfda");
   };
 
+  createRightBranch = (innerHTML, time, update) => {
+    let newElement = (
+      <div class="timeline-event">
+        <div class="card timeline-content">
+          <div class="card-image waves-effect waves-block waves-light"></div>
+          {/* card */}
+          <div class="card-content">
+            <span
+              id="myText"
+              class="card-title activator grey-text text-darken-4"
+            >
+              {innerHTML}
+            </span>
+            <p>-20 pts</p>
+          </div>
+        </div>
+
+        {/* timeline icon */}
+        <div class="timeline-badge  red white-text">
+          <i class="material-icons">person</i>
+        </div>
+      </div>
+    );
+    update
+      ? this.state.leftRightBranch.unshift(newElement) // queue
+      : this.state.leftRightBranch.push(newElement); // stack
+    this.setState({
+      leftRightBranch: this.state.leftRightBranch,
+    });
+  };
+  createLeftBranch = (innerHTML, time, update) => {
+    {
+      /* whole thing event left */
+    }
+    let newElement = (
+      <div class="timeline-event">
+        <div class="card timeline-content">
+          <div class="card-image waves-effect waves-block waves-light"></div>
+          <div class="card-content">
+            <span
+              id="myText"
+              class="card-title activator grey-text text-darken-4"
+            >
+              {innerHTML}
+            </span>
+            <p>-24 points</p>
+          </div>
+        </div>
+
+        <div class="timeline-badge green white-text">
+          <i class="material-icons">person</i>
+        </div>
+      </div>
+    );
+    update
+      ? this.state.leftRightBranch.unshift(newElement) // queue
+      : this.state.leftRightBranch.push(newElement); // stack
+    this.setState({
+      leftRightBranch: this.state.leftRightBranch,
+    });
+  };
+
   createLeftCard = (innerHTML, time, update) => {
     let newElement = (
       <div className="row">
@@ -98,12 +160,16 @@ export default class Timeline extends Component {
       if (msg.message === "timeline") {
         // let url = msg.url;
         let time = msg.time;
-
-        let innerHTML = `Anonymous beaver visited ${msg.url}`;
         let url = innerHTML;
+        let innerHTML = `Anonymous ${
+          this.state.animals[msg.animal % 11]
+        }  visited ${msg.url}`;
         msg.flip
-          ? this.createLeftCard(url, time, 1)
-          : this.createRightCard(url, time, 1);
+          ? this.createLeftBranch(innerHTML, time, 1)
+          : this.createRightBranch(innerHTML, time, 1);
+        // msg.flip
+        //   ? this.createLeftCard(url, time, 1)
+        //   : this.createRightCard(url, time, 1);
       }
     }
     console.log(msg);
@@ -123,19 +189,36 @@ export default class Timeline extends Component {
       });
     });
     let data = await task;
+    let i = 0;
     data.map((tab) => {
       // let url = tab.url;
-      let innerHTML = `Anonymous beaver visited ${tab.url}`;
+      let innerHTML = `Anonymous ${this.state.animals[i % 11]}  visited ${
+        tab.url
+      }`;
       let url = innerHTML;
       let time = tab.time;
       let flip = tab.flip;
       flip
-        ? this.createLeftCard(url, time, 0)
-        : this.createRightCard(url, time, 0);
+        ? this.createLeftBranch(url, time, 0)
+        : this.createRightBranch(url, time, 0);
+      i++;
+      // flip
+      //   ? this.createLeftCard(url, time, 0)
+      //   : this.createRightCard(url, time, 0);
     });
   };
 
   render() {
-    return <div id="timeline">{this.state.leftRightBranch}</div>;
+    return (
+      <div>
+        <div class="container">
+          <div id="timeline" class="timeline">
+            {this.state.leftRightBranch}
+          </div>
+        </div>
+
+        {/* <div id="timeline">{this.state.leftRightBranch}</div> */}
+      </div>
+    );
   }
 }

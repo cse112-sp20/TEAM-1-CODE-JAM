@@ -1,7 +1,9 @@
+/*global chrome*/
 var currTabUrl;
 var lastTabUrl;
 var updateInterval = 1000;
 var flip = false;
+var animal = 0;
 
 // limit of how long you can be on blacklisted site
 var threshold = 5000;
@@ -21,13 +23,9 @@ function updateLocalStorage(tabUrl, timeSpend) {
   } else {
     let time = localStorage.getItem(tabUrl);
     var newTime = parseInt(time) + parseInt(timeSpend);
-    if (newTime % threshold == 0) {
-      updateTimeline(tabUrl, newTime);
-      localStorage.setItem(tabUrl, newTime);
-      //localStorage.setItem(tabUrl, 0); // reset timer
-    } else {
-      localStorage.setItem(tabUrl, newTime);
-    }
+    localStorage.setItem(tabUrl, newTime);
+
+    if (newTime % threshold == 0) updateTimeline(tabUrl);
   }
 }
 /**
@@ -36,12 +34,12 @@ function updateLocalStorage(tabUrl, timeSpend) {
  * @author Brian Aguirre
  * @param {URL} currTabUrl url of blacklisted site
  */
-function updateTimeline(currTabUrl, newTime) {
+function updateTimeline(currTabUrl) {
   return new Promise((resolve, reject) => {
     let currTime = new Date().toLocaleTimeString(); // needs to be local storage time
 
-    // let seconds = localStorage.getItem(currTabUrl) / 1000;
-    let seconds = newTime / 1000;
+    let seconds = localStorage.getItem(currTabUrl) / 1000;
+    // let seconds = newTime / 1000;
     //threshold / 1000;
     let time = `Total Time: ${seconds} minutes`;
     let msg = {
@@ -49,17 +47,20 @@ function updateTimeline(currTabUrl, newTime) {
       message: "timeline",
       url: currTabUrl,
       time: time,
+      timestamp: currTime,
       flip: flip,
+      animal: animal,
     };
+    animal = (animal + 1) % 11;
     flip = !flip;
 
     if (localStorage["oldElements"] == undefined) {
       // localStorage["oldElements"] = [];
-      let firstItem = [{ url: currTabUrl, time: time }];
+      let firstItem = [{ url: currTabUrl, time: currTime }];
       localStorage.setItem("oldElements", JSON.stringify(firstItem));
     } else {
       let oldElements = JSON.parse(localStorage.getItem("oldElements"));
-      oldElements.push({ url: currTabUrl, time: time });
+      oldElements.push({ url: currTabUrl, time: currTime });
       localStorage.setItem("oldElements", JSON.stringify(oldElements));
     }
     chrome.runtime.sendMessage(msg, function (response) {
