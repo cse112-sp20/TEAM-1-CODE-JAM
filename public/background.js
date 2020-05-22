@@ -47,10 +47,11 @@ function getHostname(url) {
  */
 function getAllTabs() {
   return new Promise((resolve, reject) => {
+    console.log(timelineArray);
     tabs = [];
-    if (localStorage["oldElements"] != undefined) {
+    if (timelineArray != undefined) {
       let oldElements = JSON.parse(
-        localStorage.getItem("oldElements")
+        timelineArray
       ).reverse();
 
       oldElements.map((obj) => {
@@ -59,11 +60,29 @@ function getAllTabs() {
         tabs.push(tab);
         flip = !flip;
       });
-      // tabs = oldElements;
+      console.log("The tabs is: ", tabs);
     }
     resolve(tabs);
   });
 }
+
+
+
+async function reverseTimelineArray() {
+  return new Promise(function (resolve){
+    let tabs = [];
+    let reverse = timelineArray.reverse();
+    reverse.map((obj) => {
+      let tab = obj;
+      tab.flip = flip;
+      tabs.push(tab);
+      flip = !flip;
+    });
+    resolve(tabs);
+  });
+}
+
+
 /**
  * setupListener listens for request coming from popup,
  * it then sends the response that the popup need
@@ -112,7 +131,7 @@ function setupListener() {
           sendResponse(doc.data());
         });
       } else if (request.message === "get timeline") {
-        getAllTabs().then((tabs) => {
+        reverseTimelineArray().then((tabs) => {
           sendResponse(tabs);
         });
       } else if (request.message === "set timeout to delete team") {
@@ -272,6 +291,7 @@ async function createTeamOnFirebase(teamName, userEmail) {
             createdTime: currentTime,
             creator: userEmail,
             members: [userEmail],
+            timeWasted : [],
           },
           { merge: true }
         ),
@@ -507,7 +527,9 @@ async function main() {
   if (userEmail === "") userEmail = "agent@gmail.com";
   await validUserEmail(userEmail, createUser);
   await getUserProfile(userEmail);
-
+  updateTimelineFB();
+  //console.log("Userporfile is: ", userProfile);
+  //deleteEverythingAboutAUser(userEmail);
   setupListener();
 }
 main();
