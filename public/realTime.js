@@ -41,6 +41,10 @@ async function updateLocalStorage(tabUrl, timeSpend) {
     }
   }
 }
+
+async 
+
+
 /**
  * Inserts a new element to the timeline if a user has been on a blacklisted
  * site longer than the set time limit (threshold)

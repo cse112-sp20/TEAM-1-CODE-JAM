@@ -47,6 +47,7 @@ function getHostname(url) {
  */
 function getAllTabs() {
   return new Promise((resolve, reject) => {
+    console.log(timelineArray);
     tabs = [];
     if (timelineArray != undefined) {
       let oldElements = JSON.parse(
@@ -59,11 +60,29 @@ function getAllTabs() {
         tabs.push(tab);
         flip = !flip;
       });
-      // tabs = oldElements;
+      console.log("The tabs is: ", tabs);
     }
     resolve(tabs);
   });
 }
+
+
+
+async function reverseTimelineArray() {
+  return new Promise(function (resolve){
+    let tabs = [];
+    let reverse = timelineArray.reverse();
+    reverse.map((obj) => {
+      let tab = obj;
+      tab.flip = flip;
+      tabs.push(tab);
+      flip = !flip;
+    });
+    resolve(tabs);
+  });
+}
+
+
 /**
  * setupListener listens for request coming from popup,
  * it then sends the response that the popup need
@@ -111,7 +130,7 @@ function setupListener() {
           sendResponse(doc.data());
         });
       } else if (request.message === "get timeline") {
-        getAllTabs().then((tabs) => {
+        reverseTimelineArray().then((tabs) => {
           sendResponse(tabs);
         });
       }
