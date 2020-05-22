@@ -67,7 +67,7 @@ describe("Test team functionality", () => {
     );
     await page.click('[data-testid="CreateJoinTeam-createbutton"]');
     await page.waitForSelector('[data-testid="Home-teammember"]');
-    await page.waitFor(1000);
+    await page.waitFor(2000);
     let teamMember = await page.$eval(
       '[data-testid="Home-teammember"]',
       (el) => el.textContent
@@ -91,7 +91,7 @@ describe("Test team functionality", () => {
     let unique = await isTeamCodeUnique(teamCode);
     expect(unique).toBe(false);
 
-    // browser.close();
+    browser.close();
     done();
   }, 100000);
 });
