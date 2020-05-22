@@ -33,16 +33,17 @@ async function updateLocalStorage(tabUrl, timeSpend) {
       let seconds = localStorage.getItem(tabUrl) / 1000;
       time = `${tabUrl}: ${seconds} seconds`;
       db.collection("teams")
-        .doc(teamCode)
-        .update({
-          timeWasted: firebase.firestore.FieldValue.arrayUnion({
-            url: tabUrl,
-            time: time,
-          }),
-        });
+      .doc(teamCode)
+      .update({
+        timeWasted: firebase.firestore.FieldValue.arrayUnion({user: userEmail, url: tabUrl, time: time}),
+      });
     }
   }
 }
+
+
+
+
 /**
  * Inserts a new element to the timeline if a user has been on a blacklisted
  * site longer than the set time limit (threshold)
