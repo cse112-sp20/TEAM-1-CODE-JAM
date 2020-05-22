@@ -1,7 +1,7 @@
 import chrome from "sinon-chrome";
 global.chrome = chrome;
 
-const { initializeFirebase } = require("../public/firebaseInit");
+require("../public/firebaseInit");
 
 const {
   randomTeamCode,

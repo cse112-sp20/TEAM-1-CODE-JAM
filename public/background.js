@@ -423,6 +423,7 @@ function getUserEmail() {
  * @author Karl Wang
  * @param {string} userEmail The email of the current chrome user
  * @param {function} createUser The function that creates a new user on database
+ * @return {boolean} true if user originally exist, false if user did not exist
  */
 function validUserEmail(userEmail, createUser) {
   return new Promise(function (resolve, reject) {
@@ -432,8 +433,10 @@ function validUserEmail(userEmail, createUser) {
       .then(async function (doc) {
         if (!doc.exists) {
           await createUser(userEmail);
+          resolve(false);
+          return;
         }
-        resolve();
+        resolve(true);
       });
   });
 }
