@@ -1,3 +1,4 @@
+/* global black_listed chrome firebase db*/
 let currTabUrl;
 let lastTabUrl;
 let updateInterval = 1000;
@@ -5,7 +6,6 @@ let flip = false;
 let teamCode;
 let timelineArray;
 let time;
-
 
 // limit of how long you can be on blacklisted site
 let threshold = 5000;
@@ -18,8 +18,7 @@ function millisecondToMin(millisecond) {
   return millisecond / (60 * 1000);
 }
 
-
-//Get team code everytime 
+//Get team code everytime
 async function updateLocalStorage(tabUrl, timeSpend) {
   teamCode = await getTeamCode();
   if (localStorage.getItem(tabUrl) == undefined) {
@@ -34,10 +33,13 @@ async function updateLocalStorage(tabUrl, timeSpend) {
       let seconds = localStorage.getItem(tabUrl) / 1000;
       time = `${tabUrl}: ${seconds} seconds`;
       db.collection("teams")
-      .doc(teamCode)
-      .update({
-        timeWasted: firebase.firestore.FieldValue.arrayUnion({url: tabUrl, time: time}),
-      });
+        .doc(teamCode)
+        .update({
+          timeWasted: firebase.firestore.FieldValue.arrayUnion({
+            url: tabUrl,
+            time: time,
+          }),
+        });
     }
   }
 }
@@ -79,41 +81,38 @@ function updateTimeline(currTabUrl) {
   });
 }
 
-
-
-async function updateTimelineFB(){
+async function updateTimelineFB() {
   teamCode = await getTeamCode();
   db.collection("teams")
-  .doc(teamCode)
-  .onSnapshot(async function(doc){
-    timelineArray = await getTimelineArrayFB();
-    console.log(timelineArray);
-    let msg = {
-      for: "popup",
-      message: "timeline",
-      url: currTabUrl,
-      time: time,
-      flip: flip,
-    };
-    flip = !flip;
-    chrome.runtime.sendMessage(msg, (response) => {
-      console.log("Send message success!");
+    .doc(teamCode)
+    .onSnapshot(async function (doc) {
+      timelineArray = await getTimelineArrayFB();
+      console.log(timelineArray);
+      let msg = {
+        for: "popup",
+        message: "timeline",
+        url: currTabUrl,
+        time: time,
+        flip: flip,
+      };
+      flip = !flip;
+      chrome.runtime.sendMessage(msg, (response) => {
+        console.log("Send message success!");
+      });
     });
-  });
 }
 
-async function getTimelineArrayFB(){
+async function getTimelineArrayFB() {
   return new Promise(function (resolve) {
     db.collection("teams")
-    .doc(teamCode)
-    .get()
-    .then(function (doc){
-      let data = doc.data();
-      resolve(data.timeWasted);
-    });
+      .doc(teamCode)
+      .get()
+      .then(function (doc) {
+        let data = doc.data();
+        resolve(data.timeWasted);
+      });
   });
 }
-
 
 var myVar = setInterval(myTimer, updateInterval);
 
@@ -141,8 +140,6 @@ chrome.tabs.onRemoved.addListener(function () {
   currTabUrl = "Closed";
 });
 
-
-
 function getTeamCode() {
   return new Promise(function (resolve) {
     chrome.storage.local.get("prevTeam", function (data) {
@@ -150,4 +147,3 @@ function getTeamCode() {
     });
   });
 }
-
