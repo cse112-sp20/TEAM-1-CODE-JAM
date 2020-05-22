@@ -36,13 +36,13 @@ async function updateLocalStorage(tabUrl, timeSpend) {
       db.collection("teams")
       .doc(teamCode)
       .update({
-        timeWasted: firebase.firestore.FieldValue.arrayUnion({url: tabUrl, time: time}),
+        timeWasted: firebase.firestore.FieldValue.arrayUnion({user: userEmail, url: tabUrl, time: time}),
       });
     }
   }
 }
 
-async 
+
 
 
 /**

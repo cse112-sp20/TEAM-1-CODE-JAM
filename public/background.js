@@ -485,6 +485,7 @@ async function main() {
   await getUserProfile(userEmail);
   updateTimelineFB();
   //console.log("Userporfile is: ", userProfile);
+  //deleteEverythingAboutAUser(userEmail);
   setupListener();
 }
 main();
