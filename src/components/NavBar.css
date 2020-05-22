@@ -1,14 +1,3 @@
-.sidebar {
-  min-height: 100%;
-  background: purple;
-  /* margin: 0; */
-  padding: 0;
-}
-.NavBar {
-  padding-left: 300px;
-}
-header,
-main,
-footer {
-  padding-left: 300px;
+#nav-background{
+  background-color: rgb(233, 150, 128);
 }

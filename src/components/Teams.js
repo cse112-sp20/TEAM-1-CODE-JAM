@@ -12,6 +12,10 @@ class Teams extends Component {
       teams: [],
     };
   }
+  componentWillUnmount = () => {
+    M.Toast.dismissAll();
+  };
+
   componentDidMount = () => {
     M.AutoInit();
     this.getTeams();
@@ -31,12 +35,21 @@ class Teams extends Component {
     document.querySelector("body").addEventListener("click", (e) => {
       if (e.target.classList.contains("undo")) {
         let teamCode = e.target.value;
+        let msg = {
+          for: "background",
+          message: "clear timeout",
+          teamCode: teamCode,
+        };
+        chrome.runtime.sendMessage(msg);
         let team = this.state.teams.find((team) => team.teamCode === teamCode);
-        team.visable = true;
-        this.setState({
-          teams: this.state.teams,
-        });
-        let toastElement = document.querySelector("." + teamCode);
+        if (team) {
+          team.visable = true;
+          this.setState({
+            teams: this.state.teams,
+          });
+        }
+        let toastElement = document.querySelector(".toast" + teamCode);
+        console.log(toastElement);
         let toastInstance = M.Toast.getInstance(toastElement);
         toastInstance.dismiss();
       }
@@ -72,16 +85,15 @@ class Teams extends Component {
 
     M.toast({
       html: toastHTML,
-      completeCallback: () => {
-        this.removeTeamOnBackend(team);
-      },
-      classes: team.teamCode,
+      classes: "toast" + team.teamCode,
       // displayLength: 4000,
     });
-  };
-  removeTeamOnBackend = (team) => {
-    // let undo = document.querySelector("#undo");
-    // console.log(undo);
+    let msg = {
+      for: "background",
+      message: "set timeout to delete team",
+      teamCode: team.teamCode,
+    };
+    chrome.runtime.sendMessage(msg);
   };
 
   render() {
@@ -119,6 +131,7 @@ class Teams extends Component {
             className="rounded-btn waves-effect waves-light btn tooltipped modal-trigger"
             data-position="bottom"
             data-tooltip="Create or join a new team"
+            data-testid="Teams-createjoin"
           >
             <div className="inside-btn">
               <text className="flexbox-centering">

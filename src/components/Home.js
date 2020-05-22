@@ -1,5 +1,9 @@
 /*global chrome*/
 import React, { Component } from "react";
+import Timeline from "./Timeline";
+import Charts from "./Charts";
+import M from "materialize-css";
+import "./Home.css";
 
 export default class Home extends Component {
   constructor(props) {
@@ -16,6 +20,7 @@ export default class Home extends Component {
    *
    */
   componentDidMount = async () => {
+    M.AutoInit();
     // ask chrome storage for the current team
     // The api is async
     let task = new Promise((resolve, reject) => {
@@ -44,21 +49,47 @@ export default class Home extends Component {
   };
   render() {
     return (
-      <div>
-        <div className="divider"></div>
-        <div className="section">
-          <h5>{this.state.teamName}</h5>
-          <p>Team Code: {this.state.teamCode}</p>
+      <div className="card">
+        <div id="card-content" className="card-content blue-grey-text">
+          <span
+            className="blue-grey-text card-title"
+            data-testid="Home-teamname"
+          >
+            {this.state.teamName}
+            <span data-testid="Home-teamcode" className="badge">
+              Team Code: {this.state.teamCode}
+            </span>
+          </span>
         </div>
-        <div className="divider"></div>
-        <div className="section">
-          <h5>Team Members</h5>
-          {/* {this.state.teamMembers} */}
-          {this.state.teamMembers.map((teamMember) => {
-            return <p>{teamMember}</p>;
-          })}
+        <div id="card-content" className="card-content grey lighten-4">
+          <div id="teamMembers">
+            <ul className="collection">
+              {this.state.teamMembers.map((teamMember) => {
+                return (
+                  <li className="collection-item" data-testid="Home-teammember">
+                    {teamMember}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </div>
       </div>
+      // <div>
+      //   <div className="divider"></div>
+      //   <div className="section">
+      //     <h5>{this.state.teamName}</h5>
+      //     <p>Team Code: {this.state.teamCode}</p>
+      //   </div>
+      //   <div className="divider"></div>
+      //   <div className="section">
+      //     <h5>Team Members</h5>
+      //     {/* {this.state.teamMembers} */}
+      //     {this.state.teamMembers.map((teamMember) => {
+      //       return <p>{teamMember}</p>;
+      //     })}
+      //   </div>
+      // </div>
     );
   }
 }

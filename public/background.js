@@ -1,4 +1,4 @@
-/*global chrome firebase flip*/
+/*global chrome firebase flip initializeFirebase*/
 let db;
 
 let black_listed = [
@@ -94,6 +94,7 @@ function setupListener() {
    * sendResponse sends a response to the sender(popup)
    * @author Karl Wang
    *  */
+  let timeoutVars = {};
   chrome.runtime.onMessage.addListener(function (
     request,
     sender,
@@ -133,6 +134,15 @@ function setupListener() {
         reverseTimelineArray().then((tabs) => {
           sendResponse(tabs);
         });
+      } else if (request.message === "set timeout to delete team") {
+        timeoutVars[request.teamCode] = setTimeout(async () => {
+          await deleteTeamFromUser(userEmail, request.teamCode);
+          await deleteIfNoMembers(request.teamCode);
+        }, 4000);
+      } else if (request.message === "clear timeout") {
+        clearTimeout(timeoutVars[request.teamCode]);
+      } else if (request.message === "get timeline array") {
+        // sendResponse(timelineArray)
       }
     }
     // return true here is important, it makes sure that
@@ -230,9 +240,19 @@ function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
           { merge: true }
         ),
     ]);
-
     resolve("success");
     return;
+  });
+}
+function deleteIfNoMembers(teamCode) {
+  return new Promise(async (resolve) => {
+    let data = await getTeamInformation(teamCode);
+    data = data.data();
+    if (data.members.length === 0) {
+      await deleteTeamEntirely(teamCode);
+      resolve();
+    }
+    resolve();
   });
 }
 /**
@@ -383,28 +403,28 @@ function isTeamCodeUnique(id) {
     });
   });
 }
-/**
- * Init Firebase configuration
- * @author Karl Wang
- */
-function initializeFirebase() {
-  try {
-    global.firebase = require("firebase");
-  } catch {}
+// /**
+//  * Init Firebase configuration
+//  * @author Karl Wang
+//  */
+// function initializeFirebase() {
+//   try {
+//     global.firebase = require("firebase");
+//   } catch {}
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyCJYc-PMIXdQxE2--bQI6Z1FGMKwMulEyc",
-    authDomain: "chrome-extension-cse-112.firebaseapp.com",
-    databaseURL: "https://chrome-extension-cse-112.firebaseio.com",
-    projectId: "chrome-extension-cse-112",
-    storageBucket: "chrome-extension-cse-112.appspot.com",
-    messagingSenderId: "275891630155",
-    appId: "1:275891630155:web:f238da778112200c815dce",
-  };
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  db = firebase.firestore();
-}
+//   const firebaseConfig = {
+//     apiKey: "AIzaSyCJYc-PMIXdQxE2--bQI6Z1FGMKwMulEyc",
+//     authDomain: "chrome-extension-cse-112.firebaseapp.com",
+//     databaseURL: "https://chrome-extension-cse-112.firebaseio.com",
+//     projectId: "chrome-extension-cse-112",
+//     storageBucket: "chrome-extension-cse-112.appspot.com",
+//     messagingSenderId: "275891630155",
+//     appId: "1:275891630155:web:f238da778112200c815dce",
+//   };
+//   // Initialize Firebase
+//   firebase.initializeApp(firebaseConfig);
+//   db = firebase.firestore();
+// }
 /**
  * Get the user email from chrome api
  * @author Karl Wang
@@ -423,6 +443,7 @@ function getUserEmail() {
  * @author Karl Wang
  * @param {string} userEmail The email of the current chrome user
  * @param {function} createUser The function that creates a new user on database
+ * @return {boolean} true if user originally exist, false if user did not exist
  */
 function validUserEmail(userEmail, createUser) {
   return new Promise(function (resolve, reject) {
@@ -432,8 +453,10 @@ function validUserEmail(userEmail, createUser) {
       .then(async function (doc) {
         if (!doc.exists) {
           await createUser(userEmail);
+          resolve(false);
+          return;
         }
-        resolve();
+        resolve(true);
       });
   });
 }
@@ -471,16 +494,37 @@ function getUserProfile(userEmail) {
       });
   });
 }
-// .then(function (userProfile) {});
+/**
+ * Init Firebase configuration
+ * @author Karl Wang
+ */
+function initializeFirebase() {
+  try {
+    global.firebase = require("firebase");
+  } catch {}
 
+  const firebaseConfig = {
+    apiKey: "AIzaSyCJYc-PMIXdQxE2--bQI6Z1FGMKwMulEyc",
+    authDomain: "chrome-extension-cse-112.firebaseapp.com",
+    databaseURL: "https://chrome-extension-cse-112.firebaseio.com",
+    projectId: "chrome-extension-cse-112",
+    storageBucket: "chrome-extension-cse-112.appspot.com",
+    messagingSenderId: "275891630155",
+    appId: "1:275891630155:web:f238da778112200c815dce",
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  return firebase;
+}
 // main
 /**
  * The main of background script
  * @author Karl Wang
  */
 async function main() {
-  initializeFirebase();
+  db = firebase.firestore();
   userEmail = await getUserEmail();
+  if (userEmail === "") userEmail = "agent@gmail.com";
   await validUserEmail(userEmail, createUser);
   await getUserProfile(userEmail);
   updateTimelineFB();
