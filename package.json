@@ -17,6 +17,7 @@
     "react-dom": "^16.13.1",
     "react-event-timeline": "^1.6.3",
     "react-materialize": "^3.9.0",
+    "react-native-timeline-listview": "^0.2.3",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.1",
     "sinon-chrome": "^3.0.1"
@@ -31,7 +32,6 @@
   },
   "eslintConfig": {
     "extends": "react-app"
-
   },
   "browserslist": {
     "production": [

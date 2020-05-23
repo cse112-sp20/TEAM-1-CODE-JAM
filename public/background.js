@@ -532,7 +532,7 @@ function initializeFirebase() {
 
 /*
  *
- * realTab.js
+ * realTime.js
  *
  */
 

@@ -63,33 +63,26 @@ export default class Home extends Component {
         </div>
         <div id="card-content" className="card-content grey lighten-4">
           <div id="teamMembers">
-            <ul className="collection">
-              {this.state.teamMembers.map((teamMember) => {
+            <ul className="collapsible popout">
+              <li>
+                <div className="collapsible-header">Team Members</div>
+                <div className="collapsible-body">
+                  {this.state.teamMembers.map((teamMember) => {
+                    return <p>{teamMember}</p>;
+                  })}
+                </div>
+              </li>
+              {/* {this.state.teamMembers.map((teamMember) => {
                 return (
                   <li className="collection-item" data-testid="Home-teammember">
                     {teamMember}
                   </li>
                 );
-              })}
+              })} */}
             </ul>
           </div>
         </div>
       </div>
-      // <div>
-      //   <div className="divider"></div>
-      //   <div className="section">
-      //     <h5>{this.state.teamName}</h5>
-      //     <p>Team Code: {this.state.teamCode}</p>
-      //   </div>
-      //   <div className="divider"></div>
-      //   <div className="section">
-      //     <h5>Team Members</h5>
-      //     {/* {this.state.teamMembers} */}
-      //     {this.state.teamMembers.map((teamMember) => {
-      //       return <p>{teamMember}</p>;
-      //     })}
-      //   </div>
-      // </div>
     );
   }
 }
