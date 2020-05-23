@@ -9,6 +9,7 @@ let timelineArray;
 let time;
 let currentTeamInfo;
 
+let myVar = setInterval(myTimer, updateInterval);
 let currentSnapShot = () => {};
 
 let black_listed = [
@@ -642,8 +643,6 @@ async function getTimelineArrayFB() {
   });
 }
 
-let myVar = setInterval(myTimer, updateInterval);
-
 function myTimer() {
   chrome.tabs.query(
     {
@@ -652,16 +651,23 @@ function myTimer() {
     },
     function (tabs) {
       let tab = tabs[0];
-      if (tab != undefined) {
-        currTabUrl = getHostname(tab.url);
+      if (tab !== undefined) {
+        let currHost = getHostname(tab.url);
+        currTabUrl = getNameOfURL(currHost);
       }
     }
   );
-  if (currTabUrl != undefined) {
+  if (currTabUrl !== undefined) {
     if (black_listed.includes(currTabUrl)) {
       updateLocalStorage(currTabUrl, updateInterval);
     }
   }
+}
+
+function getNameOfURL(currHost) {
+  let splitArr = currHost.split(".");
+  if (splitArr.length <= 2) return splitArr[0];
+  else return splitArr[1];
 }
 
 chrome.tabs.onRemoved.addListener(function () {
@@ -691,8 +697,10 @@ function getTeamOnSnapshot() {
           };
           chrome.runtime.sendMessage(msg);
           resolve();
+          return;
         });
     }
+    resolve();
   });
 }
 
