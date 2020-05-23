@@ -6,7 +6,7 @@ let flip = false;
 let teamCode;
 let timelineArray;
 let time;
-
+let teamInformation;
 
 // limit of how long you can be on blacklisted site
 let threshold = 5000;
@@ -34,16 +34,17 @@ async function updateLocalStorage(tabUrl, timeSpend) {
       let seconds = localStorage.getItem(tabUrl) / 1000;
       time = `${tabUrl}: ${seconds} seconds`;
       db.collection("teams")
-      .doc(teamCode)
-      .update({
-        timeWasted: firebase.firestore.FieldValue.arrayUnion({user: userEmail, url: tabUrl, time: time}),
-      });
+        .doc(teamCode)
+        .update({
+          timeWasted: firebase.firestore.FieldValue.arrayUnion({
+            user: userEmail,
+            url: tabUrl,
+            time: time,
+          }),
+        });
     }
   }
 }
-
-
-
 
 /**
  * Inserts a new element to the timeline if a user has been on a blacklisted
@@ -89,7 +90,7 @@ async function updateTimelineFB() {
     .doc(teamCode)
     .onSnapshot(async function (doc) {
       timelineArray = await getTimelineArrayFB();
-      console.log(timelineArray);
+      // console.log(timelineArray);
       let msg = {
         for: "popup",
         message: "timeline",
@@ -99,7 +100,7 @@ async function updateTimelineFB() {
       };
       flip = !flip;
       chrome.runtime.sendMessage(msg, (response) => {
-        console.log("Send message success!");
+        // console.log("Send message success!");
       });
     });
 }
@@ -147,5 +148,22 @@ function getTeamCode() {
     chrome.storage.local.get("prevTeam", function (data) {
       resolve(data.prevTeam);
     });
+  });
+}
+
+function getTeamOnSnapshot() {
+  return new Promise(async function (resolve, reject) {
+    const currentTeam = await getTeamCode();
+    db.collection("teams")
+      .doc(currentTeam)
+      .onSnapshot(async function (doc) {
+        teamInformation = doc.data();
+        let msg = {
+          for: "timeline demo",
+          message: teamInformation,
+        };
+        chrome.runtime.sendMessage(msg);
+        resolve();
+      });
   });
 }

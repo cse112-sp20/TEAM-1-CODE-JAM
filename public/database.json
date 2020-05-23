@@ -5,6 +5,10 @@
         "test@gmail.com": {
           "www.facebook.com": "30",
           "www.twitter.com": "60"
+        },
+        "test2@gmail.com": {
+          "www.facebook.com": "30",
+          "www.twitter.com": "60"
         }
       }
     }
@@ -12,7 +16,7 @@
   "teams": {
     "ABCDE": {
       "members": ["test@gmail.com"],
-      "timeline": [
+      "timeWasted": [
         {
           "user": "test@gmail.com",
           "url": "www.facebook.com",

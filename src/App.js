@@ -14,6 +14,7 @@ import Teams from "./components/Teams";
 import Home from "./components/Home";
 import Timeline from "./components/Timeline";
 import Charts from "./components/Charts";
+import TimelineDemo from "./components/TimelineDemo";
 
 // for Testing purpose
 class App extends Component {
@@ -42,6 +43,11 @@ class App extends Component {
                 <Route exact path="/teams" component={Teams}></Route>
                 <Route exact path="/timeline" component={Timeline}></Route>
                 <Route exact path="/charts" component={Charts}></Route>
+                <Route
+                  exact
+                  path="/timelinedemo"
+                  component={TimelineDemo}
+                ></Route>
                 <Route path="/" component={Home}></Route>
               </Switch>
             </div>

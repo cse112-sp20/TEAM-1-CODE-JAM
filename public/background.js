@@ -1,5 +1,15 @@
-/*global chrome firebase flip initializeFirebase*/
+/*global chrome firebase*/
 let db;
+let currTabUrl;
+let lastTabUrl;
+let updateInterval = 1000;
+let flip = false;
+let teamCode;
+let timelineArray;
+let time;
+let currentTeamInfo;
+
+let currentSnapShot = () => {};
 
 let black_listed = [
   "www.youtube.com",
@@ -13,6 +23,8 @@ let userProfile = {
 let teams;
 let userEmail;
 let tabs;
+// limit of how long you can be on blacklisted site
+let threshold = 5000;
 
 /**
  *  Gets the host name of a URL
@@ -32,7 +44,7 @@ function getHostname(url) {
     return "invalid";
   }
   try {
-    var newUrl = new URL(url);
+    let newUrl = new URL(url);
     return newUrl.hostname;
   } catch (err) {
     console.log(err);
@@ -45,31 +57,27 @@ function getHostname(url) {
  * @author Brian Aguirre
  * @return {Array} array of objects
  */
-function getAllTabs() {
-  return new Promise((resolve, reject) => {
-    console.log(timelineArray);
-    tabs = [];
-    if (timelineArray != undefined) {
-      let oldElements = JSON.parse(
-        timelineArray
-      ).reverse();
+// function getAllTabs() {
+//   return new Promise((resolve, reject) => {
+//     console.log(timelineArray);
+//     tabs = [];
+//     if (timelineArray != undefined) {
+//       let oldElements = JSON.parse(timelineArray).reverse();
 
-      oldElements.map((obj) => {
-        let tab = obj;
-        tab.flip = flip;
-        tabs.push(tab);
-        flip = !flip;
-      });
-      console.log("The tabs is: ", tabs);
-    }
-    resolve(tabs);
-  });
-}
-
-
+//       oldElements.map((obj) => {
+//         let tab = obj;
+//         tab.flip = flip;
+//         tabs.push(tab);
+//         flip = !flip;
+//       });
+//       console.log("The tabs is: ", tabs);
+//     }
+//     resolve(tabs);
+//   });
+// }
 
 async function reverseTimelineArray() {
-  return new Promise(function (resolve){
+  return new Promise(function (resolve) {
     let tabs = [];
     let reverse = timelineArray.reverse();
     reverse.map((obj) => {
@@ -81,7 +89,6 @@ async function reverseTimelineArray() {
     resolve(tabs);
   });
 }
-
 
 /**
  * setupListener listens for request coming from popup,
@@ -127,9 +134,10 @@ function setupListener() {
       } else if (request.message === "get teams") {
         sendResponse(teams);
       } else if (request.message === "get team info") {
-        getTeamInformation(request.teamCode).then(function (doc) {
-          sendResponse(doc.data());
-        });
+        // getTeamInformation(request.teamCode).then(function (doc) {
+        //   sendResponse(doc.data());
+        // });
+        sendResponse(currentTeamInfo);
       } else if (request.message === "get timeline") {
         reverseTimelineArray().then((tabs) => {
           sendResponse(tabs);
@@ -142,7 +150,12 @@ function setupListener() {
       } else if (request.message === "clear timeout") {
         clearTimeout(timeoutVars[request.teamCode]);
       } else if (request.message === "get timeline array") {
-        // sendResponse(timelineArray)
+        sendResponse(currentTeamInfo);
+      } else if (request.message === "switch team") {
+        currentSnapShot();
+        getTeamOnSnapshot().then(() => {
+          sendResponse("success");
+        });
       }
     }
     // return true here is important, it makes sure that
@@ -291,7 +304,7 @@ async function createTeamOnFirebase(teamName, userEmail) {
             createdTime: currentTime,
             creator: userEmail,
             members: [userEmail],
-            timeWasted : [],
+            timeWasted: [],
           },
           { merge: true }
         ),
@@ -516,6 +529,173 @@ function initializeFirebase() {
   firebase.initializeApp(firebaseConfig);
   return firebase;
 }
+
+/*
+ *
+ * realTab.js
+ *
+ */
+
+function minToMillisecond(min) {
+  return min * 60 * 1000;
+}
+
+function millisecondToMin(millisecond) {
+  return millisecond / (60 * 1000);
+}
+
+//Get team code everytime
+async function updateLocalStorage(tabUrl, timeSpend) {
+  teamCode = await getTeamCode();
+  if (localStorage.getItem(tabUrl) === undefined) {
+    localStorage.setItem(tabUrl, 0);
+    console.log(localStorage.getItem(tabUrl));
+  } else {
+    let time = localStorage.getItem(tabUrl);
+    let newTime = parseInt(time) + parseInt(timeSpend);
+    localStorage.setItem(tabUrl, newTime);
+    if (newTime % threshold === 0) {
+      //updateTimeline(tabUrl);
+      let seconds = localStorage.getItem(tabUrl) / 1000;
+      time = `${tabUrl}: ${seconds} seconds`;
+      db.collection("teams")
+        .doc(teamCode)
+        .update({
+          timeWasted: firebase.firestore.FieldValue.arrayUnion({
+            user: userEmail,
+            url: tabUrl,
+            time: time,
+          }),
+        });
+    }
+  }
+}
+
+/**
+ * Inserts a new element to the timeline if a user has been on a blacklisted
+ * site longer than the set time limit (threshold)
+ * @author Brian Aguirre
+ * @param {URL} currTabUrl url of blacklisted site
+ */
+function updateTimeline(currTabUrl) {
+  return new Promise((resolve, reject) => {
+    let currTime = new Date().toLocaleTimeString(); // needs to be local storage time
+
+    let seconds = localStorage.getItem(currTabUrl) / 1000;
+    //threshold / 1000;
+    let time = `${currTabUrl}: ${seconds} seconds`;
+    let msg = {
+      for: "popup",
+      message: "timeline",
+      url: currTabUrl,
+      time: time,
+      flip: flip,
+    };
+    flip = !flip;
+
+    if (localStorage["oldElements"] == undefined) {
+      // localStorage["oldElements"] = [];
+      let firstItem = [{ url: currTabUrl, time: time }];
+      localStorage.setItem("oldElements", JSON.stringify(firstItem));
+    } else {
+      let oldElements = JSON.parse(localStorage.getItem("oldElements"));
+      oldElements.push({ url: currTabUrl, time: time });
+      localStorage.setItem("oldElements", JSON.stringify(oldElements));
+    }
+    chrome.runtime.sendMessage(msg, function (response) {
+      console.log(response);
+      resolve(response);
+    });
+  });
+}
+
+async function updateTimelineFB() {
+  teamCode = await getTeamCode();
+  db.collection("teams")
+    .doc(teamCode)
+    .onSnapshot(async function (doc) {
+      timelineArray = await getTimelineArrayFB();
+      // console.log(timelineArray);
+      let msg = {
+        for: "popup",
+        message: "timeline",
+        url: currTabUrl,
+        time: time,
+        flip: flip,
+      };
+      flip = !flip;
+      chrome.runtime.sendMessage(msg, (response) => {
+        // console.log("Send message success!");
+      });
+    });
+}
+
+async function getTimelineArrayFB() {
+  return new Promise(function (resolve) {
+    db.collection("teams")
+      .doc(teamCode)
+      .get()
+      .then(function (doc) {
+        let data = doc.data();
+        resolve(data.timeWasted);
+      });
+  });
+}
+
+let myVar = setInterval(myTimer, updateInterval);
+
+function myTimer() {
+  chrome.tabs.query(
+    {
+      active: true,
+      lastFocusedWindow: true,
+    },
+    function (tabs) {
+      let tab = tabs[0];
+      if (tab != undefined) {
+        currTabUrl = getHostname(tab.url);
+      }
+    }
+  );
+  if (currTabUrl != undefined) {
+    if (black_listed.includes(currTabUrl)) {
+      updateLocalStorage(currTabUrl, updateInterval);
+    }
+  }
+}
+
+chrome.tabs.onRemoved.addListener(function () {
+  currTabUrl = "Closed";
+});
+
+function getTeamCode() {
+  return new Promise(function (resolve) {
+    chrome.storage.local.get("prevTeam", function (data) {
+      resolve(data.prevTeam);
+    });
+  });
+}
+
+function getTeamOnSnapshot() {
+  return new Promise(async function (resolve, reject) {
+    const currentTeam = await getTeamCode();
+    if (currentTeam !== undefined) {
+      currentSnapShot = db
+        .collection("teams")
+        .doc(currentTeam)
+        .onSnapshot(function (doc) {
+          currentTeamInfo = doc.data();
+          let msg = {
+            for: "timeline demo",
+            message: currentTeamInfo,
+          };
+          chrome.runtime.sendMessage(msg);
+          resolve();
+        });
+    }
+  });
+}
+
 // main
 /**
  * The main of background script
@@ -526,10 +706,11 @@ async function main() {
   userEmail = await getUserEmail();
   if (userEmail === "") userEmail = "agent@gmail.com";
   await validUserEmail(userEmail, createUser);
-  await getUserProfile(userEmail);
-  updateTimelineFB();
+  await Promise.all([getUserProfile(userEmail), getTeamOnSnapshot()]);
+  // updateTimelineFB();
   //console.log("Userporfile is: ", userProfile);
   //deleteEverythingAboutAUser(userEmail);
+
   setupListener();
 }
 main();

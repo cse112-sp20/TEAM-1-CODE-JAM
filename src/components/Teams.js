@@ -10,6 +10,7 @@ class Teams extends Component {
     super(props);
     this.state = {
       teams: [],
+      tabsInstance: undefined,
     };
   }
   componentWillUnmount = () => {
@@ -20,12 +21,13 @@ class Teams extends Component {
     M.AutoInit();
     this.getTeams();
     this.setupButtonListener();
-
-    // document.addEventListener("DOMContentLoaded", function () {
-    //   let elems = document.querySelectorAll(".tabs");
-    //   let instances = M.Tabs.getInstance(elems);
-    //   instances.select("joinTeam");
-    // });
+    let elem = document.querySelector(".tabs");
+    let tabsInstance = M.Tabs.init(elem);
+    elem = document.querySelectorAll(".modal");
+    M.Modal.init(elem, {
+      onOpenStart: () =>
+        setTimeout(() => tabsInstance.updateTabIndicator(), 200),
+    });
   };
   /**
    * getTeams asks the background js for all the teams of the current user
@@ -69,11 +71,21 @@ class Teams extends Component {
   /**
    * This will redirect the page to home team with the clicked team information.
    * @author Karl Wang
-   * @param {Object} team the team that was clicked
+   * @param {Object} teamCode the team that was clicked
    */
-  onClickTeam = (team) => {
-    chrome.storage.local.set({ prevTeam: team.teamCode });
-    this.props.history.push("/" + team.teamCode);
+  onClickTeam = (teamCode) => {
+    chrome.storage.local.set({ prevTeam: teamCode }, () => this.redirect());
+  };
+  redirect = () => {
+    let msg = {
+      for: "background",
+      message: "switch team",
+    };
+    chrome.runtime.sendMessage(msg, (response) => {
+      if (response === "success") {
+        this.props.history.push("/");
+      }
+    });
   };
   onRemoveTeam = (team) => {
     team.visable = false;
@@ -86,7 +98,6 @@ class Teams extends Component {
     M.toast({
       html: toastHTML,
       classes: "toast" + team.teamCode,
-      // displayLength: 4000,
     });
     let msg = {
       for: "background",
@@ -106,7 +117,7 @@ class Teams extends Component {
             <div className="col s3" id="team-and-delete">
               {/* This is the button of each team */}
               <button
-                onClick={this.onClickTeam.bind(this, team)}
+                onClick={this.onClickTeam.bind(this, team.teamCode)}
                 teamCode={team.teamCode}
                 className="rounded-btn waves-effect waves-light btn"
               >
@@ -114,10 +125,11 @@ class Teams extends Component {
                   <text className="flexbox-centering">{team.teamName}</text>
                 </div>
               </button>
+              {/* delete button */}
               <button
-                onClick={this.onRemoveTeam.bind(this, team)}
                 className="btn-floating btn-small waves-effect waves-light red accent-2"
                 id="delete"
+                onClick={this.onRemoveTeam.bind(this, team)}
               >
                 <i className="material-icons">remove</i>
               </button>
@@ -146,7 +158,7 @@ class Teams extends Component {
         <div id="modal-createjoin" className="modal">
           <div className="modal-content">
             {/* render modal when clicked on add Button */}
-            <CreateJoinTeam></CreateJoinTeam>
+            <CreateJoinTeam redirect={this.onClickTeam}></CreateJoinTeam>
           </div>
           <div className="modal-footer">
             <a
