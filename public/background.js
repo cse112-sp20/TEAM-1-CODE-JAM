@@ -548,16 +548,26 @@ function millisecondToMin(millisecond) {
 //Get team code everytime
 async function updateLocalStorage(tabUrl, timeSpend) {
   teamCode = await getTeamCode();
-  if (localStorage.getItem(tabUrl) === undefined) {
-    localStorage.setItem(tabUrl, 0);
-    console.log(localStorage.getItem(tabUrl));
+  //console.log(teamCode);
+  //console.log("test: ", localStorage.getItem(teamCode));
+  let check = localStorage.getItem(teamCode);
+  if (check == undefined || JSON.parse(check)[tabUrl] == undefined) {
+    let data = {};
+    data[tabUrl] = 0;
+    data = JSON.stringify(data);
+    localStorage.setItem(teamCode, data);
+    console.log(localStorage.getItem(teamCode));
   } else {
-    let time = localStorage.getItem(tabUrl);
+    let currData = localStorage.getItem(teamCode);
+    currData = JSON.parse(currData);
+    let time = currData[tabUrl];
     let newTime = parseInt(time) + parseInt(timeSpend);
-    localStorage.setItem(tabUrl, newTime);
-    if (newTime % threshold === 0) {
+    currData.time = newTime;
+    currData = JSON.stringify(currData);
+    localStorage.setItem(teamCode, currData);
+    if (newTime % threshold == 0) {
       //updateTimeline(tabUrl);
-      let seconds = localStorage.getItem(tabUrl) / 1000;
+      let seconds = parseInt(JSON.parse(localStorage.getItem(teamCode)).time) / 1000;
       time = `${tabUrl}: ${seconds} seconds`;
       db.collection("teams")
         .doc(teamCode)
