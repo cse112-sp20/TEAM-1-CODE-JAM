@@ -3,6 +3,7 @@ import React, { Component } from "react";
 import M from "materialize-css";
 import "./NavBar.css";
 
+
 export default class NavBar extends Component {
   componentDidMount() {
     M.AutoInit();
@@ -13,6 +14,7 @@ export default class NavBar extends Component {
   };
 
   render() {
+
     return (
       <div>
         {/* <!-- Navbar goes here --> */}
@@ -24,6 +26,11 @@ export default class NavBar extends Component {
             <ul className="right">
               <li>
                 <a onClick={this.openSettingPage}>Settings</a>
+              </li>
+            </ul>
+            <ul className="left">
+              <li>
+                <a href="#"><i class = "material-icons">settings</i></a>
               </li>
             </ul>
           </div>
