@@ -12,12 +12,7 @@ let currentTeamInfo;
 let myVar = setInterval(myTimer, updateInterval);
 let currentSnapShot = () => {};
 
-let black_listed = [
-  "www.youtube.com",
-  "www.facebook.com",
-  "twitter.com",
-  "myspace.com",
-];
+let black_listed = ["facebook", "twitter", "myspace", "youtube"];
 let userProfile = {
   joined_teams: [],
 };
@@ -550,24 +545,27 @@ async function updateLocalStorage(tabUrl, timeSpend) {
   teamCode = await getTeamCode();
   //console.log(teamCode);
   //console.log("test: ", localStorage.getItem(teamCode));
-  let check = localStorage.getItem(teamCode);
-  if (check == undefined || JSON.parse(check)[tabUrl] == undefined) {
-    let data = {};
-    data[tabUrl] = 0;
+  let currData = localStorage.getItem(teamCode);
+  if (currData == undefined) {
+    let data = { [tabUrl]: 0 };
     data = JSON.stringify(data);
     localStorage.setItem(teamCode, data);
-    console.log(localStorage.getItem(teamCode));
   } else {
-    let currData = localStorage.getItem(teamCode);
     currData = JSON.parse(currData);
-    let time = currData[tabUrl];
-    let newTime = parseInt(time) + parseInt(timeSpend);
-    currData.time = newTime;
+    let newTime;
+    if (!(tabUrl in currData)) {
+      currData[tabUrl] = Number(0);
+    } else {
+      let time = currData[tabUrl];
+      newTime = parseInt(time) + parseInt(timeSpend);
+      currData[tabUrl] = newTime;
+    }
     currData = JSON.stringify(currData);
     localStorage.setItem(teamCode, currData);
     if (newTime % threshold == 0) {
       //updateTimeline(tabUrl);
-      let seconds = parseInt(JSON.parse(localStorage.getItem(teamCode)).time) / 1000;
+      let seconds =
+        parseInt(JSON.parse(localStorage.getItem(teamCode)).time) / 1000;
       time = `${tabUrl}: ${seconds} seconds`;
       db.collection("teams")
         .doc(teamCode)
