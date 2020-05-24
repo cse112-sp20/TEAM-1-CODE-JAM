@@ -4,6 +4,10 @@
   line-height: 50px;
   padding-left: 10px;
 }
+#adjust-height {
+  height: 50px;
+  line-height: 50px;
+}
 
 #team-name {
   font-size: medium;
