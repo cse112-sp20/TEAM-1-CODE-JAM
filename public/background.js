@@ -9,15 +9,10 @@ let timelineArray;
 let time;
 let currentTeamInfo;
 
-
+let myVar = setInterval(myTimer, updateInterval);
 let currentSnapShot = () => {};
 
-let black_listed = [
-  "www.youtube.com",
-  "www.facebook.com",
-  "twitter.com",
-  "myspace.com",
-];
+let black_listed = ["facebook", "twitter", "myspace", "youtube"];
 let userProfile = {
   joined_teams: [],
 };
@@ -550,37 +545,62 @@ async function updateLocalStorage(tabUrl, timeSpend) {
   teamCode = await getTeamCode();
   //console.log(teamCode);
   //console.log("test: ", localStorage.getItem(teamCode));
-  localStorage.getItem(teamCode);
-  
-  if (localStorage.getItem(teamCode) == undefined || localStorage.getItem(teamCode).has(tabUrl) == false) {
-    data.set(tabUrl, 1);
+  let currData = localStorage.getItem(teamCode);
+  if (currData == undefined) {
+    let data = { [tabUrl]: 0 };
     data = JSON.stringify(data);
     localStorage.setItem(teamCode, data);
-    console.log(localStorage.getItem(teamCode));
   } else {
-    let currData = localStorage.getItem(teamCode);
     currData = JSON.parse(currData);
-    let time = currData[tabUrl];
-    let newTime = parseInt(time) + parseInt(timeSpend);
-    currData.time = newTime;
+    let newTime;
+    if (!(tabUrl in currData)) {
+      currData[tabUrl] = Number(0);
+    } else {
+      let time = currData[tabUrl];
+      newTime = parseInt(time) + parseInt(timeSpend);
+      currData[tabUrl] = newTime;
+    }
     currData = JSON.stringify(currData);
     localStorage.setItem(teamCode, currData);
-    if (newTime % threshold == 0) {
-      //updateTimeline(tabUrl);
-      let seconds = parseInt(JSON.parse(localStorage.getItem(teamCode)).time) / 1000;
-      time = `${tabUrl}: ${seconds} seconds`;
+    if (JSON.parse(currData)[tabUrl] % threshold == 0) {
+      console.log("here");
+      let seconds = JSON.parse(currData)[tabUrl] / 1000;
+      //let seconds =
+       // parseInt(JSON.parse(localStorage.getItem(teamCode)).time) / 1000;
+      //time = `${tabUrl}: ${seconds} seconds`;
       db.collection("teams")
         .doc(teamCode)
         .update({
           timeWasted: firebase.firestore.FieldValue.arrayUnion({
             user: userEmail,
             url: tabUrl,
-            time: time,
+            time: seconds,
           }),
         });
     }
   }
 }
+
+
+
+function checkDate(){
+  let d = new Date();
+  let date = d.getDate();
+  let month = d.getMonth() + 1; // Since getMonth() returns month from 0-11 not 1-12
+  let year = d.getFullYear();
+  let dateStr = month + "/" + date + "/" + year;
+  if(localStorage.getItem("date") == undefined){
+    localStorage.setItem("date", dateStr);
+  }
+  else if(localStorage.getItem("date") != dateStr){
+    localStorage.clear();
+    localStorage.setItem("date", dateStr);
+  }
+
+}
+
+
+
 
 /**
  * Inserts a new element to the timeline if a user has been on a blacklisted
@@ -653,8 +673,6 @@ async function getTimelineArrayFB() {
   });
 }
 
-let myVar = setInterval(myTimer, updateInterval);
-
 function myTimer() {
   chrome.tabs.query(
     {
@@ -663,16 +681,23 @@ function myTimer() {
     },
     function (tabs) {
       let tab = tabs[0];
-      if (tab != undefined) {
-        currTabUrl = getHostname(tab.url);
+      if (tab !== undefined) {
+        let currHost = getHostname(tab.url);
+        currTabUrl = getNameOfURL(currHost);
       }
     }
   );
-  if (currTabUrl != undefined) {
+  if (currTabUrl !== undefined) {
     if (black_listed.includes(currTabUrl)) {
       updateLocalStorage(currTabUrl, updateInterval);
     }
   }
+}
+
+function getNameOfURL(currHost) {
+  let splitArr = currHost.split(".");
+  if (splitArr.length <= 2) return splitArr[0];
+  else return splitArr[1];
 }
 
 chrome.tabs.onRemoved.addListener(function () {
@@ -702,8 +727,10 @@ function getTeamOnSnapshot() {
           };
           chrome.runtime.sendMessage(msg);
           resolve();
+          return;
         });
     }
+    resolve();
   });
 }
 
@@ -718,10 +745,12 @@ async function main() {
   if (userEmail === "") userEmail = "agent@gmail.com";
   await validUserEmail(userEmail, createUser);
   await Promise.all([getUserProfile(userEmail), getTeamOnSnapshot()]);
+  //Todo: Change later
+  checkDate();
   // updateTimelineFB();
   //console.log("Userporfile is: ", userProfile);
   //deleteEverythingAboutAUser(userEmail);
-
+  
   setupListener();
 }
 main();
