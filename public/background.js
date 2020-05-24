@@ -8,6 +8,7 @@ let teamCode;
 let timelineArray;
 let time;
 let currentTeamInfo;
+let data = new Map();
 
 let currentSnapShot = () => {};
 
@@ -549,10 +550,10 @@ async function updateLocalStorage(tabUrl, timeSpend) {
   teamCode = await getTeamCode();
   //console.log(teamCode);
   //console.log("test: ", localStorage.getItem(teamCode));
-  let check = localStorage.getItem(teamCode);
-  if (check == undefined || JSON.parse(check)[tabUrl] == undefined) {
-    let data = {};
-    data[tabUrl] = 0;
+  localStorage.getItem(teamCode);
+  
+  if (localStorage.getItem(teamCode) == undefined || localStorage.getItem(teamCode).has(tabUrl) == false) {
+    data.set(tabUrl, 1);
     data = JSON.stringify(data);
     localStorage.setItem(teamCode, data);
     console.log(localStorage.getItem(teamCode));
