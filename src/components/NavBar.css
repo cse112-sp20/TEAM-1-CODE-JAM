@@ -1,3 +1,10 @@
-#nav-background{
+#nav-background {
   background-color: rgb(233, 150, 128);
+  height: 50px;
+  line-height: 50px;
+  padding-left: 10px;
+}
+
+#team-name {
+  font-size: medium;
 }
