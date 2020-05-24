@@ -693,7 +693,7 @@ function getTeamCode() {
 function getTeamOnSnapshot() {
   return new Promise(async function (resolve, reject) {
     const currentTeam = await getTeamCode();
-    if (currentTeam !== undefined) {
+    if (currentTeam != undefined) {
       currentSnapShot = db
         .collection("teams")
         .doc(currentTeam)
@@ -705,10 +705,11 @@ function getTeamOnSnapshot() {
           };
           chrome.runtime.sendMessage(msg);
           resolve();
-          return;
+          // return;
         });
+    } else {
+      resolve();
     }
-    resolve();
   });
 }
 
