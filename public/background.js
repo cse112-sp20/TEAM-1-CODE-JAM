@@ -8,7 +8,7 @@ let teamCode;
 let timelineArray;
 let time;
 let currentTeamInfo;
-let data = new Map();
+
 
 let currentSnapShot = () => {};
 
