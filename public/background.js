@@ -562,23 +562,45 @@ async function updateLocalStorage(tabUrl, timeSpend) {
     }
     currData = JSON.stringify(currData);
     localStorage.setItem(teamCode, currData);
-    if (newTime % threshold == 0) {
-      //updateTimeline(tabUrl);
-      let seconds =
-        parseInt(JSON.parse(localStorage.getItem(teamCode)).time) / 1000;
-      time = `${tabUrl}: ${seconds} seconds`;
+    if (JSON.parse(currData)[tabUrl] % threshold == 0) {
+      console.log("here");
+      let seconds = JSON.parse(currData)[tabUrl] / 1000;
+      //let seconds =
+       // parseInt(JSON.parse(localStorage.getItem(teamCode)).time) / 1000;
+      //time = `${tabUrl}: ${seconds} seconds`;
       db.collection("teams")
         .doc(teamCode)
         .update({
           timeWasted: firebase.firestore.FieldValue.arrayUnion({
             user: userEmail,
             url: tabUrl,
-            time: time,
+            time: seconds,
           }),
         });
     }
   }
 }
+
+
+
+function checkDate(){
+  let d = new Date();
+  let date = d.getDate();
+  let month = d.getMonth() + 1; // Since getMonth() returns month from 0-11 not 1-12
+  let year = d.getFullYear();
+  let dateStr = month + "/" + date + "/" + year;
+  if(localStorage.getItem("date") == undefined){
+    localStorage.setItem("date", dateStr);
+  }
+  else if(localStorage.getItem("date") != dateStr){
+    localStorage.clear();
+    localStorage.setItem("date", dateStr);
+  }
+
+}
+
+
+
 
 /**
  * Inserts a new element to the timeline if a user has been on a blacklisted
@@ -724,10 +746,12 @@ async function main() {
   if (userEmail === "") userEmail = "agent@gmail.com";
   await validUserEmail(userEmail, createUser);
   await Promise.all([getUserProfile(userEmail), getTeamOnSnapshot()]);
+  //Todo: Change later
+  checkDate();
   // updateTimelineFB();
   //console.log("Userporfile is: ", userProfile);
   //deleteEverythingAboutAUser(userEmail);
-
+  
   setupListener();
 }
 main();
