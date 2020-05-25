@@ -2,9 +2,11 @@
 import React, { Component } from "react";
 import M from "materialize-css";
 // import { Timeline, TimelineBlip } from "react-event-timeline";
-import { Timeline, Icon } from "rsuite";
+import { Timeline, Icon, Button } from "rsuite";
 
+import "rsuite/dist/styles/rsuite-default.css";
 import "./Home.css";
+// const profilePics = require("../images/emojis");
 
 export default class Home extends Component {
   constructor(props) {
@@ -15,6 +17,9 @@ export default class Home extends Component {
       teamName: "",
       teamMembers: [],
       currWebsite: "facebook",
+      profilePics: [],
+      blacklist: ["youtube", "facebook"],
+      isInBlacklist: false,
     };
   }
   /**
@@ -23,15 +28,20 @@ export default class Home extends Component {
    *
    */
   componentDidMount = async () => {
-    M.AutoInit();
-
+    const profilePics = this.importAll(
+      require.context("../images/emojis", false, /\.(png|jpe?g|svg)$/)
+    );
+    this.setState({ profilePics: profilePics });
     var elems = document.querySelectorAll(".dropdown-trigger");
+    // M.AutoInit();
     M.Dropdown.init(elems, {
       constrainWidth: false,
       hover: true,
       autoTrigger: false,
       closeOnClick: false,
     });
+    // elems = document.querySelectorAll(".tooltipped");
+    // M.Tooltip.init(elems, { html: true });
 
     // ask chrome storage for the current team
     // The api is async
@@ -56,7 +66,104 @@ export default class Home extends Component {
         teamName: response.teamName,
         teamMembers: response.members,
       });
+      if (this.state.blacklist.includes(this.state.currWebsite)) {
+        this.setState({
+          isInBlacklist: true,
+        });
+      }
     });
+  };
+  importAll = (r) => {
+    return r.keys().map(r);
+  };
+  onClickBlacklistButton = (e) => {
+    if (!this.state.isInBlacklist) {
+      this.setState({
+        isInBlacklist: true,
+      });
+    } else {
+      this.setState({
+        isInBlacklist: false,
+      });
+    }
+    let elems = document.querySelectorAll(".tooltipped");
+    M.Tooltip.init(elems, {});
+  };
+  createBlacklistButton = () => {
+    let appearance = "ghost";
+    let id = "blacklist-button";
+    let tooltipMsg;
+    let style = {};
+    if (!this.state.isInBlacklist) {
+      // appearance = "ghost";
+      tooltipMsg = "Add current website to black list";
+      style["backgroundColor"] = "transparent";
+    } else {
+      // appearance = "primary";
+      style["backgroundColor"] = "rgba(255, 115, 115, 0.8)";
+      style["color"] = "#fff";
+      tooltipMsg = "Remove current website from black list";
+    }
+
+    return (
+      <Button
+        onClick={this.onClickBlacklistButton}
+        id={id}
+        appearance={appearance}
+        style={style}
+        block
+        size="sm"
+        className="tooltipped"
+        data-html="true"
+        data-position="bottom"
+        data-tooltip={tooltipMsg}
+      >
+        {this.state.currWebsite}
+      </Button>
+    );
+  };
+  createTimelineItem = (profilePic, website, points) => {
+    let isProductive = points[0] === "-" ? false : true;
+    let profilePics = this.state.profilePics;
+    profilePic = profilePics[Math.floor(Math.random() * profilePics.length)];
+    let dotColor;
+    let textColor;
+    if (isProductive) {
+      dotColor = "#98edaa";
+      textColor = "#52d16d";
+    } else {
+      dotColor = "#ff7373";
+      textColor = dotColor;
+    }
+    const paddingTop = "11px";
+    return (
+      <Timeline.Item
+        dot={
+          <Icon
+            id="dot-icon"
+            size="lg"
+            icon="circle"
+            style={{ color: dotColor }}
+          />
+        }
+      >
+        <div id="example" className="row">
+          <div id="col" className="col s1"></div>
+          <div id="col" className="col s2">
+            <img src={profilePic} className="circle" />
+          </div>
+          <div id="col" className="col s1"></div>
+          <div id="col" className="col s5">
+            <p style={{ paddingTop: paddingTop }}>{website}</p>
+          </div>
+          <div id="col" className="col s3">
+            <p style={{ color: textColor, paddingTop: paddingTop }}>
+              {points} Points
+            </p>
+          </div>
+        </div>
+      </Timeline.Item>
+    );
   };
 
   render() {
@@ -122,83 +229,32 @@ export default class Home extends Component {
     );
     let addToBlackList = (
       <div id="col" className="col s6">
-        <span className="left black-text truncate">
-          {this.state.currWebsite}
-        </span>
-        <div id="blacklist" className="switch right">
-          <label>
-            <input type="checkbox" />
-            <span className="lever"></span>
-          </label>
-        </div>
+        {this.createBlacklistButton()}
       </div>
     );
     let checkIn = (
       <div id="col" className="col s6">
-        <span className="left black-text">Check In</span>
+        {/* <span className="left black-text">Check In</span> */}
         <div id="checkin" className="switch right">
           <label>
+            Check off
             <input type="checkbox" />
             <span className="lever"></span>
+            Check in
           </label>
         </div>
       </div>
     );
-    let exampleNode = (
-      <div id="example" className="row">
-        <div id="col" className="col s2">
-          <img src={profilePic} />
-        </div>
-        <div id="col" className="col s6">
-          <p>Facebook</p>
-        </div>
-        <div id="col" className="col s4">
-          <p>+20 Points</p>
-        </div>
-      </div>
-    );
-    // let timeline = (
-    //   <Timeline>
-    //     <TimelineBlip
-    //       title={exampleNode}
-    //       icon={<i className="material-icons">brightness_1</i>}
-    //       iconColor="#95d44c"
-    //     ></TimelineBlip>
-    //   </Timeline>
-    // );
     let timeline = (
-      <Timeline>
-        <Timeline.Item
-          dot={<Icon icon="check-circle" style={{ color: "green" }} />}
-        >
-          <p>2018-03-01</p>
-          <p>Your order starts processing</p>
-        </Timeline.Item>
-        <Timeline.Item
-          dot={<Icon icon="exclamation-triangle" style={{ color: "orange" }} />}
-        >
-          <p>2018-03-02</p>
-          <p>Order out of stock</p>
-        </Timeline.Item>
-        <Timeline.Item
-          dot={<Icon icon="info-circle" style={{ color: "blue" }} />}
-        >
-          <p>2018-03-10</p>
-          <p>Arrival</p>
-        </Timeline.Item>
-        <Timeline.Item
-          dot={<Icon icon="check-circle" style={{ color: "green" }} />}
-        >
-          <p>2018-03-12</p>
-          <p>Order out of the library</p>
-        </Timeline.Item>
-        <Timeline.Item
-          dot={<Icon icon="spinner" spin style={{ borderRadius: "50%" }} />}
-        >
-          <p>2018-03-15</p>
-          <p>Sending you a piece</p>
-        </Timeline.Item>
-      </Timeline>
+      <div id="mini-timeline">
+        <Timeline>
+          {this.createTimelineItem(profilePic, "facebook", "-30")}
+          {this.createTimelineItem(profilePic, "github commit", "+30")}
+          {this.createTimelineItem(profilePic, "youtube", "-30")}
+          {this.createTimelineItem(profilePic, "myspace", "-30")}
+          {this.createTimelineItem(profilePic, "github commit", "+30")}
+        </Timeline>
+      </div>
     );
 
     return (
@@ -220,7 +276,12 @@ export default class Home extends Component {
           </div>
         </div>
         <div id="row" className="row">
-          {/* <div className="card blue-grey lighten-5">{timeline}</div> */}
+          <div
+            id="mini-timeline-wrapper"
+            className="valign-wrapper card blue-grey lighten-5"
+          >
+            {timeline}
+          </div>
         </div>
       </div>
     );

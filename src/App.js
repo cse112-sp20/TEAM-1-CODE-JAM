@@ -5,6 +5,7 @@ import {
   BrowserRouter as Router,
   withRouter,
 } from "react-router-dom";
+// import "rsuite/dist/styles/rsuite-default.css";
 import "./components/materialize.min.css";
 import CreateJoinTeam from "./components/CreateJoinTeam";
 import NavBar from "./components/NavBar";

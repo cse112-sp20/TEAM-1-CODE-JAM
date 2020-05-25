@@ -13,3 +13,10 @@ span {
 #sidenav-background {
   background-color: rgba(139, 143, 163, 0.3);
 }
+.btn-flat i,
+.btn-floating i,
+.btn-large i,
+.btn-small i,
+.btn i {
+  font-size: 2rem;
+}
