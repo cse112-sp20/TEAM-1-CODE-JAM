@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/static/css/main.10155862.chunk.css",
-    "main.js": "/static/js/main.1ff949f0.chunk.js",
-    "main.js.map": "/static/js/main.1ff949f0.chunk.js.map",
+    "main.css": "/static/css/main.74a43bc0.chunk.css",
+    "main.js": "/static/js/main.177701fe.chunk.js",
+    "main.js.map": "/static/js/main.177701fe.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.a47727e6.js",
     "runtime-main.js.map": "/static/js/runtime-main.a47727e6.js.map",
-    "static/js/2.891f7b1b.chunk.js": "/static/js/2.891f7b1b.chunk.js",
-    "static/js/2.891f7b1b.chunk.js.map": "/static/js/2.891f7b1b.chunk.js.map",
+    "static/js/2.1450fc07.chunk.js": "/static/js/2.1450fc07.chunk.js",
+    "static/js/2.1450fc07.chunk.js.map": "/static/js/2.1450fc07.chunk.js.map",
     "index.html": "/index.html",
-    "precache-manifest.f76d0851cd4cfe0eac5e19c5a13b7041.js": "/precache-manifest.f76d0851cd4cfe0eac5e19c5a13b7041.js",
+    "precache-manifest.d07d1310e1bb486f00b1100124272d7e.js": "/precache-manifest.d07d1310e1bb486f00b1100124272d7e.js",
     "service-worker.js": "/service-worker.js",
-    "static/css/main.10155862.chunk.css.map": "/static/css/main.10155862.chunk.css.map",
-    "static/js/2.891f7b1b.chunk.js.LICENSE.txt": "/static/js/2.891f7b1b.chunk.js.LICENSE.txt",
+    "static/css/main.74a43bc0.chunk.css.map": "/static/css/main.74a43bc0.chunk.css.map",
+    "static/js/2.1450fc07.chunk.js.LICENSE.txt": "/static/js/2.1450fc07.chunk.js.LICENSE.txt",
     "static/media/Predator.svg": "/static/media/Predator.1869373e.svg",
     "static/media/Walle-female.svg": "/static/media/Walle-female.79e1890f.svg",
     "static/media/airbaloon.svg": "/static/media/airbaloon.427d7cd2.svg",
@@ -27,6 +27,7 @@
     "static/media/clap.svg": "/static/media/clap.0a1c762c.svg",
     "static/media/cop-male.svg": "/static/media/cop-male.084773e3.svg",
     "static/media/cucumber.svg": "/static/media/cucumber.6f26cefb.svg",
+    "static/media/donut.svg": "/static/media/donut.0b2e364d.svg",
     "static/media/facebook.svg": "/static/media/facebook.2b2fa562.svg",
     "static/media/family-institution.svg": "/static/media/family-institution.0ad0a774.svg",
     "static/media/fear.svg": "/static/media/fear.621af8fd.svg",
@@ -65,8 +66,8 @@
   },
   "entrypoints": [
     "static/js/runtime-main.a47727e6.js",
-    "static/js/2.891f7b1b.chunk.js",
-    "static/css/main.10155862.chunk.css",
-    "static/js/main.1ff949f0.chunk.js"
+    "static/js/2.1450fc07.chunk.js",
+    "static/css/main.74a43bc0.chunk.css",
+    "static/js/main.177701fe.chunk.js"
   ]
 }
