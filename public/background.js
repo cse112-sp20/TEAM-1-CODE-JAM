@@ -229,6 +229,8 @@ function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
       return;
     }
 
+    let points = await getTeamPoint();
+    points = parseInt(points) + 100;
     // do both of these two things parallelly
     await Promise.all([
       // add the user to the team
@@ -237,6 +239,7 @@ function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
         .doc(teamCode)
         .update({
           members: firebase.firestore.FieldValue.arrayUnion(userEmail),
+          teamPoints : points,
         }),
       // add the team code to the user
       db
@@ -276,6 +279,7 @@ async function createTeamOnFirebase(teamName, userEmail) {
     let teamCode = await generateRandomTeamCode(5);
     // create a time stamp (used for sorting)
     let currentTime = Date.now();
+    let initPoint = 100;
     // Do these parallelly
     await Promise.all([
       // add the team to the user
@@ -301,6 +305,7 @@ async function createTeamOnFirebase(teamName, userEmail) {
             creator: userEmail,
             members: [userEmail],
             timeWasted: [],
+            teamPoints : initPoint,
           },
           { merge: true }
         ),
@@ -565,6 +570,10 @@ async function updateLocalStorage(tabUrl, timeSpend) {
     if (JSON.parse(currData)[tabUrl] % threshold == 0) {
       console.log("here");
       let seconds = JSON.parse(currData)[tabUrl] / 1000;
+      let score = threshold / (60 * 1000);
+      let today = new Date();
+      let currTime = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+      //console.log("Current time is: ", time);
       //let seconds =
        // parseInt(JSON.parse(localStorage.getItem(teamCode)).time) / 1000;
       //time = `${tabUrl}: ${seconds} seconds`;
@@ -575,13 +584,18 @@ async function updateLocalStorage(tabUrl, timeSpend) {
             user: userEmail,
             url: tabUrl,
             time: seconds,
+            points : -score,
+            currTime : currTime,
+
           }),
         });
     }
   }
 }
 
-
+/**
+ * @author: Youliang Liu
+ */
 
 function checkDate(){
   let d = new Date();
@@ -599,6 +613,31 @@ function checkDate(){
 
 }
 
+async function getTeamPoint(){
+  return new Promise(function(resolve){
+    getTeamCode();
+    db.collection('teams')
+    .doc(teamCode)
+    .get()
+    .then(function (doc) {
+      let data = doc.data();
+      console.log("teamPoint is: ", data.teamPoints);
+      resolve(data.teamPoints);
+    });
+  })
+}
+
+function getTeamPoint1(){
+    getTeamCode();
+    db.collection('teams')
+    .doc(teamCode)
+    .get()
+    .then(function (doc) {
+      let data = doc.data();
+      console.log("teamPoint is: ", data.teamPoints);
+    return data.teamPoints;
+    })
+}
 
 
 
@@ -747,10 +786,10 @@ async function main() {
   await Promise.all([getUserProfile(userEmail), getTeamOnSnapshot()]);
   //Todo: Change later
   checkDate();
-  // updateTimelineFB();
-  //console.log("Userporfile is: ", userProfile);
   //deleteEverythingAboutAUser(userEmail);
   
+  //console.log("Current team info is: ", currentTeamInfo.members.length);
+  //getTeamPoint();
   setupListener();
 }
 main();
