@@ -3,8 +3,9 @@ var currTabUrl;
 var lastTabUrl;
 var updateInterval = 1000;
 var flip = false;
-var animal = 0;
+var animal = 4;
 
+console.log(animals[0]);
 // limit of how long you can be on blacklisted site
 var threshold = 5000;
 
@@ -39,23 +40,17 @@ function updateTimeline(currTabUrl) {
     let currTime = new Date().toLocaleTimeString(); // needs to be local storage time
 
     let seconds = localStorage.getItem(currTabUrl) / 1000;
-    // let seconds = newTime / 1000;
-    //threshold / 1000;
-    let time = `Total Time: ${seconds} minutes`;
     let msg = {
       for: "popup",
       message: "timeline",
       url: currTabUrl,
-      time: time,
-      timestamp: currTime,
-      flip: flip,
+      time: currTime,
       animal: animal,
     };
-    animal = (animal + 1) % 11;
+    animal = (animal + 1) % 20;
     flip = !flip;
 
     if (localStorage["oldElements"] == undefined) {
-      // localStorage["oldElements"] = [];
       let firstItem = [{ url: currTabUrl, time: currTime }];
       localStorage.setItem("oldElements", JSON.stringify(firstItem));
     } else {
@@ -73,6 +68,7 @@ function updateTimeline(currTabUrl) {
 var myVar = setInterval(myTimer, updateInterval);
 
 function myTimer() {
+  console.log("update");
   chrome.tabs.query(
     {
       active: true,
