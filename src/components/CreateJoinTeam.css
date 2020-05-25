@@ -8,3 +8,7 @@ button {
 #teamCode {
   text-transform: uppercase;
 }
+
+#body {
+  overflow-x: hidden; /* Hide horizontal scrollbar */
+}

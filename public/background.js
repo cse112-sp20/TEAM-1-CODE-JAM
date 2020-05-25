@@ -1,18 +1,26 @@
-/*global chrome firebase flip*/
+/*global chrome firebase*/
 let db;
+let currTabUrl;
+let lastTabUrl;
+let updateInterval = 1000;
+let flip = false;
+let teamCode;
+let timelineArray;
+let time;
+let currentTeamInfo;
 
-let black_listed = [
-  "www.youtube.com",
-  "www.facebook.com",
-  "twitter.com",
-  "myspace.com",
-];
+let myVar = setInterval(myTimer, updateInterval);
+let currentSnapShot = () => {};
+
+let black_listed = ["facebook", "twitter", "myspace", "youtube"];
 let userProfile = {
   joined_teams: [],
 };
 let teams;
 let userEmail;
 let tabs;
+// limit of how long you can be on blacklisted site
+let threshold = 5000;
 
 /**
  *  Gets the host name of a URL
@@ -32,7 +40,7 @@ function getHostname(url) {
     return "invalid";
   }
   try {
-    var newUrl = new URL(url);
+    let newUrl = new URL(url);
     return newUrl.hostname;
   } catch (err) {
     console.log(err);
@@ -45,25 +53,39 @@ function getHostname(url) {
  * @author Brian Aguirre
  * @return {Array} array of objects
  */
-function getAllTabs() {
-  return new Promise((resolve, reject) => {
-    tabs = [];
-    if (localStorage["oldElements"] != undefined) {
-      let oldElements = JSON.parse(
-        localStorage.getItem("oldElements")
-      ).reverse();
+// function getAllTabs() {
+//   return new Promise((resolve, reject) => {
+//     console.log(timelineArray);
+//     tabs = [];
+//     if (timelineArray != undefined) {
+//       let oldElements = JSON.parse(timelineArray).reverse();
 
-      oldElements.map((obj) => {
-        let tab = obj;
-        tab.flip = flip;
-        tabs.push(tab);
-        flip = !flip;
-      });
-      // tabs = oldElements;
-    }
+//       oldElements.map((obj) => {
+//         let tab = obj;
+//         tab.flip = flip;
+//         tabs.push(tab);
+//         flip = !flip;
+//       });
+//       console.log("The tabs is: ", tabs);
+//     }
+//     resolve(tabs);
+//   });
+// }
+
+async function reverseTimelineArray() {
+  return new Promise(function (resolve) {
+    let tabs = [];
+    let reverse = timelineArray.reverse();
+    reverse.map((obj) => {
+      let tab = obj;
+      tab.flip = flip;
+      tabs.push(tab);
+      flip = !flip;
+    });
     resolve(tabs);
   });
 }
+
 /**
  * setupListener listens for request coming from popup,
  * it then sends the response that the popup need
@@ -108,11 +130,12 @@ function setupListener() {
       } else if (request.message === "get teams") {
         sendResponse(teams);
       } else if (request.message === "get team info") {
-        getTeamInformation(request.teamCode).then(function (doc) {
-          sendResponse(doc.data());
-        });
+        // getTeamInformation(request.teamCode).then(function (doc) {
+        //   sendResponse(doc.data());
+        // });
+        sendResponse(currentTeamInfo);
       } else if (request.message === "get timeline") {
-        getAllTabs().then((tabs) => {
+        reverseTimelineArray().then((tabs) => {
           sendResponse(tabs);
         });
       } else if (request.message === "set timeout to delete team") {
@@ -122,6 +145,13 @@ function setupListener() {
         }, 4000);
       } else if (request.message === "clear timeout") {
         clearTimeout(timeoutVars[request.teamCode]);
+      } else if (request.message === "get timeline array") {
+        sendResponse(currentTeamInfo);
+      } else if (request.message === "switch team") {
+        currentSnapShot();
+        getTeamOnSnapshot().then(() => {
+          sendResponse("success");
+        });
       }
     }
     // return true here is important, it makes sure that
@@ -270,6 +300,7 @@ async function createTeamOnFirebase(teamName, userEmail) {
             createdTime: currentTime,
             creator: userEmail,
             members: [userEmail],
+            timeWasted: [],
           },
           { merge: true }
         ),
@@ -381,28 +412,28 @@ function isTeamCodeUnique(id) {
     });
   });
 }
-/**
- * Init Firebase configuration
- * @author Karl Wang
- */
-function initializeFirebase() {
-  try {
-    global.firebase = require("firebase");
-  } catch {}
+// /**
+//  * Init Firebase configuration
+//  * @author Karl Wang
+//  */
+// function initializeFirebase() {
+//   try {
+//     global.firebase = require("firebase");
+//   } catch {}
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyCJYc-PMIXdQxE2--bQI6Z1FGMKwMulEyc",
-    authDomain: "chrome-extension-cse-112.firebaseapp.com",
-    databaseURL: "https://chrome-extension-cse-112.firebaseio.com",
-    projectId: "chrome-extension-cse-112",
-    storageBucket: "chrome-extension-cse-112.appspot.com",
-    messagingSenderId: "275891630155",
-    appId: "1:275891630155:web:f238da778112200c815dce",
-  };
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  db = firebase.firestore();
-}
+//   const firebaseConfig = {
+//     apiKey: "AIzaSyCJYc-PMIXdQxE2--bQI6Z1FGMKwMulEyc",
+//     authDomain: "chrome-extension-cse-112.firebaseapp.com",
+//     databaseURL: "https://chrome-extension-cse-112.firebaseio.com",
+//     projectId: "chrome-extension-cse-112",
+//     storageBucket: "chrome-extension-cse-112.appspot.com",
+//     messagingSenderId: "275891630155",
+//     appId: "1:275891630155:web:f238da778112200c815dce",
+//   };
+//   // Initialize Firebase
+//   firebase.initializeApp(firebaseConfig);
+//   db = firebase.firestore();
+// }
 /**
  * Get the user email from chrome api
  * @author Karl Wang
@@ -421,6 +452,7 @@ function getUserEmail() {
  * @author Karl Wang
  * @param {string} userEmail The email of the current chrome user
  * @param {function} createUser The function that creates a new user on database
+ * @return {boolean} true if user originally exist, false if user did not exist
  */
 function validUserEmail(userEmail, createUser) {
   return new Promise(function (resolve, reject) {
@@ -430,8 +462,10 @@ function validUserEmail(userEmail, createUser) {
       .then(async function (doc) {
         if (!doc.exists) {
           await createUser(userEmail);
+          resolve(false);
+          return;
         }
-        resolve();
+        resolve(true);
       });
   });
 }
@@ -469,7 +503,237 @@ function getUserProfile(userEmail) {
       });
   });
 }
-// .then(function (userProfile) {});
+/**
+ * Init Firebase configuration
+ * @author Karl Wang
+ */
+function initializeFirebase() {
+  try {
+    global.firebase = require("firebase");
+  } catch {}
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCJYc-PMIXdQxE2--bQI6Z1FGMKwMulEyc",
+    authDomain: "chrome-extension-cse-112.firebaseapp.com",
+    databaseURL: "https://chrome-extension-cse-112.firebaseio.com",
+    projectId: "chrome-extension-cse-112",
+    storageBucket: "chrome-extension-cse-112.appspot.com",
+    messagingSenderId: "275891630155",
+    appId: "1:275891630155:web:f238da778112200c815dce",
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  return firebase;
+}
+
+/*
+ *
+ * realTime.js
+ *
+ */
+
+function minToMillisecond(min) {
+  return min * 60 * 1000;
+}
+
+function millisecondToMin(millisecond) {
+  return millisecond / (60 * 1000);
+}
+
+//Get team code everytime
+async function updateLocalStorage(tabUrl, timeSpend) {
+  teamCode = await getTeamCode();
+  //console.log(teamCode);
+  //console.log("test: ", localStorage.getItem(teamCode));
+  let currData = localStorage.getItem(teamCode);
+  if (currData == undefined) {
+    let data = { [tabUrl]: 0 };
+    data = JSON.stringify(data);
+    localStorage.setItem(teamCode, data);
+  } else {
+    currData = JSON.parse(currData);
+    let newTime;
+    if (!(tabUrl in currData)) {
+      currData[tabUrl] = Number(0);
+    } else {
+      let time = currData[tabUrl];
+      newTime = parseInt(time) + parseInt(timeSpend);
+      currData[tabUrl] = newTime;
+    }
+    currData = JSON.stringify(currData);
+    localStorage.setItem(teamCode, currData);
+    if (JSON.parse(currData)[tabUrl] % threshold == 0) {
+      console.log("here");
+      let seconds = JSON.parse(currData)[tabUrl] / 1000;
+      //let seconds =
+       // parseInt(JSON.parse(localStorage.getItem(teamCode)).time) / 1000;
+      //time = `${tabUrl}: ${seconds} seconds`;
+      db.collection("teams")
+        .doc(teamCode)
+        .update({
+          timeWasted: firebase.firestore.FieldValue.arrayUnion({
+            user: userEmail,
+            url: tabUrl,
+            time: seconds,
+          }),
+        });
+    }
+  }
+}
+
+
+
+function checkDate(){
+  let d = new Date();
+  let date = d.getDate();
+  let month = d.getMonth() + 1; // Since getMonth() returns month from 0-11 not 1-12
+  let year = d.getFullYear();
+  let dateStr = month + "/" + date + "/" + year;
+  if(localStorage.getItem("date") == undefined){
+    localStorage.setItem("date", dateStr);
+  }
+  else if(localStorage.getItem("date") != dateStr){
+    localStorage.clear();
+    localStorage.setItem("date", dateStr);
+  }
+
+}
+
+
+
+
+/**
+ * Inserts a new element to the timeline if a user has been on a blacklisted
+ * site longer than the set time limit (threshold)
+ * @author Brian Aguirre
+ * @param {URL} currTabUrl url of blacklisted site
+ */
+function updateTimeline(currTabUrl) {
+  return new Promise((resolve, reject) => {
+    let currTime = new Date().toLocaleTimeString(); // needs to be local storage time
+
+    let seconds = localStorage.getItem(currTabUrl) / 1000;
+    //threshold / 1000;
+    let time = `${currTabUrl}: ${seconds} seconds`;
+    let msg = {
+      for: "popup",
+      message: "timeline",
+      url: currTabUrl,
+      time: time,
+      flip: flip,
+    };
+    flip = !flip;
+
+    if (localStorage["oldElements"] == undefined) {
+      // localStorage["oldElements"] = [];
+      let firstItem = [{ url: currTabUrl, time: time }];
+      localStorage.setItem("oldElements", JSON.stringify(firstItem));
+    } else {
+      let oldElements = JSON.parse(localStorage.getItem("oldElements"));
+      oldElements.push({ url: currTabUrl, time: time });
+      localStorage.setItem("oldElements", JSON.stringify(oldElements));
+    }
+    chrome.runtime.sendMessage(msg, function (response) {
+      console.log(response);
+      resolve(response);
+    });
+  });
+}
+
+async function updateTimelineFB() {
+  teamCode = await getTeamCode();
+  db.collection("teams")
+    .doc(teamCode)
+    .onSnapshot(async function (doc) {
+      timelineArray = await getTimelineArrayFB();
+      // console.log(timelineArray);
+      let msg = {
+        for: "popup",
+        message: "timeline",
+        url: currTabUrl,
+        time: time,
+        flip: flip,
+      };
+      flip = !flip;
+      chrome.runtime.sendMessage(msg, (response) => {
+        // console.log("Send message success!");
+      });
+    });
+}
+
+async function getTimelineArrayFB() {
+  return new Promise(function (resolve) {
+    db.collection("teams")
+      .doc(teamCode)
+      .get()
+      .then(function (doc) {
+        let data = doc.data();
+        resolve(data.timeWasted);
+      });
+  });
+}
+
+function myTimer() {
+  chrome.tabs.query(
+    {
+      active: true,
+      lastFocusedWindow: true,
+    },
+    function (tabs) {
+      let tab = tabs[0];
+      if (tab !== undefined) {
+        let currHost = getHostname(tab.url);
+        currTabUrl = getNameOfURL(currHost);
+      }
+    }
+  );
+  if (currTabUrl !== undefined) {
+    if (black_listed.includes(currTabUrl)) {
+      updateLocalStorage(currTabUrl, updateInterval);
+    }
+  }
+}
+
+function getNameOfURL(currHost) {
+  let splitArr = currHost.split(".");
+  if (splitArr.length <= 2) return splitArr[0];
+  else return splitArr[1];
+}
+
+chrome.tabs.onRemoved.addListener(function () {
+  currTabUrl = "Closed";
+});
+
+function getTeamCode() {
+  return new Promise(function (resolve) {
+    chrome.storage.local.get("prevTeam", function (data) {
+      resolve(data.prevTeam);
+    });
+  });
+}
+
+function getTeamOnSnapshot() {
+  return new Promise(async function (resolve, reject) {
+    const currentTeam = await getTeamCode();
+    if (currentTeam != undefined) {
+      currentSnapShot = db
+        .collection("teams")
+        .doc(currentTeam)
+        .onSnapshot(function (doc) {
+          currentTeamInfo = doc.data();
+          let msg = {
+            for: "timeline demo",
+            message: currentTeamInfo,
+          };
+          chrome.runtime.sendMessage(msg);
+          resolve();
+          // return;
+        });
+    } else {
+      resolve();
+    }
+  });
+}
 
 // main
 /**
@@ -477,11 +741,17 @@ function getUserProfile(userEmail) {
  * @author Karl Wang
  */
 async function main() {
-  initializeFirebase();
+  db = firebase.firestore();
   userEmail = await getUserEmail();
+  if (userEmail === "") userEmail = "agent@gmail.com";
   await validUserEmail(userEmail, createUser);
-  await getUserProfile(userEmail);
-
+  await Promise.all([getUserProfile(userEmail), getTeamOnSnapshot()]);
+  //Todo: Change later
+  checkDate();
+  // updateTimelineFB();
+  //console.log("Userporfile is: ", userProfile);
+  //deleteEverythingAboutAUser(userEmail);
+  
   setupListener();
 }
 main();
