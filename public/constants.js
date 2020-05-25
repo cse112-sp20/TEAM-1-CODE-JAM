@@ -1,4 +1,4 @@
-const animals = [
+const animals2 = [
   "airbaloon.svg",
   "android.svg",
   "arcade.svg",

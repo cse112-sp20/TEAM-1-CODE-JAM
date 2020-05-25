@@ -1,4 +1,4 @@
-export let animalsLeft = [
+let animalsLeft = [
   "airbaloon",
   "android",
   "arcade",
@@ -51,12 +51,12 @@ export let animalsLeft = [
   "water-bottle",
 ];
 
-export const animals = Array.from(animalsLeft);
+const animals = Array.from(animalsLeft);
 
 /**
  * Distributes animal for new user
  */
-export function getAnimal() {
+function getAnimal() {
   if (animalsLeft.length === 0) {
     throw "ERROR";
   }
@@ -69,7 +69,7 @@ export function getAnimal() {
  * Puts animal back if a user leaves team
  * @param {string} animal
  */
-export function addAnimal(animal) {
+function addAnimal(animal) {
   if (animals.includes(animal)) {
     animalsLeft.push(animal);
   }

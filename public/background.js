@@ -1,4 +1,5 @@
 /*global chrome firebase*/
+
 let db;
 let currTabUrl;
 let lastTabUrl;
@@ -18,6 +19,7 @@ let userProfile = {
 };
 let teams;
 let userEmail;
+let userAnimal;
 let tabs;
 // limit of how long you can be on blacklisted site
 let threshold = 5000;
@@ -238,6 +240,7 @@ function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
         .update({
           members: firebase.firestore.FieldValue.arrayUnion(userEmail),
         }),
+
       // add the team code to the user
       db
         .collection("users")
@@ -245,6 +248,15 @@ function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
         .set(
           {
             joined_teams: { [teamCode]: currentTime },
+          },
+          { merge: true }
+        ),
+      db //me
+        .collection("teams")
+        .doc(teamCode)
+        .set(
+          {
+            distributedAnimal: { [userEmail]: getAnimal() },
           },
           { merge: true }
         ),
@@ -276,6 +288,8 @@ async function createTeamOnFirebase(teamName, userEmail) {
     let teamCode = await generateRandomTeamCode(5);
     // create a time stamp (used for sorting)
     let currentTime = Date.now();
+    // let host_animal = {`{userEmail: getAnimal()};
+
     // Do these parallelly
     await Promise.all([
       // add the team to the user
@@ -301,6 +315,8 @@ async function createTeamOnFirebase(teamName, userEmail) {
             creator: userEmail,
             members: [userEmail],
             timeWasted: [],
+            distributedAnimal: { [userEmail]: getAnimal() },
+            animalsLeft: animalsLeft,
           },
           { merge: true }
         ),
@@ -539,6 +555,21 @@ function minToMillisecond(min) {
 function millisecondToMin(millisecond) {
   return millisecond / (60 * 1000);
 }
+/**
+ * @return user's personal animal
+ */
+async function getUserAnimal() {
+  return new Promise(function (resolve) {
+    db.collection("teams")
+      .doc(teamCode)
+      .get()
+      .then(function (doc) {
+        let data = doc.data();
+        let userAnimal = data.distributedAnimal[userEmail];
+        resolve(userAnimal);
+      });
+  });
+}
 
 //Get team code everytime
 async function updateLocalStorage(tabUrl, timeSpend) {
@@ -564,10 +595,13 @@ async function updateLocalStorage(tabUrl, timeSpend) {
     localStorage.setItem(teamCode, currData);
     if (JSON.parse(currData)[tabUrl] % threshold == 0) {
       console.log("here");
-      let seconds = JSON.parse(currData)[tabUrl] / 1000;
+      // let seconds = JSON.parse(currData)[tabUrl] / 1000;
+      let seconds = new Date().toLocaleTimeString();
       //let seconds =
-       // parseInt(JSON.parse(localStorage.getItem(teamCode)).time) / 1000;
+      // parseInt(JSON.parse(localStorage.getItem(teamCode)).time) / 1000;
       //time = `${tabUrl}: ${seconds} seconds`;
+      console.log("in update local storage");
+      let userAnimal = await getUserAnimal();
       db.collection("teams")
         .doc(teamCode)
         .update({
@@ -575,32 +609,26 @@ async function updateLocalStorage(tabUrl, timeSpend) {
             user: userEmail,
             url: tabUrl,
             time: seconds,
+            animal: userAnimal,
           }),
         });
     }
   }
 }
 
-
-
-function checkDate(){
+function checkDate() {
   let d = new Date();
   let date = d.getDate();
   let month = d.getMonth() + 1; // Since getMonth() returns month from 0-11 not 1-12
   let year = d.getFullYear();
   let dateStr = month + "/" + date + "/" + year;
-  if(localStorage.getItem("date") == undefined){
+  if (localStorage.getItem("date") == undefined) {
     localStorage.setItem("date", dateStr);
-  }
-  else if(localStorage.getItem("date") != dateStr){
+  } else if (localStorage.getItem("date") != dateStr) {
     localStorage.clear();
     localStorage.setItem("date", dateStr);
   }
-
 }
-
-
-
 
 /**
  * Inserts a new element to the timeline if a user has been on a blacklisted
@@ -751,7 +779,7 @@ async function main() {
   // updateTimelineFB();
   //console.log("Userporfile is: ", userProfile);
   //deleteEverythingAboutAUser(userEmail);
-  
+
   setupListener();
 }
 main();

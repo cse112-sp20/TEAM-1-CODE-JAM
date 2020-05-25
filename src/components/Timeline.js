@@ -1,17 +1,12 @@
 /*global chrome*/
 import React, { Component } from "react";
 import "./Timeline.css";
-import Animal from "react-animals";
-import { animals } from "./animals";
-
-// import images from "../images/donut.svg";
-// import { donut } from "..images/images/donut.svg";
 
 export default class Timeline extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      leftRightBranch: [],
+      timeline: [],
     };
   }
   componentDidMount = () => {
@@ -19,86 +14,61 @@ export default class Timeline extends Component {
     chrome.runtime.onMessage.addListener(this.handleMessage);
   };
 
-  createTimelineElement = (time, animal, url, points, update) => {
+  createTimelineElement = (timelineElement) => {
+    let animal = timelineElement.animal;
+    if (animal == undefined) {
+      animal = "Predator";
+    }
     let newElement = (
       <tr>
-        <td>{time}</td>
+        <td>{timelineElement.time}</td>
         <td>
-          <img src={require(`../SVG/${animal}`)}></img>
+          <img src={require(`../SVG/${animal}.svg`)}></img>
         </td>
         <td id="points">
-          {`${url}`}
+          {`${timelineElement.url}`}
           <br></br>
-          {`+${points}`}
+          {`+${30}`}
         </td>
       </tr>
     );
-
-    update
-      ? this.state.leftRightBranch.unshift(newElement) // queue
-      : this.state.leftRightBranch.push(newElement); // stack
-    this.setState({
-      leftRightBranch: this.state.leftRightBranch,
-    });
+    return newElement;
   };
 
-  handleMessage = (msg) => {
+  /**
+   * Updates timeline if a new element is created for the timeline.
+   */
+  handleMessage = (request) => {
     // new element for timeline
-    if (msg.for === "popup") {
-      if (msg.message === "timeline") {
-        // let url = msg.url;
+    if (request.for === "timeline demo")
+      this.setState({
+        timeline: request.message.timeWasted.reverse(),
+      });
 
-        let time = msg.time;
-        let animal = animals[msg.animal];
-
-        let url = msg.url;
-        let innerHTML = `visited ${msg.url}`;
-        let name = "alligator";
-        this.createTimelineElement(time, animal, url, 30, 1);
-        // msg.flip
-        //   ? this.createLeftBranch(innerHTML, name, time, 1)
-        //   : this.createRightBranch(innerHTML, time, 1);
-      }
-    }
-    console.log(msg);
+    console.log(request);
     return true;
   };
-
+  /**
+   * Loads the timeline. Only called once
+   */
   timeline = async () => {
-    //   team name is empty
-    let msg = {
+    const msg = {
       for: "background",
-      message: "get timeline",
+      message: "get timeline array",
     };
-
-    let task = new Promise((resolve, reject) => {
-      chrome.runtime.sendMessage(msg, function (response) {
-        resolve(response);
+    chrome.runtime.sendMessage(msg, (response) => {
+      this.setState({
+        timeline: response.timeWasted.reverse(),
       });
-    });
-    let data = await task;
-    let i = 0;
-    // let animal = animals[0];
-    let len = animals.length;
-    data.map((tab) => {
-      let innerHTML = ` visited ${tab.url}`;
-      let name = "alligator";
-      let url = tab.url;
-      let time = tab.time;
-      console.log(time);
-      let animal = animals[i];
-      this.createTimelineElement(time, animal, url, 30, 0);
-      i = (i + 1) % len;
     });
   };
 
   render() {
     return (
-      <div class="row">
-        <div class="card e4e4e4 darken-1" id="timeline">
-          <div class="card-content black-text">
-            <table class="highlight centered">
-              {/* header */}
+      <div class="row" id="myTimeline">
+        <div class="card e4e4e4 darken-1" id="myCard">
+          <div class="card-content black-text" id="myContent">
+            <table class="highlight" id="myTable">
               <thead>
                 <tr>
                   <th>Time</th>
@@ -106,8 +76,11 @@ export default class Timeline extends Component {
                   <th>Earned</th>
                 </tr>
               </thead>
-              {/* Timeline activity */}
-              <tbody>{this.state.leftRightBranch}</tbody>
+              <tbody>
+                {this.state.timeline.map((eachTimeline) => {
+                  return this.createTimelineElement(eachTimeline);
+                })}
+              </tbody>
             </table>
           </div>
         </div>
