@@ -5,9 +5,9 @@ import {
   BrowserRouter as Router,
   withRouter,
 } from "react-router-dom";
+import "./components/materialize.min.css";
 import CreateJoinTeam from "./components/CreateJoinTeam";
 import NavBar from "./components/NavBar";
-import "./components/materialize.min.css";
 import SideNav from "./components/SideNav";
 import "./App.css";
 import Teams from "./components/Teams";
@@ -18,8 +18,6 @@ import TimelineDemo from "./components/TimelineDemo";
 
 // for Testing purpose
 class App extends Component {
-  componentDidMount = () => {};
-
   render() {
     return (
       <div className="app">

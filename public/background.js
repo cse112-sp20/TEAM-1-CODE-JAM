@@ -130,9 +130,6 @@ function setupListener() {
       } else if (request.message === "get teams") {
         sendResponse(teams);
       } else if (request.message === "get team info") {
-        // getTeamInformation(request.teamCode).then(function (doc) {
-        //   sendResponse(doc.data());
-        // });
         sendResponse(currentTeamInfo);
       } else if (request.message === "get timeline") {
         reverseTimelineArray().then((tabs) => {
@@ -566,7 +563,7 @@ async function updateLocalStorage(tabUrl, timeSpend) {
       console.log("here");
       let seconds = JSON.parse(currData)[tabUrl] / 1000;
       //let seconds =
-       // parseInt(JSON.parse(localStorage.getItem(teamCode)).time) / 1000;
+      // parseInt(JSON.parse(localStorage.getItem(teamCode)).time) / 1000;
       //time = `${tabUrl}: ${seconds} seconds`;
       db.collection("teams")
         .doc(teamCode)
@@ -581,26 +578,19 @@ async function updateLocalStorage(tabUrl, timeSpend) {
   }
 }
 
-
-
-function checkDate(){
+function checkDate() {
   let d = new Date();
   let date = d.getDate();
   let month = d.getMonth() + 1; // Since getMonth() returns month from 0-11 not 1-12
   let year = d.getFullYear();
   let dateStr = month + "/" + date + "/" + year;
-  if(localStorage.getItem("date") == undefined){
+  if (localStorage.getItem("date") == undefined) {
     localStorage.setItem("date", dateStr);
-  }
-  else if(localStorage.getItem("date") != dateStr){
+  } else if (localStorage.getItem("date") != dateStr) {
     localStorage.clear();
     localStorage.setItem("date", dateStr);
   }
-
 }
-
-
-
 
 /**
  * Inserts a new element to the timeline if a user has been on a blacklisted
@@ -751,7 +741,7 @@ async function main() {
   // updateTimelineFB();
   //console.log("Userporfile is: ", userProfile);
   //deleteEverythingAboutAUser(userEmail);
-  
+
   setupListener();
 }
 main();

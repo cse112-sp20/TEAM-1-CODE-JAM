@@ -1,3 +1,59 @@
 #card-content {
-  padding: 10px;
+  padding: 0;
+}
+#row {
+  margin: 0;
+}
+#col {
+  margin: 0;
+}
+#profile {
+  margin: 5px;
+}
+#top {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+#bottom {
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+#title {
+  margin: 0px;
+  font-size: 30px;
+}
+
+.divider {
+  margin-top: 16px;
+  margin-bottom: 10px;
+}
+
+#blacklist,
+#checkin {
+  margin-top: 5px;
+}
+
+#blacklist label input[type="checkbox"]:checked + .lever:after {
+  background-color: rgba(255, 82, 82, 0.8) !important;
+}
+#blacklist label input[type="checkbox"]:checked + .lever {
+  background-color: rgba(255, 82, 82, 0.6) !important;
+}
+
+#checkin label input[type="checkbox"]:checked + .lever:after {
+  background-color: rgba(149, 212, 76, 0.8) !important;
+}
+#checkin label input[type="checkbox"]:checked + .lever {
+  background-color: rgba(149, 212, 76, 0.6) !important;
+}
+div .card-action {
+  padding-left: 16px !important;
+  padding-right: 0 !important;
+}
+
+#example {
+  margin: 0;
+  width: 100%;
 }
