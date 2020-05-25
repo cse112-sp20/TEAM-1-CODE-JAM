@@ -290,6 +290,7 @@ async function createTeamOnFirebase(teamName, userEmail) {
     let currentTime = Date.now();
     // let host_animal = {`{userEmail: getAnimal()};
 
+    let copiedAnimal = Array.from(animals);
     // Do these parallelly
     await Promise.all([
       // add the team to the user
@@ -315,9 +316,8 @@ async function createTeamOnFirebase(teamName, userEmail) {
             creator: userEmail,
             members: [userEmail],
             timeWasted: [],
-            distributedAnimal: { [userEmail]: getAnimal() },
-            animalsLeft: animalsLeft,
-          },
+            distributedAnimal: { [userEmail]: getAnimal(copiedAnimal) },
+            animalsLeft: copiedAnimal},
           { merge: true }
         ),
     ]);
@@ -567,6 +567,19 @@ async function getUserAnimal() {
         let data = doc.data();
         let userAnimal = data.distributedAnimal[userEmail];
         resolve(userAnimal);
+      });
+  });
+}
+
+async function getAnimalsLeft() {
+  return new Promise(function (resolve) {
+    db.collection("teams")
+      .doc(teamCode)
+      .get()
+      .then(function (doc) {
+        let data = doc.data();
+        let animalsLeft = data.animalsLeft;
+        resolve(animalsLeft);
       });
   });
 }
