@@ -11,7 +11,7 @@ let time;
 let currentTeamInfo;
 
 let myVar = setInterval(myTimer, updateInterval);
-let currentSnapShot = () => {};
+let currentSnapShot = () => { };
 
 let black_listed = ["facebook", "twitter", "myspace", "youtube"];
 let userProfile = {
@@ -143,7 +143,10 @@ function setupListener() {
         });
       } else if (request.message === "set timeout to delete team") {
         timeoutVars[request.teamCode] = setTimeout(async () => {
-          await deleteTeamFromUser(userEmail, request.teamCode);
+          let userAnimal = await getUserAnimal(request.userEmail, request.teamCode);
+          let animalsLeft = await getAnimalsLeft(request.teamCode);
+          let distributedAnimal = await getDistributedAnimal(request.teamCode);
+          await deleteTeamFromUser(userEmail, request.teamCode, userAnimal, animalsLeft, distributedAnimal);
           await deleteIfNoMembers(request.teamCode);
         }, 4000);
       } else if (request.message === "clear timeout") {
@@ -361,17 +364,10 @@ function deleteEverythingAboutAUser(userEmail) {
   });
 }
 
-function deleteTeamFromUser(userEmail, teamCode) {
-  let userAnimal;
-  let animalsLeft;
-  let distributedAnimal;
-  setTimeout(async () => {
-    userAnimal = await getUserAnimal(userEmail, teamCode);
-    animalsLeft = await getAnimalsLeft(teamCode);
-    distributedAnimal = await getDistributedAnimal(teamCode);
-    delete distributedAnimal[userAnimal];
-    addAnimal(animalsLeft, userAnimal);
-  }, 0);
+function deleteTeamFromUser(userEmail, teamCode, userAnimal, animalsLeft, distributedAnimal) {
+  delete distributedAnimal[userAnimal];
+  addAnimal(animalsLeft, userAnimal);
+
   return Promise.all([
     db
       .collection("users")
@@ -379,7 +375,7 @@ function deleteTeamFromUser(userEmail, teamCode) {
       .update({
         ["joined_teams." + teamCode]: firebase.firestore.FieldValue.delete(),
       })
-      .catch((err) => {}),
+      .catch((err) => { }),
     db
       .collection("teams")
       .doc(teamCode)
@@ -388,7 +384,7 @@ function deleteTeamFromUser(userEmail, teamCode) {
         distributedAnimal: distributedAnimal,
         animalsLeft: animalsLeft,
       })
-      .catch((err) => {}),
+      .catch((err) => { }),
   ]);
 }
 function deleteTeamEntirely(teamCode) {
@@ -549,7 +545,7 @@ function getUserProfile(userEmail) {
 function initializeFirebase() {
   try {
     global.firebase = require("firebase");
-  } catch {}
+  } catch { }
 
   const firebaseConfig = {
     apiKey: "AIzaSyCJYc-PMIXdQxE2--bQI6Z1FGMKwMulEyc",
@@ -853,4 +849,4 @@ try {
     createUser,
     deleteEverythingAboutAUser,
   };
-} catch {}
+} catch { }
