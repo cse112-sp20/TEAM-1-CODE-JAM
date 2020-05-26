@@ -11,12 +11,13 @@ let time;
 let currentTeamInfo;
 let tmp_teamCode;
 let tmp_animal;
+let github_timeout = 15000;
 
 let myVar = setInterval(myTimer, updateInterval);
 let tracker = setInterval(function () {
-  sendToDB(tmp_teamCode, tmp_animal)
-}, 15000)
-let currentSnapShot = () => { };
+  sendToDB(tmp_teamCode, tmp_animal);
+}, github_timeout);
+let currentSnapShot = () => {};
 
 let black_listed = ["facebook", "twitter", "myspace", "youtube"];
 let userProfile = {
@@ -150,7 +151,13 @@ function setupListener() {
           let userAnimal = await getUserAnimal(userEmail, request.teamCode);
           let animalsLeft = await getAnimalsLeft(request.teamCode);
           let distributedAnimal = await getDistributedAnimal(request.teamCode);
-          await deleteTeamFromUser(userEmail, request.teamCode, userAnimal, animalsLeft, distributedAnimal);
+          await deleteTeamFromUser(
+            userEmail,
+            request.teamCode,
+            userAnimal,
+            animalsLeft,
+            distributedAnimal
+          );
           await deleteIfNoMembers(request.teamCode);
         }, 4000);
       } else if (request.message === "clear timeout") {
@@ -373,8 +380,13 @@ function deleteEverythingAboutAUser(userEmail) {
   });
 }
 
-function deleteTeamFromUser(userEmail, teamCode, userAnimal, animalsLeft, distributedAnimal) {
-
+function deleteTeamFromUser(
+  userEmail,
+  teamCode,
+  userAnimal,
+  animalsLeft,
+  distributedAnimal
+) {
   delete distributedAnimal[userEmail];
   addAnimal(animalsLeft, userAnimal);
 
@@ -385,7 +397,7 @@ function deleteTeamFromUser(userEmail, teamCode, userAnimal, animalsLeft, distri
       .update({
         ["joined_teams." + teamCode]: firebase.firestore.FieldValue.delete(),
       })
-      .catch((err) => { }),
+      .catch((err) => {}),
     db
       .collection("teams")
       .doc(teamCode)
@@ -394,7 +406,7 @@ function deleteTeamFromUser(userEmail, teamCode, userAnimal, animalsLeft, distri
         distributedAnimal: distributedAnimal,
         animalsLeft: animalsLeft,
       })
-      .catch((err) => { }),
+      .catch((err) => {}),
   ]);
 }
 function deleteTeamEntirely(teamCode) {
@@ -555,7 +567,7 @@ function getUserProfile(userEmail) {
 function initializeFirebase() {
   try {
     global.firebase = require("firebase");
-  } catch { }
+  } catch {}
 
   const firebaseConfig = {
     apiKey: "AIzaSyCJYc-PMIXdQxE2--bQI6Z1FGMKwMulEyc",
@@ -859,4 +871,4 @@ try {
     createUser,
     deleteEverythingAboutAUser,
   };
-} catch { }
+} catch {}

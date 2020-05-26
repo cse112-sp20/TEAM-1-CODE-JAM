@@ -1,17 +1,16 @@
 {
   "files": {
-    "main.css": "/static/css/main.006f17eb.chunk.css",
-    "main.js": "/static/js/main.c8d99e14.chunk.js",
-    "main.js.map": "/static/js/main.c8d99e14.chunk.js.map",
+    "main.css": "/static/css/main.114dca29.chunk.css",
+    "main.js": "/static/js/main.765be703.chunk.js",
+    "main.js.map": "/static/js/main.765be703.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.a47727e6.js",
     "runtime-main.js.map": "/static/js/runtime-main.a47727e6.js.map",
     "static/js/2.7bdba5b7.chunk.js": "/static/js/2.7bdba5b7.chunk.js",
     "static/js/2.7bdba5b7.chunk.js.map": "/static/js/2.7bdba5b7.chunk.js.map",
     "index.html": "/index.html",
-
-    "precache-manifest.e12242ec2f9efaaec08a0877e3c7a71d.js": "/precache-manifest.e12242ec2f9efaaec08a0877e3c7a71d.js",
+    "precache-manifest.a052389c02e79c7790427e96ba68741d.js": "/precache-manifest.a052389c02e79c7790427e96ba68741d.js",
     "service-worker.js": "/service-worker.js",
-    "static/css/main.006f17eb.chunk.css.map": "/static/css/main.006f17eb.chunk.css.map",
+    "static/css/main.114dca29.chunk.css.map": "/static/css/main.114dca29.chunk.css.map",
     "static/js/2.7bdba5b7.chunk.js.LICENSE.txt": "/static/js/2.7bdba5b7.chunk.js.LICENSE.txt",
     "static/media/Predator.svg": "/static/media/Predator.1869373e.svg",
     "static/media/Walle-female.svg": "/static/media/Walle-female.79e1890f.svg",
@@ -68,8 +67,7 @@
   "entrypoints": [
     "static/js/runtime-main.a47727e6.js",
     "static/js/2.7bdba5b7.chunk.js",
-
-    "static/css/main.006f17eb.chunk.css",
-    "static/js/main.c8d99e14.chunk.js"
+    "static/css/main.114dca29.chunk.css",
+    "static/js/main.765be703.chunk.js"
   ]
 }
