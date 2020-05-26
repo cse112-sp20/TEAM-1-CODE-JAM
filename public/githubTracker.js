@@ -165,8 +165,6 @@ function sendToDB(teamCode, animal) {
           };
 
           if (localStorage.getItem("oldElements") == null) {
-            // console.log("Local Storage is empty...")
-
             let item = [{ url: "github.com", time: max }];
             localStorage.setItem("oldElements", JSON.stringify(item));
 
@@ -232,7 +230,7 @@ function sendToDB(teamCode, animal) {
                 .update({
                   timeWasted: firebase.firestore.FieldValue.arrayUnion({
                     user: userEmail,
-                    url: "Git Commit",
+                    url: "Git Push",
                     time: seconds,
                     animal: userAnimal,
                   }),
