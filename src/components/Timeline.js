@@ -6,130 +6,93 @@ export default class Timeline extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      black_listed: [
-        "www.youtube.com",
-        "www.facebook.com",
-        "twitter.com",
-        "myspace.com",
-      ],
-      animals: [
-        "alligator",
-        "anteater",
-        "armadillo",
-        "aurochs",
-        "axolotl",
-        "badger",
-        "bat",
-        "beaver",
-        "buffalo",
-        "camel",
-        "capybara",
-      ],
-      leftRightBranch: [],
-      urls: [],
+      black_listed: ["facebook", "twitter", "myspace", "youtube"],
+      timeline: [],
     };
-
-    this.createLeftCard = this.createLeftCard.bind(this);
   }
   componentDidMount = () => {
     this.timeline();
     chrome.runtime.onMessage.addListener(this.handleMessage);
   };
 
-  createLeftCard = (innerHTML, time, update) => {
-    let newElement = (
-      <div className="row">
-        <div className="col s6">
-          <div className="card blue-grey lighten-5">
-            <div className="card-content white-text">
-              <span style={{ color: "black" }} className="card-title">
-                {innerHTML}
-              </span>
-            </div>
-          </div>
-        </div>
-        <div className="col s6">
-          <div>
-            <h4 style={{ color: "#6886c5" }}>{time}</h4>
-          </div>
-        </div>
-      </div>
-    );
-    // Differentiate if first time opening timeline
-    update
-      ? this.state.leftRightBranch.unshift(newElement) // queue
-      : this.state.leftRightBranch.push(newElement); // stack
-    this.setState({
-      leftRightBranch: this.state.leftRightBranch,
-    });
-  };
-
-  createRightCard = (innerHTML, time, update) => {
-    // date.
-    let newElement = (
-      <div className="row">
-        <div className="col s6 ">
-          <h4 style={{ color: "#fa9191" }}>{time}</h4>
-        </div>
-        <div className="col s6">
-          <div className="card blue-grey lighten-5">
-            <div className="card-content white-text">
-              <span style={{ color: "black" }} className="card-title">
-                {innerHTML}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-    // Differentiate if first time opening timeline
-    update
-      ? this.state.leftRightBranch.unshift(newElement) // queue
-      : this.state.leftRightBranch.push(newElement); // stack
-    this.setState({
-      leftRightBranch: this.state.leftRightBranch,
-    });
-  };
-
-  handleMessage = (msg) => {
-    // new element for timeline
-    if (msg.for === "popup") {
-      if (msg.message === "timeline") {
-        let url = msg.url;
-        let time = msg.time;
-        msg.flip
-          ? this.createLeftCard(url, time, 1)
-          : this.createRightCard(url, time, 1);
-      }
+  createTimelineElement = (timelineElement) => {
+    let animal = timelineElement.animal;
+    if (animal == undefined) {
+      animal = "Predator";
     }
-    console.log(msg);
+    let color = "green";
+    let points = "+30";
+
+    if (this.state.black_listed.includes(timelineElement.url)) {
+      color = "red";
+      points = "-30";
+    }
+    let newElement = (
+      <tr>
+        <td>{timelineElement.time}</td>
+        <td>
+          <img src={require(`../SVG/${animal}.svg`)}></img>
+        </td>
+        <td id="thirdElem" style={{ color: `${color}` }}>
+          {`${timelineElement.url}`}
+          <br></br>
+          {`${points}`}
+        </td>
+      </tr>
+    );
+    return newElement;
+  };
+
+  /**
+   * Updates timeline if a new element is created for the timeline.
+   */
+  handleMessage = (request) => {
+    // new element for timeline
+    if (request.for === "timeline demo")
+      this.setState({
+        timeline: request.message.timeWasted.reverse(),
+      });
+
+    console.log(request);
     return true;
   };
-
+  /**
+   * Loads the timeline. Only called once
+   */
   timeline = async () => {
-    //   team name is empty
-    let msg = {
+    const msg = {
       for: "background",
-      message: "get timeline",
+      message: "get timeline array",
     };
-
-    let task = new Promise((resolve, reject) => {
-      chrome.runtime.sendMessage(msg, function (response) {
-        resolve(response);
+    chrome.runtime.sendMessage(msg, (response) => {
+      this.setState({
+        timeline: response.timeWasted.reverse(),
       });
-    });
-    let data = await task;
-    data.map((tab) => {
-      let url = tab.url;
-      let time = tab.time;
-      let flip = tab.flip;
-      flip
-        ? this.createLeftCard(url, time, 0)
-        : this.createRightCard(url, time, 0);
     });
   };
 
   render() {
-    return <div id="timeline">{this.state.leftRightBranch}</div>;
+    return (
+      <div class="row" id="myTimeline">
+        <div class="card e4e4e4 darken-1" id="myCard">
+          <div class="card-content black-text" id="myContent">
+            <table class="highlight" id="myTable">
+              <thead>
+                <tr>
+                  <th id="myHead">Time</th>
+                  <th id="myHead">Person</th>
+                  <th>Earned</th>
+                </tr>
+              </thead>
+              <tbody>
+                {this.state.timeline.map((eachTimeline) => {
+                  return this.createTimelineElement(eachTimeline);
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
   }
 }

@@ -1,11 +1,82 @@
+td {
+  margin: 0;
+  border: 1px solid grey;
+  white-space: nowrap;
+  border-top-width: 0px;
+  width: 500px;
+}
+
+#mycard {
+  max-height: 544px;
+}
+#myContent {
+  width: 400px;
+  height: 500px;
+}
+#myTimeline {
+  margin-left: 5px;
+  width: 430px;
+  height: 500px;
+}
+table {
+  max-width: 500px;
+  overflow-y: scroll;
+}
+
+tbody {
+  width: 400px;
+  display: block;
+  overflow-y: scroll;
+  max-height: 400px;
+  max-width: 400px;
+}
+
+#myHead,
+th {
+  display: inline-block;
+}
+#myHead:nth-child(even) {
+  margin-left: 100px;
+  margin-right: 100px;
+}
+
+img {
+  size: 10px;
+  width: 50px;
+  height: 50px;
+}
+#points {
+  color: green;
+  word-wrap: break-word;
+  scrollbar-width: none;
+}
+#component {
+  padding: 10px;
+}
+table,
+td {
+  border: none;
+}
+
+#animal {
+  margin-left: 100px;
+}
+
+#thirdElem {
+  /* display: block; */
+  font-size: 13px;
+  position: relative;
+  padding-left: 35px;
+  /* margin-left: 50px; */
+}
+
+/* timeline */
 #timeline {
   overflow-y: scroll;
   max-height: 544px;
   scrollbar-width: none;
 }
-#timeline::-webkit-scrollbar {
-  display: none;
-}
+
 /* Hide scrollbar for IE and Edge */
 #timeline {
   -ms-overflow-style: none;
@@ -13,4 +84,83 @@
 
 .row {
   margin: 0;
+}
+
+.timeline {
+  position: relative;
+}
+
+.timeline .timeline-event {
+  position: relative;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.timeline .timeline-event .timeline-content {
+  position: relative;
+  width: calc(50% - 50px);
+}
+
+.timeline .timeline-event::before {
+  display: block;
+  content: "";
+  width: 2px;
+  height: calc(50% - 30px);
+  position: absolute;
+  background: #d2d2d2;
+  left: calc(50% - 1px);
+  top: 0;
+}
+
+.timeline .timeline-event::after {
+  display: block;
+  content: "";
+  width: 2px;
+  height: calc(50% - 30px);
+  position: absolute;
+  background: #d2d2d2;
+  left: calc(50% - 1px);
+  top: calc(50% + 30px);
+}
+
+.timeline .timeline-event:first-child::before {
+  display: none;
+}
+
+.timeline .timeline-event:last-child::after {
+  display: none;
+}
+
+.timeline .timeline-event:nth-child(even) .timeline-content {
+  margin-left: calc(50% + 50px);
+}
+
+.timeline .timeline-event:nth-child(odd) .timeline-content {
+  margin-left: 0;
+}
+
+.timeline .timeline-badge {
+  display: block;
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background: #465881;
+  top: calc(50% - 20px);
+  right: calc(50% - 20px);
+  border-radius: 50%;
+  text-align: center;
+  cursor: default;
+}
+
+.timeline .timeline-badge i {
+  font-size: 25px;
+  line-height: 40px;
+}
+.card-content {
+  font-size: 10px;
+}
+
+#myText {
+  font-size: 10px;
+  word-wrap: break-word;
 }

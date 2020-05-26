@@ -13,6 +13,7 @@
     "identity-obj-proxy": "^3.0.0",
     "materialize-css": "^1.0.0-rc.2",
     "react": "^16.13.1",
+    "react-animals": "0.0.82",
     "react-chartjs-2": "^2.9.0",
     "react-dom": "^16.13.1",
     "react-event-timeline": "^1.6.3",
@@ -29,7 +30,8 @@
     "testw": "jest --watchAll",
     "test": "jest",
     "test1": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "eslint:github-action": "node ./node_modules/eslint/bin/eslint . --ignore-path .gitignore"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -51,6 +53,7 @@
     "@babel/plugin-transform-runtime": "^7.9.6",
     "@babel/preset-env": "^7.9.6",
     "@babel/preset-react": "^7.9.4",
+    "eslint": "^6.6.0",
     "jest-puppeteer": "^4.4.0",
     "puppeteer": "^3.1.0",
     "react-test-renderer": "^16.13.1"

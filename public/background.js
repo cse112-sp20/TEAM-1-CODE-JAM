@@ -1,15 +1,19 @@
-/*global chrome firebase*/
+/*global chrome firebase getAnimal addAnimal sendToDB animals*/
+
 let db;
 let currTabUrl;
-let lastTabUrl;
 let updateInterval = 1000;
 let flip = false;
 let teamCode;
 let timelineArray;
 let time;
 let currentTeamInfo;
+let currTeamCode;
+let userAnimal;
+let github_timeout = 15000;
 
 let updateToDatabase;
+let githubTracker;
 let currentSnapShot = () => {};
 
 let blacklist = ["facebook", "twitter", "myspace", "youtube"];
@@ -130,7 +134,17 @@ function setupListener() {
         });
       } else if (request.message === "set timeout to delete team") {
         timeoutVars[request.teamCode] = setTimeout(async () => {
-          await deleteTeamFromUser(userEmail, request.teamCode);
+          let teamInfo = await getTeamInformation(request.teamCode);
+          let userAnimal = teamInfo.distributedAnimal[userEmail];
+          let animalsLeft = teamInfo.animalsLeft;
+          let distributedAnimal = teamInfo.distributedAnimal;
+          await deleteTeamFromUser(
+            userEmail,
+            request.teamCode,
+            userAnimal,
+            animalsLeft,
+            distributedAnimal
+          );
           await deleteIfNoMembers(request.teamCode);
         }, 4000);
       } else if (request.message === "clear timeout") {
@@ -138,11 +152,15 @@ function setupListener() {
       } else if (request.message === "get timeline array") {
         sendResponse(currentTeamInfo);
       } else if (request.message === "switch team") {
-        checkOff();
-        currentSnapShot();
-        getTeamOnSnapshot().then(() => {
-          sendResponse("success");
-        });
+        (async () => {
+          checkOff();
+          currentSnapShot();
+          currTeamCode = await getTeamCode();
+          userAnimal = await getUserAnimal(userEmail, currTeamCode);
+          getTeamOnSnapshot().then(() => {
+            sendResponse("success");
+          });
+        })();
       } else if (request.message === "toggle check in") {
         toggleCheckIn();
       } else if (request.message === "get home info") {
@@ -244,8 +262,12 @@ function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
       return;
     }
     let initPoint = 100;
-    let points = await getTeamPoint();
-    points = parseInt(points) + 100;
+    // let points = await getTeamPoint();
+    // points = parseInt(points) + 100;
+
+    let animalsLeft = await getAnimalsLeft(teamCode);
+    let newAnimal = getAnimal(animalsLeft);
+
     // do both of these two things parallelly
     await Promise.all([
       // add the user to the team
@@ -254,8 +276,10 @@ function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
         .doc(teamCode)
         .update({
           members: firebase.firestore.FieldValue.arrayUnion(userEmail),
-          teamPoints: points,
+          animalsLeft: animalsLeft,
+          // teamPoints: points,
         }),
+
       // add the team code to the user
       db
         .collection("users")
@@ -269,6 +293,20 @@ function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
           },
           { merge: true }
         ),
+      db //me
+        .collection("teams")
+        .doc(teamCode)
+        .set(
+          {
+            distributedAnimal: { [userEmail]: newAnimal },
+          },
+          { merge: true }
+        ),
+      // db //me
+      //   .collection("teams")
+      //   .doc(teamCode)
+      //   .update({
+      //   }),
     ]);
     resolve("success");
     return;
@@ -295,9 +333,13 @@ async function createTeamOnFirebase(teamName, userEmail) {
   return new Promise(async (resolve, reject) => {
     // first generate a random length 5 id
     let teamCode = await generateRandomTeamCode(5);
+    currTeamCode = teamCode;
     // create a time stamp (used for sorting)
     let currentTime = Date.now();
     let initPoint = 100;
+    // let host_animal = {`{userEmail: getAnimal()};
+
+    let copiedAnimal = Array.from(animals);
     // Do these parallelly
     await Promise.all([
       // add the team to the user
@@ -327,6 +369,8 @@ async function createTeamOnFirebase(teamName, userEmail) {
             members: [userEmail],
             timeWasted: [],
             teamPoints: initPoint,
+            distributedAnimal: { [userEmail]: getAnimal(copiedAnimal) },
+            animalsLeft: copiedAnimal,
           },
           { merge: true }
         ),
@@ -360,7 +404,16 @@ function deleteEverythingAboutAUser(userEmail) {
   });
 }
 
-function deleteTeamFromUser(userEmail, teamCode) {
+function deleteTeamFromUser(
+  userEmail,
+  teamCode,
+  userAnimal,
+  animalsLeft,
+  distributedAnimal
+) {
+  delete distributedAnimal[userEmail];
+  addAnimal(animalsLeft, userAnimal);
+
   return Promise.all([
     db
       .collection("users")
@@ -374,6 +427,8 @@ function deleteTeamFromUser(userEmail, teamCode) {
       .doc(teamCode)
       .update({
         members: firebase.firestore.FieldValue.arrayRemove(userEmail),
+        distributedAnimal: distributedAnimal,
+        animalsLeft: animalsLeft,
       })
       .catch((err) => {}),
   ]);
@@ -540,10 +595,14 @@ function isCheckIn() {
 function checkIn() {
   localStorage.setItem("check in", true);
   updateToDatabase = setInterval(myTimer, updateInterval);
+  githubTracker = setInterval(function () {
+    sendToDB(currTeamCode, userAnimal);
+  }, github_timeout);
 }
 function checkOff() {
   localStorage.setItem("check in", false);
   clearInterval(updateToDatabase);
+  clearInterval(githubTracker);
 }
 /**
  * Init Firebase configuration
@@ -580,6 +639,50 @@ function minToMillisecond(min) {
 
 function millisecondToMin(millisecond) {
   return millisecond / (60 * 1000);
+}
+/**
+ * @return user's personal animal
+ */
+async function getUserAnimal(userEmail, teamCode) {
+  return new Promise(function (resolve) {
+    db.collection("teams")
+      .doc(teamCode)
+      .get()
+      .then(function (doc) {
+        let data = doc.data();
+        let userAnimal = data.distributedAnimal[userEmail];
+        resolve(userAnimal);
+      });
+  });
+}
+
+/**
+ * @return animal remaining in the database
+ */
+async function getAnimalsLeft(teamCode) {
+  return new Promise(function (resolve) {
+    db.collection("teams")
+      .doc(teamCode)
+      .get()
+      .then(function (doc) {
+        let data = doc.data();
+        console.log(data);
+        let animalsLeft = data.animalsLeft;
+        resolve(animalsLeft);
+      });
+  });
+}
+async function getDistributedAnimal(teamCode) {
+  return new Promise(function (resolve) {
+    db.collection("teams")
+      .doc(teamCode)
+      .get()
+      .then(function (doc) {
+        let data = doc.data();
+        let distributedAnimal = data.distributedAnimal;
+        resolve(distributedAnimal);
+      });
+  });
 }
 
 //Get team code everytime
@@ -620,6 +723,8 @@ async function updateLocalStorage(tabUrl, timeSpend) {
       // let userPoints = await getUserPoint();
       let userPoints = userProfile.user_points[teamCode];
       userPoints = userPoints - score;
+
+      let userAnimal = await getUserAnimal(userEmail, teamCode);
       db.collection("teams")
         .doc(teamCode)
         .update({
@@ -629,6 +734,7 @@ async function updateLocalStorage(tabUrl, timeSpend) {
             time: seconds,
             points: -score,
             currTime: currTime,
+            animal: userAnimal,
           }),
           teamPoints: teamPoints,
         });
