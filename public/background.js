@@ -34,7 +34,6 @@ let threshold = 5000;
 
 function getHostname(url) {
   // Handle Chrome URLs
-  console.log(url);
   if (/^chrome:\/\//.test(url)) {
     return "invalid";
   }
@@ -143,7 +142,6 @@ function setupListener() {
         });
       } else if (request.message === "set timeout to delete team") {
         timeoutVars[request.teamCode] = setTimeout(async () => {
-          console.log("userEmail: " + userEmail + " request.userEmail:" + request.userEmail);
           let userAnimal = await getUserAnimal(userEmail, request.teamCode);
           let animalsLeft = await getAnimalsLeft(request.teamCode);
           let distributedAnimal = await getDistributedAnimal(request.teamCode);
@@ -366,16 +364,8 @@ function deleteEverythingAboutAUser(userEmail) {
 }
 
 function deleteTeamFromUser(userEmail, teamCode, userAnimal, animalsLeft, distributedAnimal) {
-  console.log("email, ", userEmail);
-  console.log("code, ", teamCode);
-  console.log("animal,", userAnimal);
-  console.log(animalsLeft);
-  console.log("Before");
-  console.log(distributedAnimal);
 
   delete distributedAnimal[userEmail];
-  console.log("After");
-  console.log(distributedAnimal);
   addAnimal(animalsLeft, userAnimal);
 
   return Promise.all([
