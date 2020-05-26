@@ -231,7 +231,7 @@ function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
       return;
     }
 
-    let animalsLeft = getAnimalsLeft();
+    let animalsLeft = await getAnimalsLeft();
     // do both of these two things parallelly
     await Promise.all([
       // add the user to the team
