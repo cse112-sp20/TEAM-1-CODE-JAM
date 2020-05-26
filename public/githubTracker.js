@@ -185,6 +185,7 @@ function sendToDB(teamCode, animal) {
               .doc(teamCode)
               .update({
                 timeWasted: firebase.firestore.FieldValue.arrayUnion({
+                  point: "+1",
                   user: userEmail,
                   url: "www.GitHub.com",
                   time: seconds,
