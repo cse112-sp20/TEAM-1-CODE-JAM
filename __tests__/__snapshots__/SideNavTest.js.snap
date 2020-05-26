@@ -176,9 +176,16 @@ exports[`Testing side navigation bar 1`] = `
           <div
             id="timeline"
           >
-            <div
-              id="timeline"
-            />
+            <div>
+              <div
+                class="container"
+              >
+                <div
+                  class="timeline"
+                  id="timeline"
+                />
+              </div>
+            </div>
           </div>
           <div
             id="charts"

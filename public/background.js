@@ -9,8 +9,13 @@ let teamCode;
 let timelineArray;
 let time;
 let currentTeamInfo;
+let tmp_teamCode;
+let tmp_animal;
 
 let myVar = setInterval(myTimer, updateInterval);
+let tracker = setInterval(function () {
+  sendToDB(tmp_teamCode, tmp_animal)
+}, 15000)
 let currentSnapShot = () => { };
 
 let black_listed = ["facebook", "twitter", "myspace", "youtube"];
@@ -157,6 +162,10 @@ function setupListener() {
         getTeamOnSnapshot().then(() => {
           sendResponse("success");
         });
+        setTimeout(async () => {
+          tmp_teamCode = await getTeamCode();
+          tmp_animal = await getUserAnimal(userEmail, tmp_teamCode);
+        }, 4000);
       }
     }
     // return true here is important, it makes sure that
@@ -298,6 +307,7 @@ async function createTeamOnFirebase(teamName, userEmail) {
   return new Promise(async (resolve, reject) => {
     // first generate a random length 5 id
     let teamCode = await generateRandomTeamCode(5);
+    tmp_teamCode = teamCode;
     // create a time stamp (used for sorting)
     let currentTime = Date.now();
     // let host_animal = {`{userEmail: getAnimal()};

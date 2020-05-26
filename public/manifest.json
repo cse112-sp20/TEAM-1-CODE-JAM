@@ -3,6 +3,7 @@
   "description": "",
   "version": "1",
   "manifest_version": 2,
+  "key" : "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCQcC0zXoDlvK7zotfJZQC9QsycwOO4uCwtYIhbWCVzGqU9iARNgpReGi6+BvKVhX+EJhLdxar5v/03FJw6gpa1NMIh1Hk5jY4kqJ1oMzykveTkLfBBJ+9St9R8MMd9nREG8NcUKciKCUxjaHkhho/BpFt1CjcWqh6kuhIfjpTEannDcNCYTTOuJB0nbjL4jRzwo5dChT4ldbgCuJLJG6Y58scHDzMnETq40NiNezdr6RLTeEiupzR1zU12pDUdNrGcqAFrDZzOUHEmfCIM0CHVmvzdp8hyQJjgfZdRJiDVBDkb8rELobu4oED44651hbx4+KIpf8Y1dDjylgBl8mS1AgMBAAECggEABWJOy+KeJY2XWesp+CoXLMAGxBjMTWvGXcuCmbNbGEzOwVDGuNruuZuMrFrW8aLkpuILldjcOMc1GaVx0Rw9xXz+U0OA8rxVS+GGlkZnzjmz4AlI6XX+jbhxOgXimu9xZtPCuKtVMv5TBiArCyzz1QNkCjbDn6SV5kOb7FXt6iOCJ11XPBptnR0Ed3cu/yFnR7NnW1YTkl9KVH5gQlynLD00ckNSWPaAQKYr+miSArKjSko1Op9P31pZitpI30V3lbBxxrRzh0DYbcokPEcO1zvBxBx+hLu2EMIrUjDjx+4z92++9P/u3byvEpz13vFfoRy6VDyC8HUMTstFhK9qKwKBgQDGdSwvMYeE9/LSphNOL6WElfxSFo9X7UaRn7KH/RRmRKL15VxyjVUJItywB+IbZ8wKJoHl0+6jlUjZ4o6+INDsG2AIa7IebR+ufDpU6JtDC7KEOn835hDvdiYgKXuRnJwHKGh03q2VcvXw3xcOEVH+6YfeADU43DVClKbEudpkWwKBgQC6UVKWXeCyNdxVY/ewd9A8X330HLpN+gbhi8QlcRIChhwuCIj1ZqZaFGiTnl5vK6oXz4tJVxzQs1+gwpehcYE4Pl5EX1SsNlnlDX7TQf8k9Dn4QC1mw5jjBj2O9wVClWltDfSO1qOMYcB5U+7fcQsiJbwroea/wcj37Ohhok9oLwKBgFl/b/ycdoQlmVEb6irhW+CODysp110MuT1k6otfO3rfSypfVDCowgeLvEB6XaKETcTqFryBteX5pc/01vCxNea0dbt2be5Awf/bMCcoexRiSxBMnSClVU/YVVs9uecx3D9yHqFN5rQ2EumcgfYrI3I0+LvKFjZdQHuVNBwVwIJvAoGBAIYhPV9avgQNmk0u5oV3+8U6yaYPeF/ie0msIM0DlX+TpH3PTym7eE6pGpALFtjZil4R36gwumHUgCdvb1GeMPSYkayPJJnFlvm6uW7EuDWWTJVXPlgYv9vQBkkBtBu3DGqh/UlHY/4P8UxnDDR3YRh4KfsPVtr9WvyA5NpEyv2pAoGAfWlGOqcVp5TgcdaUk1Q+m3/2Q8y8lPOGLVJYuHzHmEMRniP8XlF2Seh0n8PMyUybqvjKnD6RiyV873axQPs55lyuhrnv9cAdILNXjKh9Vl79FMWFq12E+vpNxFPmhHA1lEzGJZJpgUzGSaD6+UczOF+MhUeK0oKAKKHY3e3S8RU=",
   "background": {
     "persistent": false,
     "page": "background.html",
@@ -11,7 +12,21 @@
   "browser_action": {
     "default_popup": "index.html"
   },
-  "permissions": ["identity", "identity.email", "tabs", "storage"],
-  "web_accessible_resources": ["index.html", "/static/*", "/*.js"],
+  "content_scripts": [
+    {
+      "matches": ["https://github.com/robots.txt"],
+      "js": ["github-oauth.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "permissions": ["identity", 
+    "identity.email", 
+    "tabs", 
+    "storage",
+    "https://www.github.com/",
+    "https://api.github.com"
+
+  ],
+  "web_accessible_resources": ["index.html", "/static/*", "/*.js","oauth2/oauth2.html"],
   "content_security_policy": "script-src 'self' https://www.gstatic.com/ https://*.firebaseio.com https://www.googleapis.com 'unsafe-eval'; object-src 'self'"
 }

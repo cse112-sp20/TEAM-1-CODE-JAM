@@ -1,5 +1,4 @@
 /*global chrome*/
-
 import React, { Component } from "react";
 import M from "materialize-css";
 import "./NavBar.css";
@@ -24,7 +23,6 @@ export default class NavBar extends Component {
               Team Activity Tracker
             </a>
             <ul className="right">
-
               <li>
                 <a id="adjust-height" href="#" onClick={this.openSettingsPage}>
                   <i id="adjust-height" className="material-icons">
