@@ -659,7 +659,7 @@ async function updateLocalStorage(tabUrl, timeSpend) {
       // parseInt(JSON.parse(localStorage.getItem(teamCode)).time) / 1000;
       //time = `${tabUrl}: ${seconds} seconds`;
       console.log("in update local storage");
-      let userAnimal = await getUserAnimal();
+      let userAnimal = await getUserAnimal(userEmail, teamCode);
       db.collection("teams")
         .doc(teamCode)
         .update({
