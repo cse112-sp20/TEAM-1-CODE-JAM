@@ -225,7 +225,9 @@ function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
       resolve("team code not found");
       return;
     }
-
+    let initPoint = 100;
+    let points = await getTeamPoint();
+    points = parseInt(points) + 100;
     // do both of these two things parallelly
     await Promise.all([
       // add the user to the team
@@ -234,6 +236,7 @@ function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
         .doc(teamCode)
         .update({
           members: firebase.firestore.FieldValue.arrayUnion(userEmail),
+          teamPoints: points,
         }),
       // add the team code to the user
       db
@@ -242,6 +245,9 @@ function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
         .set(
           {
             joined_teams: { [teamCode]: currentTime },
+            user_points: {
+              [teamCode]: initPoint,
+            },
           },
           { merge: true }
         ),
@@ -273,6 +279,7 @@ async function createTeamOnFirebase(teamName, userEmail) {
     let teamCode = await generateRandomTeamCode(5);
     // create a time stamp (used for sorting)
     let currentTime = Date.now();
+    let initPoint = 100;
     // Do these parallelly
     await Promise.all([
       // add the team to the user
@@ -283,6 +290,9 @@ async function createTeamOnFirebase(teamName, userEmail) {
           {
             joined_teams: {
               [teamCode]: currentTime,
+            },
+            user_points: {
+              [teamCode]: initPoint,
             },
           },
           { merge: true }
@@ -298,6 +308,7 @@ async function createTeamOnFirebase(teamName, userEmail) {
             creator: userEmail,
             members: [userEmail],
             timeWasted: [],
+            teamPoints: initPoint,
           },
           { merge: true }
         ),
@@ -550,6 +561,7 @@ async function updateLocalStorage(tabUrl, timeSpend) {
   } else {
     currData = JSON.parse(currData);
     let newTime;
+    // user visited a new url not in localstorage
     if (!(tabUrl in currData)) {
       currData[tabUrl] = Number(0);
     } else {
@@ -558,13 +570,22 @@ async function updateLocalStorage(tabUrl, timeSpend) {
       currData[tabUrl] = newTime;
     }
     currData = JSON.stringify(currData);
+
     localStorage.setItem(teamCode, currData);
     if (JSON.parse(currData)[tabUrl] % threshold == 0) {
-      console.log("here");
       let seconds = JSON.parse(currData)[tabUrl] / 1000;
-      //let seconds =
-      // parseInt(JSON.parse(localStorage.getItem(teamCode)).time) / 1000;
-      //time = `${tabUrl}: ${seconds} seconds`;
+      let score = threshold / (60 * 1000);
+      let today = new Date();
+      let currTime =
+        today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+      let teamCode = await getTeamCode();
+      // let teamPoints = await getTeamPoint();
+      let teamPoints = currentTeamInfo.teamPoints
+      // we will be using teamCode and userEmail to retrieve userPoints and update these
+      teamPoints = teamPoints - score;
+      // let userPoints = await getUserPoint();
+      let userPoints = userProfile.user_points[teamCode];
+      userPoints = userPoints - score;
       db.collection("teams")
         .doc(teamCode)
         .update({
@@ -572,11 +593,29 @@ async function updateLocalStorage(tabUrl, timeSpend) {
             user: userEmail,
             url: tabUrl,
             time: seconds,
+            points: -score,
+            currTime: currTime,
           }),
+          teamPoints: teamPoints,
         });
+      db.collection("users")
+        .doc(userEmail)
+        .set(
+          {
+            user_points: {
+              [teamCode]: userPoints,
+            },
+          },
+          { merge: true }
+        );
     }
   }
 }
+
+/**
+ * @author: Youliang Liu
+ * check if it is the current date, otherwise clear the localStorage and cloud storage
+ */
 
 function checkDate() {
   let d = new Date();
@@ -590,6 +629,38 @@ function checkDate() {
     localStorage.clear();
     localStorage.setItem("date", dateStr);
   }
+}
+/**
+ * @author: Xiang Liu & Youliang Liu
+ * get the current team points from the database
+ */
+async function getTeamPoint() {
+  return new Promise(async function (resolve) {
+    teamCode = await getTeamCode();
+    db.collection("teams")
+      .doc(teamCode)
+      .get()
+      .then(function (doc) {
+        let data = doc.data();
+        resolve(data.teamPoints);
+      });
+  });
+}
+/**
+ * @author: Xiang Liu
+ * get the current user points from the database
+ */
+async function getUserPoint() {
+  return new Promise(async function (resolve) {
+    teamCode = await getTeamCode();
+    db.collection("users")
+      .doc(userEmail)
+      .get()
+      .then(function (doc) {
+        let data = doc.data();
+        resolve(data.user_points[teamCode]);
+      });
+  });
 }
 
 /**
@@ -662,8 +733,7 @@ async function getTimelineArrayFB() {
       });
   });
 }
-
-function myTimer() {
+function getCurrentTab() {
   chrome.tabs.query(
     {
       active: true,
@@ -673,10 +743,13 @@ function myTimer() {
       let tab = tabs[0];
       if (tab !== undefined) {
         let currHost = getHostname(tab.url);
-        currTabUrl = getNameOfURL(currHost);
+        return getNameOfURL(currHost);
       }
     }
   );
+}
+function myTimer() {
+  currTabUrl = getCurrentTab();
   if (currTabUrl !== undefined) {
     if (black_listed.includes(currTabUrl)) {
       updateLocalStorage(currTabUrl, updateInterval);
@@ -712,7 +785,7 @@ function getTeamOnSnapshot() {
         .onSnapshot(function (doc) {
           currentTeamInfo = doc.data();
           let msg = {
-            for: "timeline demo",
+            for: "team information",
             message: currentTeamInfo,
           };
           chrome.runtime.sendMessage(msg);
@@ -733,13 +806,12 @@ function getTeamOnSnapshot() {
 async function main() {
   db = firebase.firestore();
   userEmail = await getUserEmail();
+  // for puppetter usage only!
   if (userEmail === "") userEmail = "agent@gmail.com";
   await validUserEmail(userEmail, createUser);
   await Promise.all([getUserProfile(userEmail), getTeamOnSnapshot()]);
   //Todo: Change later
   checkDate();
-  // updateTimelineFB();
-  //console.log("Userporfile is: ", userProfile);
   //deleteEverythingAboutAUser(userEmail);
 
   setupListener();
