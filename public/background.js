@@ -234,7 +234,7 @@ function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
 
     let animalsLeft = await getAnimalsLeft(teamCode);
     console.log(animalsLeft);
-    
+
     // do both of these two things parallelly
     await Promise.all([
       // add the user to the team
@@ -267,11 +267,9 @@ function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
       db //me
         .collection("teams")
         .doc(teamCode)
-        .update(
-          {
-            animalsLeft: animalsLeft,
-          },
-        ),
+        .update({
+          animalsLeft: animalsLeft,
+        }),
     ]);
     resolve("success");
     return;
@@ -329,7 +327,8 @@ async function createTeamOnFirebase(teamName, userEmail) {
             members: [userEmail],
             timeWasted: [],
             distributedAnimal: { [userEmail]: getAnimal(copiedAnimal) },
-            animalsLeft: copiedAnimal},
+            animalsLeft: copiedAnimal,
+          },
           { merge: true }
         ),
     ]);
@@ -363,6 +362,20 @@ function deleteEverythingAboutAUser(userEmail) {
 }
 
 function deleteTeamFromUser(userEmail, teamCode) {
+  let userAnimal;
+  setTimeout(async () => {
+    userAnimal = await getUserAnimal(userEmail, teamCode);
+  }, 0);
+  let animalsLeft;
+  setTimeout(async () => {
+    animalsLeft = await getAnimalsLeft(teamCode);
+  }, 0);
+  let distributedAnimal;
+  setTimeout(async () => {
+    distributedAnimal = await getDistributedAnimal(teamCode);
+  }, 0);
+  delete distributedAnimal[userAnimal];
+  addAnimal(animalsLeft, userAnimal);
   return Promise.all([
     db
       .collection("users")
@@ -376,6 +389,8 @@ function deleteTeamFromUser(userEmail, teamCode) {
       .doc(teamCode)
       .update({
         members: firebase.firestore.FieldValue.arrayRemove(userEmail),
+        distributedAnimal: distributedAnimal,
+        animalsLeft: animalsLeft,
       })
       .catch((err) => {}),
   ]);
@@ -570,7 +585,7 @@ function millisecondToMin(millisecond) {
 /**
  * @return user's personal animal
  */
-async function getUserAnimal() {
+async function getUserAnimal(userEmail, teamCode) {
   return new Promise(function (resolve) {
     db.collection("teams")
       .doc(teamCode)
@@ -596,6 +611,18 @@ async function getAnimalsLeft(teamCode) {
         console.log(data);
         let animalsLeft = data.animalsLeft;
         resolve(animalsLeft);
+      });
+  });
+}
+async function getDistributedAnimal(teamCode) {
+  return new Promise(function (resolve) {
+    db.collection("teams")
+      .doc(teamCode)
+      .get()
+      .then(function (doc) {
+        let data = doc.data();
+        let distributedAnimal = data.distributedAnimal;
+        resolve(distributedAnimal);
       });
   });
 }
