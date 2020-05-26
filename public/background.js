@@ -34,6 +34,7 @@ let threshold = 5000;
 
 function getHostname(url) {
   // Handle Chrome URLs
+  console.log(url);
   if (/^chrome:\/\//.test(url)) {
     return "invalid";
   }
@@ -266,11 +267,10 @@ function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
       db //me
         .collection("teams")
         .doc(teamCode)
-        .setData(
+        .update(
           {
             animalsLeft: animalsLeft,
           },
-          {merge: true}
         ),
     ]);
     resolve("success");
@@ -593,6 +593,7 @@ async function getAnimalsLeft(teamCode) {
       .get()
       .then(function (doc) {
         let data = doc.data();
+        console.log(data);
         let animalsLeft = data.animalsLeft;
         resolve(animalsLeft);
       });
