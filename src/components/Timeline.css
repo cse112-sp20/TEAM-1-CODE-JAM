@@ -31,6 +31,9 @@ tbody {
   max-width: 400px;
 }
 
+table.highlight > tbody > tr  {
+  border: none;
+}
 #myHead,
 th {
   display: inline-block;

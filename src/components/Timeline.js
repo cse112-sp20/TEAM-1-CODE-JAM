@@ -29,7 +29,7 @@ export default class Timeline extends Component {
     }
     let newElement = (
       <tr>
-        <td>{timelineElement.time}</td>
+        <td>{timelineElement.currTime}</td>
         <td>
           <img src={require(`../SVG/${animal}.svg`)}></img>
         </td>
