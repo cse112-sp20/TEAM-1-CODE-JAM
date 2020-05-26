@@ -129,7 +129,8 @@ export default class Home extends Component {
     let dotColor;
     let textColor;
     if (isProductive) {
-      dotColor = "#98edaa";
+      // dotColor = "#98edaa";
+      dotColor = "#52d16d";
       textColor = "#52d16d";
     } else {
       dotColor = "#ff7373";
@@ -154,10 +155,24 @@ export default class Home extends Component {
           </div>
           <div id="col" className="col s1"></div>
           <div id="col" className="col s5">
-            <p style={{ paddingTop: paddingTop }}>{website}</p>
+            <p
+              style={{
+                textTransform: "capitalize",
+                fontWeight: 600,
+                paddingTop: paddingTop,
+              }}
+            >
+              {website}
+            </p>
           </div>
           <div id="col" className="col s3">
-            <p style={{ color: textColor, paddingTop: paddingTop }}>
+            <p
+              style={{
+                fontWeight: 600,
+                color: textColor,
+                paddingTop: paddingTop,
+              }}
+            >
               {points} Points
             </p>
           </div>
