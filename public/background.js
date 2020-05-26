@@ -214,7 +214,7 @@ function getTeamName(teamCode, userProfile) {
  * "already joined the group" if user has joined the group already,
  * "team code not found" if the team code does not exist
  */
-function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
+async function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
   return new Promise(async function (resolve, reject) {
     //   user already join the group
     if (teamCode in userProfile.joined_teams) {
