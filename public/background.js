@@ -363,19 +363,15 @@ function deleteEverythingAboutAUser(userEmail) {
 
 function deleteTeamFromUser(userEmail, teamCode) {
   let userAnimal;
-  setTimeout(async () => {
-    userAnimal = await getUserAnimal(userEmail, teamCode);
-  }, 0);
   let animalsLeft;
-  setTimeout(async () => {
-    animalsLeft = await getAnimalsLeft(teamCode);
-  }, 0);
   let distributedAnimal;
   setTimeout(async () => {
+    userAnimal = await getUserAnimal(userEmail, teamCode);
+    animalsLeft = await getAnimalsLeft(teamCode);
     distributedAnimal = await getDistributedAnimal(teamCode);
+    delete distributedAnimal[userAnimal];
+    addAnimal(animalsLeft, userAnimal);
   }, 0);
-  delete distributedAnimal[userAnimal];
-  addAnimal(animalsLeft, userAnimal);
   return Promise.all([
     db
       .collection("users")
