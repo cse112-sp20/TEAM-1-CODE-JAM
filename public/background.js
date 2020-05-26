@@ -9,16 +9,15 @@ let timelineArray;
 let time;
 let currentTeamInfo;
 
-let myVar = setInterval(myTimer, updateInterval);
+let updateToDatabase;
 let currentSnapShot = () => {};
 
-let black_listed = ["facebook", "twitter", "myspace", "youtube"];
+let blacklist = ["facebook", "twitter", "myspace", "youtube"];
 let userProfile = {
   joined_teams: [],
 };
 let teams;
 let userEmail;
-let tabs;
 // limit of how long you can be on blacklisted site
 let threshold = 5000;
 
@@ -44,6 +43,7 @@ function getHostname(url) {
     return newUrl.hostname;
   } catch (err) {
     console.log(err);
+    return "invalid";
   }
 }
 /**
@@ -108,14 +108,7 @@ function setupListener() {
       // popup needs the user email
       if (request.message === "get email") {
         sendResponse({ email: userEmail });
-      }
-      //  else if (request.message === "get team code") {
-      //   // generate a random team code of length 5 then send it back
-      //   generateRandomTeamCode(5).then((teamCode) => {
-      //     sendResponse({ teamCode: teamCode });
-      //   });
-      // }
-      else if (request.message === "create team") {
+      } else if (request.message === "create team") {
         // create the team on database
         createTeamOnFirebase(request.teamName, userEmail).then((response) => {
           sendResponse(response);
@@ -145,10 +138,26 @@ function setupListener() {
       } else if (request.message === "get timeline array") {
         sendResponse(currentTeamInfo);
       } else if (request.message === "switch team") {
+        checkOff();
         currentSnapShot();
         getTeamOnSnapshot().then(() => {
           sendResponse("success");
         });
+      } else if (request.message === "toggle check in") {
+        toggleCheckIn();
+      } else if (request.message === "get home info") {
+        (async () => {
+          let currUrl = await getCurrentUrl();
+          let currTeamCode = await getTeamCode();
+          let data = {
+            isCheckIn: isCheckIn(),
+            blacklist: blacklist,
+            teamInfo: currentTeamInfo,
+            currUrl: currUrl,
+            currTeamCode: currTeamCode,
+          };
+          sendResponse(data);
+        })();
       }
     }
     // return true here is important, it makes sure that
@@ -157,6 +166,15 @@ function setupListener() {
     return true;
   });
 }
+
+function toggleCheckIn() {
+  if (isCheckIn()) {
+    checkOff(updateToDatabase);
+  } else {
+    checkIn(updateToDatabase, updateInterval);
+  }
+}
+
 /**
  * Return the team information on database
  * @author Karl Wang
@@ -511,6 +529,22 @@ function getUserProfile(userEmail) {
       });
   });
 }
+function isCheckIn() {
+  let data = localStorage.getItem("check in");
+  if (data == undefined) {
+    localStorage.setItem("check in", false);
+    return false;
+  }
+  return data === "true";
+}
+function checkIn() {
+  localStorage.setItem("check in", true);
+  updateToDatabase = setInterval(myTimer, updateInterval);
+}
+function checkOff() {
+  localStorage.setItem("check in", false);
+  clearInterval(updateToDatabase);
+}
 /**
  * Init Firebase configuration
  * @author Karl Wang
@@ -580,7 +614,7 @@ async function updateLocalStorage(tabUrl, timeSpend) {
         today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
       let teamCode = await getTeamCode();
       // let teamPoints = await getTeamPoint();
-      let teamPoints = currentTeamInfo.teamPoints
+      let teamPoints = currentTeamInfo.teamPoints;
       // we will be using teamCode and userEmail to retrieve userPoints and update these
       teamPoints = teamPoints - score;
       // let userPoints = await getUserPoint();
@@ -733,31 +767,38 @@ async function getTimelineArrayFB() {
       });
   });
 }
-function getCurrentTab() {
-  chrome.tabs.query(
-    {
-      active: true,
-      lastFocusedWindow: true,
-    },
-    function (tabs) {
-      let tab = tabs[0];
-      if (tab !== undefined) {
-        let currHost = getHostname(tab.url);
-        return getNameOfURL(currHost);
+function getCurrentUrl() {
+  return new Promise((resolve) => {
+    chrome.tabs.query(
+      {
+        active: true,
+        lastFocusedWindow: true,
+      },
+      function (tabs) {
+        let tab = tabs[0];
+        if (tab !== undefined) {
+          let currHost = getHostname(tab.url);
+          resolve(getNameOfURL(currHost));
+        } else {
+          console.log("here");
+          resolve(undefined);
+        }
       }
-    }
-  );
+    );
+  });
 }
-function myTimer() {
-  currTabUrl = getCurrentTab();
-  if (currTabUrl !== undefined) {
-    if (black_listed.includes(currTabUrl)) {
+async function myTimer() {
+  currTabUrl = await getCurrentUrl();
+  console.log(currTabUrl);
+  if (currTabUrl !== undefined || currTabUrl !== "invalid") {
+    if (blacklist.includes(currTabUrl)) {
       updateLocalStorage(currTabUrl, updateInterval);
     }
   }
 }
 
 function getNameOfURL(currHost) {
+  if (currHost == "invalid") return currHost;
   let splitArr = currHost.split(".");
   if (splitArr.length <= 2) return splitArr[0];
   else return splitArr[1];
@@ -785,7 +826,7 @@ function getTeamOnSnapshot() {
         .onSnapshot(function (doc) {
           currentTeamInfo = doc.data();
           let msg = {
-            for: "team information",
+            for: "team info",
             message: currentTeamInfo,
           };
           chrome.runtime.sendMessage(msg);
@@ -797,7 +838,6 @@ function getTeamOnSnapshot() {
     }
   });
 }
-
 // main
 /**
  * The main of background script
@@ -811,9 +851,9 @@ async function main() {
   await validUserEmail(userEmail, createUser);
   await Promise.all([getUserProfile(userEmail), getTeamOnSnapshot()]);
   //Todo: Change later
+  checkOff();
   checkDate();
   //deleteEverythingAboutAUser(userEmail);
-
   setupListener();
 }
 main();

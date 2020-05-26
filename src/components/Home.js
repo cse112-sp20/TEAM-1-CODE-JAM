@@ -1,11 +1,9 @@
 /*global chrome*/
 import React, { Component } from "react";
 import M from "materialize-css";
-// import { Timeline, TimelineBlip } from "react-event-timeline";
 import { Timeline, Icon, Button } from "rsuite";
-
-import "rsuite/dist/styles/rsuite-default.css";
 import "./Home.css";
+
 // const profilePics = require("../images/emojis");
 
 export default class Home extends Component {
@@ -16,10 +14,12 @@ export default class Home extends Component {
       teamCode: "",
       teamName: "",
       teamMembers: [],
-      currWebsite: "facebook",
+      currUrl: "unknown website",
       profilePics: [],
       blacklist: ["youtube", "facebook"],
       isInBlacklist: false,
+      isCheckIn: false,
+      timelineArr: [],
     };
   }
   /**
@@ -40,37 +40,46 @@ export default class Home extends Component {
       autoTrigger: false,
       closeOnClick: false,
     });
-    // elems = document.querySelectorAll(".tooltipped");
-    // M.Tooltip.init(elems, { html: true });
 
     // ask chrome storage for the current team
     // The api is async
-    let task = new Promise((resolve, reject) => {
-      chrome.storage.local.get("prevTeam", function (data) {
-        resolve(data);
-      });
-    });
-    let data = await task;
-    // First time logging in
-    if (!("prevTeam" in data)) {
-      return;
-    }
     let msg = {
       for: "background",
-      message: "get team info",
+      message: "get home info",
     };
     // ask the background for team information
     chrome.runtime.sendMessage(msg, (response) => {
+      if (response.currTeamCode == undefined) return;
+      let teamInfo = response.teamInfo;
+      let timelineArr = teamInfo.timeWasted.reverse();
+      if (timelineArr.length > 5) timelineArr = timelineArr.slice(0, 5);
+      let isInBlacklist = response.blacklist.includes(response.currUrl);
+      let teamPoints = this.roundNumber(teamInfo.teamPoints);
       this.setState({
-        teamCode: data.prevTeam,
-        teamName: response.teamName,
-        teamMembers: response.members,
+        teamCode: response.currTeamCode,
+        currUrl: response.currUrl,
+        isInBlacklist: isInBlacklist,
+        isCheckIn: response.isCheckIn,
+        blacklist: response.blacklist,
+        teamName: teamInfo.teamName,
+        teamMembers: teamInfo.members,
+        teamPoints: teamPoints,
+        timelineArr: timelineArr,
       });
-      if (this.state.blacklist.includes(this.state.currWebsite)) {
-        this.setState({
-          isInBlacklist: true,
-        });
-      }
+      chrome.runtime.onMessage.addListener((msg) => {
+        if (msg.for === "team info") {
+          let teamInfo = msg.message;
+          let timelineArr = teamInfo.timeWasted.reverse();
+          if (timelineArr.length > 5) timelineArr = timelineArr.slice(0, 5);
+          let teamPoints = this.roundNumber(teamInfo.teamPoints);
+          this.setState({
+            teamName: teamInfo.teamName,
+            teamMembers: teamInfo.members,
+            teamPoints: teamPoints,
+            timelineArr: timelineArr,
+          });
+        }
+      });
     });
   };
   importAll = (r) => {
@@ -113,17 +122,27 @@ export default class Home extends Component {
         style={style}
         block
         size="sm"
-        className="tooltipped"
+        className="tooltipped truncate"
         data-html="true"
         data-position="bottom"
         data-tooltip={tooltipMsg}
       >
-        {this.state.currWebsite}
+        {this.state.currUrl}
       </Button>
     );
   };
+  handleCheckIn = (e) => {
+    this.setState({
+      isCheckIn: !this.state.isCheckIn,
+    });
+    let msg = {
+      for: "background",
+      message: "toggle check in",
+    };
+    chrome.runtime.sendMessage(msg);
+  };
   createTimelineItem = (profilePic, website, points) => {
-    let isProductive = points[0] === "-" ? false : true;
+    let isProductive = Number(points) < 0 ? false : true;
     let profilePics = this.state.profilePics;
     profilePic = profilePics[Math.floor(Math.random() * profilePics.length)];
     let dotColor;
@@ -179,6 +198,9 @@ export default class Home extends Component {
         </div>
       </Timeline.Item>
     );
+  };
+  roundNumber = (num) => {
+    return Math.round((num + Number.EPSILON) * 100) / 100;
   };
 
   render() {
@@ -253,7 +275,11 @@ export default class Home extends Component {
         <div id="checkin" className="switch right">
           <label>
             Check off
-            <input type="checkbox" />
+            <input
+              onChange={this.handleCheckIn}
+              checked={this.state.isCheckIn}
+              type="checkbox"
+            />
             <span className="lever"></span>
             Check in
           </label>
@@ -263,11 +289,13 @@ export default class Home extends Component {
     let timeline = (
       <div id="mini-timeline">
         <Timeline>
-          {this.createTimelineItem(profilePic, "facebook", "-30")}
-          {this.createTimelineItem(profilePic, "github commit", "+30")}
-          {this.createTimelineItem(profilePic, "youtube", "-30")}
-          {this.createTimelineItem(profilePic, "myspace", "-30")}
-          {this.createTimelineItem(profilePic, "github commit", "+30")}
+          {this.state.timelineArr.map((item) => {
+            return this.createTimelineItem(
+              profilePic,
+              item.url,
+              this.roundNumber(item.points)
+            );
+          })}
         </Timeline>
       </div>
     );

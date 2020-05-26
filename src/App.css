@@ -9,3 +9,11 @@
 #component {
   margin: 0;
 }
+
+a {
+  text-decoration: none !important;
+}
+
+a:hover {
+  color: #fff;
+}
