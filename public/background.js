@@ -231,7 +231,9 @@ function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
       return;
     }
 
-    let animalsLeft = getAnimalsLeft();
+    let animalsLeft = await getAnimalsLeft(teamCode);
+    console.log(animalsLeft);
+    
     // do both of these two things parallelly
     await Promise.all([
       // add the user to the team
@@ -264,10 +266,11 @@ function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
       db //me
         .collection("teams")
         .doc(teamCode)
-        .set(
+        .setData(
           {
             animalsLeft: animalsLeft,
           },
+          {merge: true}
         ),
     ]);
     resolve("success");
@@ -583,7 +586,7 @@ async function getUserAnimal() {
 /**
  * @return animal remaining in the database
  */
-function getAnimalsLeft() {
+async function getAnimalsLeft(teamCode) {
   return new Promise(function (resolve) {
     db.collection("teams")
       .doc(teamCode)
