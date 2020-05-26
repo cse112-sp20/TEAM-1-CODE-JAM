@@ -28,6 +28,7 @@ function updateLocalStorage(tabUrl, timeSpend) {
     if (newTime % threshold == 0) updateTimeline(tabUrl);
   }
 }
+
 /**
  * Inserts a new element to the timeline if a user has been on a blacklisted
  * site longer than the set time limit (threshold)
@@ -71,8 +72,10 @@ function updateTimeline(currTabUrl) {
 }
 
 var myVar = setInterval(myTimer, updateInterval);
+// var myVar = setInterval(x, updateInterval);
 
 function myTimer() {
+  // console.log("updating")
   chrome.tabs.query(
     {
       active: true,
@@ -92,6 +95,10 @@ function myTimer() {
   }
 }
 
-chrome.tabs.onRemoved.addListener(function () {
-  currTabUrl = "Closed";
-});
+// /home/gdb/112/timeline_github_v2/TEAM-1-CODE-JAM/public.pem
+// /home/gdb/112/timeline_github_v2/TEAM-1-CODE-JAM/public.crx
+
+// chrome.tabs.onRemoved.addListener(function () {
+//   currTabUrl = "Closed";
+// });
+

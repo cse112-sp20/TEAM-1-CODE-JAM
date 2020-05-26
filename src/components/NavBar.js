@@ -1,3 +1,4 @@
+/*global chrome*/
 import React, { Component } from "react";
 import M from "materialize-css";
 import "./NavBar.css";
@@ -7,6 +8,7 @@ export default class NavBar extends Component {
     M.AutoInit();
   }
 
+  settings = () => { chrome.tabs.create({ url: "popup.html" }); }; 
   render() {
     return (
       <div>
@@ -17,9 +19,7 @@ export default class NavBar extends Component {
               Team 1
             </a>
             <ul className="right">
-              <li>
-                <a href="#">About</a>
-              </li>
+            <i onClick={this.settings} class="material-icons"> settings </i> 
             </ul>
           </div>
         </nav>

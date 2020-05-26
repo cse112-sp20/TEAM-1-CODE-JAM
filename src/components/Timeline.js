@@ -155,6 +155,7 @@ export default class Timeline extends Component {
   };
 
   handleMessage = (msg) => {
+    
     // new element for timeline
     if (msg.for === "popup") {
       if (msg.message === "timeline") {
@@ -185,17 +186,22 @@ export default class Timeline extends Component {
 
     let task = new Promise((resolve, reject) => {
       chrome.runtime.sendMessage(msg, function (response) {
+        console.log(response);
         resolve(response);
       });
     });
     let data = await task;
+    console.log("timeline.js data");
+    console.log(data)
     let i = 0;
     data.map((tab) => {
+      console.log("timeline.js tab");
+      console.log(tab)
       // let url = tab.url;
       let innerHTML = `Anonymous ${this.state.animals[i % 11]}  visited ${
         tab.url
       }`;
-      let url = innerHTML;
+      let url = tab.url;
       let time = tab.time;
       let flip = tab.flip;
       flip
