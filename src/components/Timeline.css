@@ -43,6 +43,7 @@ img {
   height: 50px;
 }
 #points {
+  color: green;
   word-wrap: break-word;
   scrollbar-width: none;
 }

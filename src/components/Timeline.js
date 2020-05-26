@@ -6,6 +6,7 @@ export default class Timeline extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      black_listed: ["facebook", "twitter", "myspace", "youtube"],
       timeline: [],
     };
   }
@@ -19,16 +20,21 @@ export default class Timeline extends Component {
     if (animal == undefined) {
       animal = "Predator";
     }
+    let color = "green";
+
+    if (this.state.black_listed.includes(timelineElement.url)) {
+      color = "red";
+    }
     let newElement = (
       <tr>
         <td>{timelineElement.time}</td>
         <td>
           <img src={require(`../SVG/${animal}.svg`)}></img>
         </td>
-        <td id="points">
+        <td style={{ color: `${color}` }}>
           {`${timelineElement.url}`}
           <br></br>
-          {`+${30}`}
+          {`-${30}`}
         </td>
       </tr>
     );
