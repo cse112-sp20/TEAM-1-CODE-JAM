@@ -8,18 +8,28 @@ export default class NavBar extends Component {
     M.AutoInit();
   }
 
-  settings = () => { chrome.tabs.create({ url: "popup.html" }); }; 
+
+  openSettingsPage = () => {
+    chrome.tabs.create({ url: "/popup.html" });
+  };
+
   render() {
     return (
       <div>
         {/* <!-- Navbar goes here --> */}
         <nav id="nav-background">
           <div className="nav-wrapper">
-            <a href="#" className="brand-logo">
-              Team 1
+            <a id="team-name" className="left">
+              Team Activity Tracker
             </a>
             <ul className="right">
-            <i onClick={this.settings} class="material-icons"> settings </i> 
+              <li>
+                <a id="adjust-height" href="#" onClick={this.openSettingsPage}>
+                  <i id="adjust-height" className="material-icons">
+                    settings
+                  </i>
+                </a>
+              </li>
             </ul>
           </div>
         </nav>

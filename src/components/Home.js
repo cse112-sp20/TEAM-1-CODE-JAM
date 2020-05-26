@@ -51,55 +51,38 @@ export default class Home extends Component {
     return (
       <div className="card">
         <div id="card-content" className="card-content blue-grey-text">
-          <span className="blue-grey-text card-title">
+          <span
+            className="blue-grey-text card-title"
+            data-testid="Home-teamname"
+          >
             {this.state.teamName}
-            <span className="badge">Team Code: {this.state.teamCode}</span>
+            <span data-testid="Home-teamcode" className="badge">
+              Team Code: {this.state.teamCode}
+            </span>
           </span>
-        </div>
-        <div className="card-tabs">
-          <ul className="tabs tabs-fixed-width">
-            <li className="tab">
-              <a href="#teamMembers">Team Members</a>
-            </li>
-            <li className="tab">
-              <a href="#timeline">Timeline</a>
-            </li>
-            <li className="tab">
-              <a href="#charts">Charts</a>
-            </li>
-          </ul>
         </div>
         <div id="card-content" className="card-content grey lighten-4">
           <div id="teamMembers">
-            <ul className="collection">
-              {this.state.teamMembers.map((teamMember) => {
-                return <li className="collection-item">{teamMember}</li>;
-              })}
+            <ul className="collapsible popout">
+              <li>
+                <div className="collapsible-header">Team Members</div>
+                <div className="collapsible-body">
+                  {this.state.teamMembers.map((teamMember) => {
+                    return <p>{teamMember}</p>;
+                  })}
+                </div>
+              </li>
+              {/* {this.state.teamMembers.map((teamMember) => {
+                return (
+                  <li className="collection-item" data-testid="Home-teammember">
+                    {teamMember}
+                  </li>
+                );
+              })} */}
             </ul>
-          </div>
-          <div id="timeline">
-            <Timeline></Timeline>
-          </div>
-          <div id="charts">
-            <Charts></Charts>
           </div>
         </div>
       </div>
-      // <div>
-      //   <div className="divider"></div>
-      //   <div className="section">
-      //     <h5>{this.state.teamName}</h5>
-      //     <p>Team Code: {this.state.teamCode}</p>
-      //   </div>
-      //   <div className="divider"></div>
-      //   <div className="section">
-      //     <h5>Team Members</h5>
-      //     {/* {this.state.teamMembers} */}
-      //     {this.state.teamMembers.map((teamMember) => {
-      //       return <p>{teamMember}</p>;
-      //     })}
-      //   </div>
-      // </div>
     );
   }
 }
