@@ -21,9 +21,11 @@ export default class Timeline extends Component {
       animal = "Predator";
     }
     let color = "green";
+    let points = "+30";
 
     if (this.state.black_listed.includes(timelineElement.url)) {
       color = "red";
+      points = "-30";
     }
     let newElement = (
       <tr>
@@ -31,10 +33,10 @@ export default class Timeline extends Component {
         <td>
           <img src={require(`../SVG/${animal}.svg`)}></img>
         </td>
-        <td style={{ color: `${color}` }}>
+        <td id="thirdElem" style={{ color: `${color}` }}>
           {`${timelineElement.url}`}
           <br></br>
-          {`-${30}`}
+          {`${points}`}
         </td>
       </tr>
     );
@@ -77,8 +79,8 @@ export default class Timeline extends Component {
             <table class="highlight" id="myTable">
               <thead>
                 <tr>
-                  <th>Time</th>
-                  <th>Person</th>
+                  <th id="myHead">Time</th>
+                  <th id="myHead">Person</th>
                   <th>Earned</th>
                 </tr>
               </thead>
