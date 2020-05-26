@@ -135,6 +135,7 @@ function setupListener() {
       } else if (request.message === "set timeout to delete team") {
         timeoutVars[request.teamCode] = setTimeout(async () => {
           let teamInfo = await getTeamInformation(request.teamCode);
+          teamInfo = teamInfo.data();
           let userAnimal = teamInfo.distributedAnimal[userEmail];
           let animalsLeft = teamInfo.animalsLeft;
           let distributedAnimal = teamInfo.distributedAnimal;
@@ -167,13 +168,18 @@ function setupListener() {
         (async () => {
           let currUrl = await getCurrentUrl();
           let currTeamCode = await getTeamCode();
-          let data = {
-            isCheckIn: isCheckIn(),
-            blacklist: blacklist,
-            teamInfo: currentTeamInfo,
-            currUrl: currUrl,
-            currTeamCode: currTeamCode,
-          };
+          let data = {};
+          try {
+            let profilePic = currentTeamInfo.distributedAnimal[userEmail];
+            data = {
+              isCheckIn: isCheckIn(),
+              blacklist: blacklist,
+              teamInfo: currentTeamInfo,
+              currUrl: currUrl,
+              currTeamCode: currTeamCode,
+              profilePic: profilePic,
+            };
+          } catch {}
           sendResponse(data);
         })();
       }
@@ -340,6 +346,7 @@ async function createTeamOnFirebase(teamName, userEmail) {
     // let host_animal = {`{userEmail: getAnimal()};
 
     let copiedAnimal = Array.from(animals);
+    let newAnimal = getAnimal(copiedAnimal);
     // Do these parallelly
     await Promise.all([
       // add the team to the user
@@ -369,7 +376,7 @@ async function createTeamOnFirebase(teamName, userEmail) {
             members: [userEmail],
             timeWasted: [],
             teamPoints: initPoint,
-            distributedAnimal: { [userEmail]: getAnimal(copiedAnimal) },
+            distributedAnimal: { [userEmail]: newAnimal },
             animalsLeft: copiedAnimal,
           },
           { merge: true }

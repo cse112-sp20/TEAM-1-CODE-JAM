@@ -40,16 +40,6 @@ export default class SideNav extends Component {
           className="btn tooltipped waves-effect waves-light card-panel center-align"
           id="sidenav-background"
           data-position="right"
-          data-tooltip="timeline"
-          to="/timelinedemo"
-        >
-          <span>demo</span>
-          {/* <i className="white-text material-icons">insert_chart</i> */}
-        </NavLink>
-        <NavLink
-          className="btn tooltipped waves-effect waves-light card-panel center-align"
-          id="sidenav-background"
-          data-position="right"
           data-tooltip="Teams"
           data-testid="SideNav-teams"
           to="/teams"

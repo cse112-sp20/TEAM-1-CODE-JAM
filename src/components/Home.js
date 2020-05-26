@@ -20,6 +20,7 @@ export default class Home extends Component {
       isInBlacklist: false,
       isCheckIn: false,
       timelineArr: [],
+      profilePic: "Predator",
     };
   }
   /**
@@ -65,6 +66,7 @@ export default class Home extends Component {
         teamMembers: teamInfo.members,
         teamPoints: teamPoints,
         timelineArr: timelineArr,
+        profilePic: response.profilePic,
       });
       chrome.runtime.onMessage.addListener((msg) => {
         if (msg.for === "team info") {
@@ -141,10 +143,9 @@ export default class Home extends Component {
     };
     chrome.runtime.sendMessage(msg);
   };
-  createTimelineItem = (profilePic, website, points) => {
+  createTimelineItem = (profilePicName, website, points) => {
     let isProductive = Number(points) < 0 ? false : true;
-    let profilePics = this.state.profilePics;
-    profilePic = profilePics[Math.floor(Math.random() * profilePics.length)];
+    let profilePic = this.getProfilePic(profilePicName);
     let dotColor;
     let textColor;
     if (isProductive) {
@@ -202,12 +203,16 @@ export default class Home extends Component {
   roundNumber = (num) => {
     return Math.round((num + Number.EPSILON) * 100) / 100;
   };
+  getProfilePic = (profilePic) => {
+    console.log(profilePic);
+    return require("../images/emojis/" + profilePic + ".svg");
+  };
 
   render() {
-    let profilePic = require("../images/emojis/Predator.svg");
+    let profilePic = this.getProfilePic(this.state.profilePic);
     let leftSide = (
       <div id="col" className="col s4">
-        <img id="profile" className="responsive-img circle" src={profilePic} />
+        <img id="profile" className="circle" src={profilePic} />
       </div>
     );
     let rightSide = (
@@ -291,7 +296,7 @@ export default class Home extends Component {
         <Timeline>
           {this.state.timelineArr.map((item) => {
             return this.createTimelineItem(
-              profilePic,
+              item.animal,
               item.url,
               this.roundNumber(item.points)
             );
@@ -305,7 +310,7 @@ export default class Home extends Component {
         <div id="row" className="row">
           <div className="card blue-grey lighten-5">
             <div id="card-content" className="card-content black-text">
-              <div className="row">
+              <div id="top-row" className="row">
                 {leftSide}
                 {rightSide}
               </div>
