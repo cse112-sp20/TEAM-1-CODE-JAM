@@ -615,7 +615,7 @@ function checkDate(){
 
 async function getTeamPoint(){
   return new Promise(function(resolve){
-    getTeamCode();
+    teamCode = await getTeamCode();
     db.collection('teams')
     .doc(teamCode)
     .get()
@@ -624,7 +624,7 @@ async function getTeamPoint(){
       console.log("teamPoint is: ", data.teamPoints);
       resolve(data.teamPoints);
     });
-  })
+  });
 }
 
 function getTeamPoint1(){
@@ -743,7 +743,7 @@ chrome.tabs.onRemoved.addListener(function () {
   currTabUrl = "Closed";
 });
 
-function getTeamCode() {
+async function getTeamCode() {
   return new Promise(function (resolve) {
     chrome.storage.local.get("prevTeam", function (data) {
       resolve(data.prevTeam);
