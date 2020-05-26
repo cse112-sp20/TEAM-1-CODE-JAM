@@ -23,6 +23,8 @@
 #title {
   margin: 0px;
   font-size: 30px;
+  font-weight: 500;
+  text-transform: capitalize;
 }
 
 .divider {
@@ -31,17 +33,17 @@
 }
 
 #blacklist label input[type="checkbox"]:checked + .lever:after {
-  background-color: rgba(255, 82, 82, 0.8) !important;
+  background-color: #FF0000 !important;
 }
 #blacklist label input[type="checkbox"]:checked + .lever {
-  background-color: rgba(255, 82, 82, 0.6) !important;
+  background-color: #FF0000 !important;
 }
 
 #checkin label input[type="checkbox"]:checked + .lever:after {
-  background-color: rgba(82, 209, 109, 0.8) !important;
+  background-color: #27AE60 !important;
 }
 #checkin label input[type="checkbox"]:checked + .lever {
-  background-color: rgba(82, 209, 109, 0.6) !important;
+  background-color: #27AE60 !important;
 }
 #checkin {
   top: 30%;
@@ -64,6 +66,8 @@ div .card-action {
   margin: 0;
   min-height: 335px;
   padding-left: 20px;
+  font-weight: 700;
+  text-transform: capitalize;
 }
 
 #mini-timeline {
@@ -89,6 +93,7 @@ div .card-action {
   transition: 0.5s linear all;
   padding: 5px 5px;
   margin: 0px;
+  text-transform: capitalize;
 }
 
 /* #unblacklist-button {

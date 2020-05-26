@@ -17,8 +17,8 @@ export default class NavBar extends Component {
       <div>
         {/* <!-- Navbar goes here --> */}
         <nav id="nav-background">
-          <div className="nav-wrapper">
-            <a id="team-name" className="left">
+          <div className="nav-wrapper center-align">
+            <a id="team-name" className="white-text">
               Team Activity Tracker
             </a>
             <ul className="right">

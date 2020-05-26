@@ -129,10 +129,10 @@ export default class Home extends Component {
     let dotColor;
     let textColor;
     if (isProductive) {
-      dotColor = "#98edaa";
+      dotColor = "#27AE60";
       textColor = "#52d16d";
     } else {
-      dotColor = "#ff7373";
+      dotColor = "#EB5757";
       textColor = dotColor;
     }
     const paddingTop = "11px";

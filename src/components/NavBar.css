@@ -10,5 +10,8 @@
 }
 
 #team-name {
-  font-size: medium;
+  font-size: 20px;
+  margin-left: 3em;
+  font-family: poppins;
+  font-weight: 600;
 }
