@@ -214,7 +214,7 @@ function getTeamName(teamCode, userProfile) {
  * "already joined the group" if user has joined the group already,
  * "team code not found" if the team code does not exist
  */
-async function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
+function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
   return new Promise(async function (resolve, reject) {
     //   user already join the group
     if (teamCode in userProfile.joined_teams) {
@@ -228,7 +228,7 @@ async function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
       resolve("team code not found");
       return;
     }
-
+    let initPoint = 100;
     let points = await getTeamPoint();
     points = parseInt(points) + 100;
     // do both of these two things parallelly
@@ -248,6 +248,9 @@ async function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
         .set(
           {
             joined_teams: { [teamCode]: currentTime },
+            user_points: {
+              [teamCode]: initPoint
+            },
           },
           { merge: true }
         ),
@@ -290,6 +293,9 @@ async function createTeamOnFirebase(teamName, userEmail) {
           {
             joined_teams: {
               [teamCode]: currentTime,
+            },
+            user_points: {
+              [teamCode]: initPoint
             },
           },
           { merge: true }
@@ -555,12 +561,14 @@ async function updateLocalStorage(tabUrl, timeSpend) {
     let data = { [tabUrl]: 0 };
     data = JSON.stringify(data);
     localStorage.setItem(teamCode, data);
-  } else {
+  }
+  else {
     currData = JSON.parse(currData);
     let newTime;
     if (!(tabUrl in currData)) {
       currData[tabUrl] = Number(0);
-    } else {
+    }
+    else {
       let time = currData[tabUrl];
       newTime = parseInt(time) + parseInt(timeSpend);
       currData[tabUrl] = newTime;
@@ -568,15 +576,16 @@ async function updateLocalStorage(tabUrl, timeSpend) {
     currData = JSON.stringify(currData);
     localStorage.setItem(teamCode, currData);
     if (JSON.parse(currData)[tabUrl] % threshold == 0) {
-      console.log("here");
       let seconds = JSON.parse(currData)[tabUrl] / 1000;
       let score = threshold / (60 * 1000);
       let today = new Date();
       let currTime = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-      //console.log("Current time is: ", time);
-      //let seconds =
-       // parseInt(JSON.parse(localStorage.getItem(teamCode)).time) / 1000;
-      //time = `${tabUrl}: ${seconds} seconds`;
+      let teamCode = await getTeamCode();
+      let teamPoints = await getTeamPoint();
+      // we will be using teamCode and userEmail to retrieve userPoints and update these
+      teamPoints = teamPoints - score;
+      let userPoints = await getUserPoint();
+      userPoints = userPoints - score;
       db.collection("teams")
         .doc(teamCode)
         .update({
@@ -586,15 +595,27 @@ async function updateLocalStorage(tabUrl, timeSpend) {
             time: seconds,
             points : -score,
             currTime : currTime,
-
           }),
+          teamPoints: teamPoints,
         });
-    }
+      db
+        .collection("users")
+        .doc(userEmail)
+        .set(
+          {
+            user_points: {
+              [teamCode]: userPoints
+            },
+          },
+          { merge: true }
+        );
+     }
   }
 }
 
 /**
  * @author: Youliang Liu
+ * check if it is the current date, otherwise clear the localStorage and cloud storage
  */
 
 function checkDate(){
@@ -612,32 +633,39 @@ function checkDate(){
   }
 
 }
-
+/**
+  * @author: Xiang Liu & Youliang Liu
+  * get the current team points from the database
+  */
 async function getTeamPoint(){
-  return new Promise(function(resolve){
+  return new Promise(async function(resolve){
     teamCode = await getTeamCode();
     db.collection('teams')
     .doc(teamCode)
     .get()
     .then(function (doc) {
       let data = doc.data();
-      console.log("teamPoint is: ", data.teamPoints);
       resolve(data.teamPoints);
     });
   });
 }
-
-function getTeamPoint1(){
-    getTeamCode();
-    db.collection('teams')
-    .doc(teamCode)
+/**
+ * @author: Xiang Liu
+ * get the current user points from the database
+ */
+async function getUserPoint(){
+  return new Promise(async function(resolve){
+    teamCode = await getTeamCode();
+    db.collection('users')
+    .doc(userEmail)
     .get()
     .then(function (doc) {
       let data = doc.data();
-      console.log("teamPoint is: ", data.teamPoints);
-    return data.teamPoints;
-    })
+      resolve(data.user_points[teamCode]);
+    });
+  });
 }
+
 
 
 
@@ -743,7 +771,7 @@ chrome.tabs.onRemoved.addListener(function () {
   currTabUrl = "Closed";
 });
 
-async function getTeamCode() {
+function getTeamCode() {
   return new Promise(function (resolve) {
     chrome.storage.local.get("prevTeam", function (data) {
       resolve(data.prevTeam);
