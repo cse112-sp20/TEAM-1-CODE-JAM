@@ -121,9 +121,9 @@ async function getTimelineArrayFB() {
 }
 
 var myVar = setInterval(myTimer, updateInterval);
+// var myVar = setInterval(x, updateInterval);
 
 function myTimer() {
-  console.log("update");
   chrome.tabs.query(
     {
       active: true,

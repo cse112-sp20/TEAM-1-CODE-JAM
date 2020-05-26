@@ -1,14 +1,8 @@
-var flip = false;
-var animal = 0;
-
-/*
- *  Asynchronous function that fetches data from github using
- *  the Github REST API. Header includes the token which was
- *  saved after user sign-in with Github. It gets all the user
- *  repositories.
- * 
- * Parameters: url - the user's repositories
- 
+/**
+ *  Fetches data from github using the Github REST API. Header 
+ * includes the token which was saved after user sign-in with Github.
+ *  It gets all the user repositories.
+ * @param {string} url 
  */
 async function getRepos(url){
     let token = localStorage.getItem("token");
@@ -26,15 +20,14 @@ async function getRepos(url){
     
 }
 
-/*
- * Asynchronous function that fetches data from github using
- * the Github REST API. Header includes the token which was
- * saved after user sign-in with Github. Function gets all
- * the commits in the master branch from a secified repository
- * 
- * Parameter: url - the url for the repositories from the Github API
- *            repo - specified repository to extract all of it's commits
- 
+/**
+ * Fetches data from github using the Github REST API. Header 
+ * includes the token which was saved after user sign-in with Github. 
+ * Function gets all the commits in the master branch from a secified 
+ * repository
+ * @author Gen Barcenas
+ * @param {string} url 
+ * @param {string} repo 
  */
 async function getCommits(url, repo){
     let token = localStorage.getItem("token");
@@ -54,14 +47,14 @@ async function getCommits(url, repo){
     return result = await response.json()
 }
 
-/*
- *  Asynchronous function that fetches data from github using
- *  the Github REST API. Iterates through the user's repositories
- *  and gets all the commits from those repositories. For each 
- *  collection of commits, the function only wants commits from 
- *  the current day.
- * 
- *  Param: N/A
+
+ 
+/**
+ * Fetches data from github using the Github REST API. 
+ * Iterates through the user's repositories and gets all 
+ * the commits from those repositories. For each collection 
+ * of commits, the function only wants commits from the current day.
+ * @author Gen Barcenas
  */
 async function getMostRecentCommit() {
 
@@ -138,13 +131,18 @@ async function getMostRecentCommit() {
     return arr;
 }
 
-/*
+/**
  * Sends the most recent commit to the database.
- *
- * Parameter: N/A
+ * @author Gen Barcenas
+ * @param {string} teamCode 
+ * @param {string} animal 
  */
-function sendToDB(){
-
+function sendToDB(teamCode, animal){
+    // console.log(teamCode)
+    if(teamCode === undefined || animal === undefined){
+        return;
+    }
+    console.log("update")
     // Sets the token for the github if authorization has been given
     getUserInfo(false);
     let token = localStorage.getItem("token");
@@ -161,30 +159,46 @@ function sendToDB(){
             if(max != "00:00:00"){
                 let msg = {
                     for: "popup",
-                    message: "timeline",
+                    message: "timeline demo",
                     url: "GitHub",
                     time: max,
-                    timestamp: max,
-                    flip: flip,
-                    animal: animal,
+                    animal: "water-bottle"
                 };
-                animal = (animal + 1) % 11;
-                flip = !flip;
 
                 if(localStorage.getItem("oldElements") == null){
-                    console.log("Local Storage is empty...")
+                    // console.log("Local Storage is empty...")
 
                     let item = [{ "url" : "github.com" , "time" : max }];
                     localStorage.setItem("oldElements", JSON.stringify(item));
-                    chrome.runtime.sendMessage(msg, function (response) {
-                        console.log(response);
-                        resolve(response);
-                    });
+
+                    // chrome.runtime.sendMessage(msg, function (response) {
+                    //     console.log(response);
+                    //     resolve(response);
+                    // });
+                    console.log("here");
+                    // let seconds = JSON.parse(currData)[tabUrl] / 1000;
+                    let seconds = new Date().toLocaleTimeString();
+                    //let seconds =
+                    // parseInt(JSON.parse(localStorage.getItem(teamCode)).time) / 1000;
+                    //time = `${tabUrl}: ${seconds} seconds`;
+                    console.log("in update local storage");
+                    // let userAnimal = await getUserAnimal(userEmail, teamCode);
+                    let userAnimal = animal;
+                    db.collection("teams")
+                        .doc(teamCode)
+                        .update({
+                        timeWasted: firebase.firestore.FieldValue.arrayUnion({
+                            user: userEmail,
+                            url: "www.GitHub.com",
+                            time: seconds,
+                            animal: userAnimal,
+                        }),
+                        });
                     
                 } else {
 
                     let item = { "url" : "github.com" , "time" : max };
-                    console.log("Local Storage is not empty...")
+                    // console.log("Local Storage is not empty...")
                     let oldElements = JSON.parse(localStorage.getItem("oldElements"));
 
                     // Checks if an item exists in the local storage
@@ -193,17 +207,37 @@ function sendToDB(){
                     console.log(itemExists);
 
                     if(itemExists) {
-                        console.log("Item is in Local Storage...")
+                        // console.log("Item is in Local Storage...")
                     } else {
                         console.log("Item is not in Local Storage...")
                         oldElements.push(item);
                         localStorage.setItem("oldElements", JSON.stringify(oldElements))
-                        chrome.runtime.sendMessage(msg, function (response) {
-                            console.log(response);
-                            resolve(response);
-                        });
+                        // chrome.runtime.sendMessage(msg, function (response) {
+                        //     console.log("send message");
+                        //     console.log(response);
+                        //     resolve(response);
+                        // });
+                        console.log("here");
+                        // let seconds = JSON.parse(currData)[tabUrl] / 1000;
+                        let seconds = new Date().toLocaleTimeString();
+                        //let seconds =
+                        // parseInt(JSON.parse(localStorage.getItem(teamCode)).time) / 1000;
+                        //time = `${tabUrl}: ${seconds} seconds`;
+                        console.log("in update local storage");
+                        // let userAnimal = await getUserAnimal(userEmail, teamCode);
+                        let userAnimal = animal;
+                        db.collection("teams")
+                            .doc(teamCode)
+                            .update({
+                            timeWasted: firebase.firestore.FieldValue.arrayUnion({
+                                user: userEmail,
+                                url: "Git Commit",
+                                time: seconds,
+                                animal: userAnimal,
+                            }),
+                            });
                     }
-                }
+                }     
             }
         })
         .catch(err => console.log(err));
@@ -212,6 +246,5 @@ function sendToDB(){
     }
 }
 
-let tracker = setInterval(sendToDB, 15000)
 
 
