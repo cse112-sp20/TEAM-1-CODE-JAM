@@ -8,6 +8,7 @@ let teamCode;
 let timelineArray;
 let time;
 let currentTeamInfo;
+let currentDate = getDate();
 
 let myVar = setInterval(myTimer, updateInterval);
 let currentSnapShot = () => {};
@@ -242,6 +243,16 @@ function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
           teamPoints : points,
         }),
       // add the team code to the user
+
+      db
+        .collection("teamPerformance")
+        .doc(currentDate)
+        .update(
+          {
+            [teamCode] : points,
+          }
+        ),  
+
       db
         .collection("users")
         .doc(userEmail)
@@ -283,6 +294,7 @@ async function createTeamOnFirebase(teamName, userEmail) {
     // create a time stamp (used for sorting)
     let currentTime = Date.now();
     let initPoint = 100;
+    
     // Do these parallelly
     await Promise.all([
       // add the team to the user
@@ -316,8 +328,27 @@ async function createTeamOnFirebase(teamName, userEmail) {
           { merge: true }
         ),
     ]);
+    createTeamPerformance(teamCode, initPoint);
     resolve(teamCode);
+    
   });
+
+
+
+
+}
+
+
+function createTeamPerformance(key, points){
+  let code = key;
+  db.collection("teamPerformance")
+  .doc(currentDate)
+  .set(
+    {
+    [code] : points,
+    },
+    { merge: true }
+  );
 }
 
 function deleteEverythingAboutAUser(userEmail) {
@@ -611,6 +642,21 @@ async function updateLocalStorage(tabUrl, timeSpend) {
         );
      }
   }
+}
+
+
+
+/**
+ * @author: Youliang Liu & Xiang Liu
+ * @return: the current date
+ */
+function getDate(){
+  let d = new Date();
+  let date = d.getDate();
+  let month = d.getMonth() + 1; // Since getMonth() returns month from 0-11 not 1-12
+  let year = d.getFullYear();
+  let dateStr = month + "" +  date + "" + year;
+  return dateStr;
 }
 
 /**
