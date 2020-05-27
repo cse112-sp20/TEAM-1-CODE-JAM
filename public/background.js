@@ -4,11 +4,12 @@ let currTabUrl;
 let lastTabUrl;
 let updateInterval = 1000;
 let flip = false;
-let teamCode;
+
 let timelineArray;
 let time;
 let currentTeamInfo;
 let currentDate = getDate();
+let currTeamCode;
 
 let myVar = setInterval(myTimer, updateInterval);
 let currentSnapShot = () => {};
@@ -73,6 +74,7 @@ function getHostname(url) {
 //   });
 // }
 
+/*
 async function reverseTimelineArray() {
   return new Promise(function (resolve) {
     let tabs = [];
@@ -86,6 +88,7 @@ async function reverseTimelineArray() {
     resolve(tabs);
   });
 }
+*/
 
 /**
  * setupListener listens for request coming from popup,
@@ -230,8 +233,6 @@ function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
       return;
     }
     let initPoint = 100;
-    let points = await getTeamPoint();
-    points = parseInt(points) + 100;
     // do both of these two things parallelly
     await Promise.all([
       // add the user to the team
@@ -240,18 +241,9 @@ function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
         .doc(teamCode)
         .update({
           members: firebase.firestore.FieldValue.arrayUnion(userEmail),
-          teamPoints : points,
+          //teamPoints : points,
         }),
-      // add the team code to the user
-
-      db
-        .collection("teamPerformance")
-        .doc(currentDate)
-        .update(
-          {
-            [teamCode] : points,
-          }
-        ),  
+      // add the team code to the user  
 
       db
         .collection("users")
@@ -584,14 +576,14 @@ function millisecondToMin(millisecond) {
 
 //Get team code everytime
 async function updateLocalStorage(tabUrl, timeSpend) {
-  teamCode = await getTeamCode();
+  currTeamCode = await getTeamCode();
   //console.log(teamCode);
   //console.log("test: ", localStorage.getItem(teamCode));
-  let currData = localStorage.getItem(teamCode);
+  let currData = localStorage.getItem(currTeamCode);
   if (currData == undefined) {
     let data = { [tabUrl]: 0 };
     data = JSON.stringify(data);
-    localStorage.setItem(teamCode, data);
+    localStorage.setItem(currTeamCode, data);
   }
   else {
     currData = JSON.parse(currData);
@@ -605,20 +597,20 @@ async function updateLocalStorage(tabUrl, timeSpend) {
       currData[tabUrl] = newTime;
     }
     currData = JSON.stringify(currData);
-    localStorage.setItem(teamCode, currData);
+    localStorage.setItem(currTeamCode, currData);
     if (JSON.parse(currData)[tabUrl] % threshold == 0) {
       let seconds = JSON.parse(currData)[tabUrl] / 1000;
       let score = threshold / (60 * 1000);
       let today = new Date();
       let currTime = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-      let teamCode = await getTeamCode();
+      //let currTeamCode = await getTeamCode();
       let teamPoints = await getTeamPoint();
       // we will be using teamCode and userEmail to retrieve userPoints and update these
       teamPoints = teamPoints - score;
       let userPoints = await getUserPoint();
       userPoints = userPoints - score;
       db.collection("teams")
-        .doc(teamCode)
+        .doc(currTeamCode)
         .update({
           timeWasted: firebase.firestore.FieldValue.arrayUnion({
             user: userEmail,
@@ -629,20 +621,38 @@ async function updateLocalStorage(tabUrl, timeSpend) {
           }),
           teamPoints: teamPoints,
         });
-      db
+
+      
+
+      await db
         .collection("users")
         .doc(userEmail)
         .set(
           {
             user_points: {
-              [teamCode]: userPoints
+              [currTeamCode]: userPoints
             },
           },
           { merge: true }
         );
+
+
+        db.collection("teamPerformance")
+        .doc(currentDate)
+        .set(
+          {
+            [currTeamCode] : teamPoints,
+            [userEmail] : userProfile.user_points,
+          },
+          { merge: true }
+        );
+
      }
   }
 }
+
+
+
 
 
 
@@ -685,9 +695,9 @@ function checkDate(){
   */
 async function getTeamPoint(){
   return new Promise(async function(resolve){
-    teamCode = await getTeamCode();
+    currTeamCode = await getTeamCode();
     db.collection('teams')
-    .doc(teamCode)
+    .doc(currTeamCode)
     .get()
     .then(function (doc) {
       let data = doc.data();
@@ -695,19 +705,37 @@ async function getTeamPoint(){
     });
   });
 }
+
+
+/**
+  * @author: Xiang Liu & Youliang Liu
+  * get the current team points from the database
+  */
+ async function getNewTeamPoint(code){
+  return new Promise(async function(resolve){
+    db.collection('teams')
+    .doc(code)
+    .get()
+    .then(function (doc) {
+      let data = doc.data();
+      resolve(data.teamPoints);
+    });
+  });
+}
+
 /**
  * @author: Xiang Liu
  * get the current user points from the database
  */
 async function getUserPoint(){
   return new Promise(async function(resolve){
-    teamCode = await getTeamCode();
+    currTeamCode = await getTeamCode();
     db.collection('users')
     .doc(userEmail)
     .get()
     .then(function (doc) {
       let data = doc.data();
-      resolve(data.user_points[teamCode]);
+      resolve(data.user_points[currTeamCode]);
     });
   });
 }
@@ -715,76 +743,6 @@ async function getUserPoint(){
 
 
 
-/**
- * Inserts a new element to the timeline if a user has been on a blacklisted
- * site longer than the set time limit (threshold)
- * @author Brian Aguirre
- * @param {URL} currTabUrl url of blacklisted site
- */
-function updateTimeline(currTabUrl) {
-  return new Promise((resolve, reject) => {
-    let currTime = new Date().toLocaleTimeString(); // needs to be local storage time
-
-    let seconds = localStorage.getItem(currTabUrl) / 1000;
-    //threshold / 1000;
-    let time = `${currTabUrl}: ${seconds} seconds`;
-    let msg = {
-      for: "popup",
-      message: "timeline",
-      url: currTabUrl,
-      time: time,
-      flip: flip,
-    };
-    flip = !flip;
-
-    if (localStorage["oldElements"] == undefined) {
-      // localStorage["oldElements"] = [];
-      let firstItem = [{ url: currTabUrl, time: time }];
-      localStorage.setItem("oldElements", JSON.stringify(firstItem));
-    } else {
-      let oldElements = JSON.parse(localStorage.getItem("oldElements"));
-      oldElements.push({ url: currTabUrl, time: time });
-      localStorage.setItem("oldElements", JSON.stringify(oldElements));
-    }
-    chrome.runtime.sendMessage(msg, function (response) {
-      console.log(response);
-      resolve(response);
-    });
-  });
-}
-
-async function updateTimelineFB() {
-  teamCode = await getTeamCode();
-  db.collection("teams")
-    .doc(teamCode)
-    .onSnapshot(async function (doc) {
-      timelineArray = await getTimelineArrayFB();
-      // console.log(timelineArray);
-      let msg = {
-        for: "popup",
-        message: "timeline",
-        url: currTabUrl,
-        time: time,
-        flip: flip,
-      };
-      flip = !flip;
-      chrome.runtime.sendMessage(msg, (response) => {
-        // console.log("Send message success!");
-      });
-    });
-}
-
-async function getTimelineArrayFB() {
-  return new Promise(function (resolve) {
-    db.collection("teams")
-      .doc(teamCode)
-      .get()
-      .then(function (doc) {
-        let data = doc.data();
-        resolve(data.timeWasted);
-      });
-  });
-}
 
 function myTimer() {
   chrome.tabs.query(
