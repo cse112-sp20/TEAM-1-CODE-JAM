@@ -156,18 +156,13 @@ function setupListener() {
         sendResponse(teams);
       } else if (request.message === "get team info") {
         sendResponse(currentTeamInfo);
-      } else if (request.message === "get timeline") {
-        reverseTimelineArray().then((tabs) => {
-          sendResponse(tabs);
-        });
       }
       // VIVIAN
-      else if( request.message === "get team points"){
-        getUserDailyPoints().then(function(){
-          sendResponse(dailyTeamPoints);
+      else if (request.message === "get team points") {
+        getUserDailyPoints().then((res) => {
+          sendResponse(res);
         });
-      } 
-      else if (request.message === "set timeout to delete team") {
+      } else if (request.message === "set timeout to delete team") {
         timeoutVars[request.teamCode] = setTimeout(async () => {
           let teamInfo = await getTeamInformation(request.teamCode);
           teamInfo = teamInfo.data();
@@ -226,11 +221,26 @@ function setupListener() {
   });
 }
 //VIVIAN
-function getUserDailyPoints(){
-  let curDate = getDate();
-  dailyTeamPoints = db.collection("teamPerformance").doc(curDate).collection(totalTeamPoint).get();
+async function getUserDailyPoints() {
+  return new Promise(async (resolve) => {
+    let curDate = getDate();
+    let dbTeamPoints = await db
+      .collection("teamPerformance")
+      .doc(curDate)
+      .get();
+    dbTeamPoints = dbTeamPoints.data();
+    let userTeamsPoints = dbTeamPoints[userEmail];
+    let allTeamsPoints = dbTeamPoints.totalTeamPoint;
+    let res = {};
+    for (let team of Object.keys(userTeamsPoints)) {
+      res[team] = {
+        userPoints: userTeamsPoints[team],
+        teamPoints: allTeamsPoints[team],
+      };
+    }
+    resolve(res);
+  });
 }
-
 
 function toggleCheckIn() {
   if (isCheckIn()) {
@@ -709,7 +719,6 @@ async function getAnimalsLeft(teamCode) {
       .get()
       .then(function (doc) {
         let data = doc.data();
-        console.log(data);
         let animalsLeft = data.animalsLeft;
         resolve(animalsLeft);
       });
@@ -731,8 +740,6 @@ async function getDistributedAnimal(teamCode) {
 //Get team code everytime
 async function updateLocalStorage(tabUrl, timeSpend) {
   currTeamCode = await getTeamCode();
-  //console.log(teamCode);
-  //console.log("test: ", localStorage.getItem(teamCode));
   let currData = localStorage.getItem(currTeamCode);
   if (currData == undefined) {
     let data = { [tabUrl]: 0 };
@@ -866,7 +873,6 @@ function getCurrentUrl() {
           let currHost = getHostname(tab.url);
           resolve(getNameOfURL(currHost));
         } else {
-          console.log("here");
           resolve(undefined);
         }
       }
@@ -876,7 +882,6 @@ function getCurrentUrl() {
 
 async function myTimer() {
   currTabUrl = await getCurrentUrl();
-  console.log(currTabUrl);
   if (currTabUrl !== undefined || currTabUrl !== "invalid") {
     if (blacklist.includes(currTabUrl)) {
       updateLocalStorage(currTabUrl, updateInterval);

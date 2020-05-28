@@ -16,7 +16,7 @@ export default class Charts extends Component {
       */
       teams: [],
       //data
-      chartData: ""
+      chartData: "",
     };
   }
   // load data from function getChartData() into this.state.chartData
@@ -25,8 +25,8 @@ export default class Charts extends Component {
     this.getChartData();
     //this.getChartOptions();
     //console.log(this.state.teams);
-  }
-  getBackgroundData(){
+  };
+  getBackgroundData() {
     // variable to hold finished parsed array for all team info
     let teamInfo = [];
 
@@ -45,6 +45,7 @@ export default class Charts extends Component {
       if (response == undefined) {
         return;
       }
+      console.log(response);
       // parse through JSON and turn all values into an array
       response.forEach((element) => {
         let newElement = Object.values(element);
@@ -59,7 +60,7 @@ export default class Charts extends Component {
       if (response == undefined) {
         return;
       }
-      console.log(JSON.stringify(response));
+      console.log(response);
     });
   }
   // function to insert data into chart
@@ -90,78 +91,76 @@ export default class Charts extends Component {
         ],
       },
     });
-  }                   
+  }
   render() {
     let data = [];
     if (window.name !== "nodejs") {
       let index;
-      for (index = 0; index < this.state.teams.length; index++) { 
-        data.push(<Bar
-        key="2"
-        data={this.state.chartData}
-        options={{
-          title: {
-            display: true,
-            text: this.state.teams[index][1],
-            fontSize: 20,
-          },
-          legend: {
-            display: true,
-            position: "bottom",
-          },
-          maintainAspectRatio: true,
-          scales: {
-            yAxes: [
-              {
-                ticks: {
-                  suggestedMin: 0,
-                  suggestedMax: 100,
-                },
+      for (index = 0; index < this.state.teams.length; index++) {
+        data.push(
+          <Bar
+            key="2"
+            data={this.state.chartData}
+            options={{
+              title: {
+                display: true,
+                text: this.state.teams[index][1],
+                fontSize: 20,
               },
-            ],
-            xAxes: [
-              {
+              legend: {
+                display: true,
+                position: "bottom",
               },
-            ],
-          },
-        }
+              maintainAspectRatio: true,
+              scales: {
+                yAxes: [
+                  {
+                    ticks: {
+                      suggestedMin: 0,
+                      suggestedMax: 100,
+                    },
+                  },
+                ],
+                xAxes: [{}],
+              },
+            }}
+          />
+        );
       }
-      />);    
+      return (
+        <div id="chart" chartData={this.state.chartData} className="chart">
+          {data}
+        </div>
+      );
     }
-    return (
-      <div id="chart" chartData={this.state.chartData} className="chart">
-        {data}
-      </div>
-    );
   }
 }
-}
 
-      // chartOptions: {
-      //   title: {
-      //     display: true,
-      //     text: "Team 1 vs Me",
-      //     fontSize: 20,
-      //   },
-      //   legend: {
-      //     display: true,
-      //     position: "bottom",
-      //   },
-      //   maintainAspectRatio: true,
-      //   scales: {
-      //     yAxes: [
-      //       {
-      //         stacked: true,
-      //         ticks: {
-      //           suggestedMin: 0,
-      //           suggestedMax: 100,
-      //         },
-      //       },
-      //     ],
-      //     xAxes: [
-      //       {
-      //         stacked: true,
-      //       },
-      //     ],
-      //   },
-      // },
+// chartOptions: {
+//   title: {
+//     display: true,
+//     text: "Team 1 vs Me",
+//     fontSize: 20,
+//   },
+//   legend: {
+//     display: true,
+//     position: "bottom",
+//   },
+//   maintainAspectRatio: true,
+//   scales: {
+//     yAxes: [
+//       {
+//         stacked: true,
+//         ticks: {
+//           suggestedMin: 0,
+//           suggestedMax: 100,
+//         },
+//       },
+//     ],
+//     xAxes: [
+//       {
+//         stacked: true,
+//       },
+//     ],
+//   },
+// },
