@@ -22,8 +22,10 @@ let teams;
 let userEmail;
 // limit of how long you can be on blacklisted site
 let threshold = 5000;
-setInterval(resetTeamInfo, 60000);
-
+/**
+ * Resets timeline elements and redistributes a new animal for each teammember
+ * @author Brian Aguirre & William Lui
+ */
 async function resetTeamInfo() {
   if (currTeamCode === undefined) return;
 
@@ -38,7 +40,7 @@ async function resetTeamInfo() {
   db.collection("teams")
     .doc(currTeamCode)
     .update({
-      currDate: new Date().toLocaleTimeString(),
+      currDate: getDate(),
       distributedAnimal: distributedAnimal,
       animalsLeft: animalsLeft,
       teamPoints: 100,
@@ -370,6 +372,8 @@ async function createTeamOnFirebase(teamName, userEmail) {
 
     let copiedAnimal = Array.from(animals);
     let newAnimal = getAnimal(copiedAnimal);
+
+    let currMin = new Date().getMinutes();
     // Do these parallelly
     await Promise.all([
       // add the team to the user
@@ -862,13 +866,15 @@ async function myTimer() {
       updateLocalStorage(currTabUrl, updateInterval);
     }
   }
-
-  // if (
-  //   currentTeamInfo.currDate !== undefined &&
-  //   currentTeamInfo.currDate !== getDate()
-  // ) {
-  //   await resetTeamInfo();
-  // }
+  // resets teams data and creates
+  if (
+    currentTeamInfo.currDate !== undefined &&
+    currentTeamInfo.currDate !== getDate()
+  ) {
+    await resetTeamInfo();
+    currentDate = getDate();
+    createTeamPerformance(teamCode, 100);
+  }
 }
 
 function getNameOfURL(currHost) {
