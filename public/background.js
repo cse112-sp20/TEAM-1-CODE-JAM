@@ -3,18 +3,16 @@
 let db;
 let currTabUrl;
 let updateInterval = 1000;
-let flip = false;
-let teamCode;
-let timelineArray;
-let time;
+
 let currentTeamInfo;
 let currTeamCode;
 let userAnimal;
 let github_timeout = 15000;
+let currentDate = getDate();
 
 let updateToDatabase;
 let githubTracker;
-let currentSnapShot = () => {};
+let currentSnapShot = () => { };
 
 let blacklist = ["facebook", "twitter", "myspace", "youtube"];
 let userProfile = {
@@ -76,6 +74,7 @@ function getHostname(url) {
 //   });
 // }
 
+/*
 async function reverseTimelineArray() {
   return new Promise(function (resolve) {
     let tabs = [];
@@ -89,6 +88,7 @@ async function reverseTimelineArray() {
     resolve(tabs);
   });
 }
+*/
 
 /**
  * setupListener listens for request coming from popup,
@@ -179,7 +179,7 @@ function setupListener() {
               currTeamCode: currTeamCode,
               profilePic: profilePic,
             };
-          } catch {}
+          } catch { }
           sendResponse(data);
         })();
       }
@@ -382,8 +382,27 @@ async function createTeamOnFirebase(teamName, userEmail) {
           { merge: true }
         ),
     ]);
+    createTeamPerformance(teamCode, initPoint);
     resolve(teamCode);
+
   });
+
+
+
+
+}
+
+
+function createTeamPerformance(key, points) {
+  let code = key;
+  db.collection("teamPerformance")
+    .doc(currentDate)
+    .set(
+      {
+        [code]: points,
+      },
+      { merge: true }
+    );
 }
 
 function deleteEverythingAboutAUser(userEmail) {
@@ -428,7 +447,7 @@ function deleteTeamFromUser(
       .update({
         ["joined_teams." + teamCode]: firebase.firestore.FieldValue.delete(),
       })
-      .catch((err) => {}),
+      .catch((err) => { }),
     db
       .collection("teams")
       .doc(teamCode)
@@ -437,7 +456,7 @@ function deleteTeamFromUser(
         distributedAnimal: distributedAnimal,
         animalsLeft: animalsLeft,
       })
-      .catch((err) => {}),
+      .catch((err) => { }),
   ]);
 }
 function deleteTeamEntirely(teamCode) {
@@ -500,28 +519,7 @@ function isTeamCodeUnique(id) {
     });
   });
 }
-// /**
-//  * Init Firebase configuration
-//  * @author Karl Wang
-//  */
-// function initializeFirebase() {
-//   try {
-//     global.firebase = require("firebase");
-//   } catch {}
 
-//   const firebaseConfig = {
-//     apiKey: "AIzaSyCJYc-PMIXdQxE2--bQI6Z1FGMKwMulEyc",
-//     authDomain: "chrome-extension-cse-112.firebaseapp.com",
-//     databaseURL: "https://chrome-extension-cse-112.firebaseio.com",
-//     projectId: "chrome-extension-cse-112",
-//     storageBucket: "chrome-extension-cse-112.appspot.com",
-//     messagingSenderId: "275891630155",
-//     appId: "1:275891630155:web:f238da778112200c815dce",
-//   };
-//   // Initialize Firebase
-//   firebase.initializeApp(firebaseConfig);
-//   db = firebase.firestore();
-// }
 /**
  * Get the user email from chrome api
  * @author Karl Wang
@@ -618,7 +616,7 @@ function checkOff() {
 function initializeFirebase() {
   try {
     global.firebase = require("firebase");
-  } catch {}
+  } catch { }
 
   const firebaseConfig = {
     apiKey: "AIzaSyCJYc-PMIXdQxE2--bQI6Z1FGMKwMulEyc",
@@ -694,15 +692,16 @@ async function getDistributedAnimal(teamCode) {
 
 //Get team code everytime
 async function updateLocalStorage(tabUrl, timeSpend) {
-  teamCode = await getTeamCode();
+  currTeamCode = await getTeamCode();
   //console.log(teamCode);
   //console.log("test: ", localStorage.getItem(teamCode));
-  let currData = localStorage.getItem(teamCode);
+  let currData = localStorage.getItem(currTeamCode);
   if (currData == undefined) {
     let data = { [tabUrl]: 0 };
     data = JSON.stringify(data);
-    localStorage.setItem(teamCode, data);
-  } else {
+    localStorage.setItem(currTeamCode, data);
+  }
+  else {
     currData = JSON.parse(currData);
     let newTime;
     // user visited a new url not in localstorage
@@ -714,8 +713,7 @@ async function updateLocalStorage(tabUrl, timeSpend) {
       currData[tabUrl] = newTime;
     }
     currData = JSON.stringify(currData);
-
-    localStorage.setItem(teamCode, currData);
+    localStorage.setItem(currTeamCode, currData);
     if (JSON.parse(currData)[tabUrl] % threshold == 0) {
       let seconds = JSON.parse(currData)[tabUrl] / 1000;
       let score = threshold / (60 * 1000);
@@ -732,7 +730,7 @@ async function updateLocalStorage(tabUrl, timeSpend) {
 
       let userAnimal = await getUserAnimal(userEmail, teamCode);
       db.collection("teams")
-        .doc(teamCode)
+        .doc(currTeamCode)
         .update({
           timeWasted: firebase.firestore.FieldValue.arrayUnion({
             user: userEmail,
@@ -744,18 +742,44 @@ async function updateLocalStorage(tabUrl, timeSpend) {
           }),
           teamPoints: teamPoints,
         });
-      db.collection("users")
+
+      await db
+        .collection("users")
         .doc(userEmail)
         .set(
           {
             user_points: {
-              [teamCode]: userPoints,
+              [currTeamCode]: userPoints
             },
           },
           { merge: true }
         );
+
+      db.collection("teamPerformance")
+        .doc(currentDate)
+        .set(
+          {
+            [currTeamCode]: teamPoints,
+            [userEmail]: userProfile.user_points,
+          },
+          { merge: true }
+        );
+
     }
   }
+}
+
+/**
+ * @author: Youliang Liu & Xiang Liu
+ * @return: the current date
+ */
+function getDate() {
+  let d = new Date();
+  let date = d.getDate();
+  let month = d.getMonth() + 1; // Since getMonth() returns month from 0-11 not 1-12
+  let year = d.getFullYear();
+  let dateStr = month + "" + date + "" + year;
+  return dateStr;
 }
 
 /**
@@ -777,14 +801,14 @@ function checkDate() {
   }
 }
 /**
- * @author: Xiang Liu & Youliang Liu
- * get the current team points from the database
- */
+  * @author: Xiang Liu & Youliang Liu
+  * get the current team points from the database
+  */
 async function getTeamPoint() {
   return new Promise(async function (resolve) {
-    teamCode = await getTeamCode();
-    db.collection("teams")
-      .doc(teamCode)
+    currTeamCode = await getTeamCode();
+    db.collection('teams')
+      .doc(currTeamCode)
       .get()
       .then(function (doc) {
         let data = doc.data();
@@ -792,93 +816,7 @@ async function getTeamPoint() {
       });
   });
 }
-/**
- * @author: Xiang Liu
- * get the current user points from the database
- */
-async function getUserPoint() {
-  return new Promise(async function (resolve) {
-    teamCode = await getTeamCode();
-    db.collection("users")
-      .doc(userEmail)
-      .get()
-      .then(function (doc) {
-        let data = doc.data();
-        resolve(data.user_points[teamCode]);
-      });
-  });
-}
 
-/**
- * Inserts a new element to the timeline if a user has been on a blacklisted
- * site longer than the set time limit (threshold)
- * @author Brian Aguirre
- * @param {URL} currTabUrl url of blacklisted site
- */
-function updateTimeline(currTabUrl) {
-  return new Promise((resolve, reject) => {
-    let currTime = new Date().toLocaleTimeString(); // needs to be local storage time
-
-    let seconds = localStorage.getItem(currTabUrl) / 1000;
-    //threshold / 1000;
-    let time = `${currTabUrl}: ${seconds} seconds`;
-    let msg = {
-      for: "popup",
-      message: "timeline",
-      url: currTabUrl,
-      time: time,
-      flip: flip,
-    };
-    flip = !flip;
-
-    if (localStorage["oldElements"] == undefined) {
-      // localStorage["oldElements"] = [];
-      let firstItem = [{ url: currTabUrl, time: time }];
-      localStorage.setItem("oldElements", JSON.stringify(firstItem));
-    } else {
-      let oldElements = JSON.parse(localStorage.getItem("oldElements"));
-      oldElements.push({ url: currTabUrl, time: time });
-      localStorage.setItem("oldElements", JSON.stringify(oldElements));
-    }
-    chrome.runtime.sendMessage(msg, function (response) {
-      console.log(response);
-      resolve(response);
-    });
-  });
-}
-
-async function updateTimelineFB() {
-  teamCode = await getTeamCode();
-  db.collection("teams")
-    .doc(teamCode)
-    .onSnapshot(async function (doc) {
-      timelineArray = await getTimelineArrayFB();
-      // console.log(timelineArray);
-      let msg = {
-        for: "popup",
-        message: "timeline",
-        url: currTabUrl,
-        time: time,
-        flip: flip,
-      };
-      flip = !flip;
-      chrome.runtime.sendMessage(msg, (response) => {
-        // console.log("Send message success!");
-      });
-    });
-}
-
-async function getTimelineArrayFB() {
-  return new Promise(function (resolve) {
-    db.collection("teams")
-      .doc(teamCode)
-      .get()
-      .then(function (doc) {
-        let data = doc.data();
-        resolve(data.timeWasted);
-      });
-  });
-}
 function getCurrentUrl() {
   return new Promise((resolve) => {
     chrome.tabs.query(
@@ -896,9 +834,11 @@ function getCurrentUrl() {
           resolve(undefined);
         }
       }
-    );
+    );  
   });
 }
+
+
 async function myTimer() {
   currTabUrl = await getCurrentUrl();
   console.log(currTabUrl);
@@ -987,4 +927,4 @@ try {
     createUser,
     deleteEverythingAboutAUser,
   };
-} catch {}
+} catch { }
