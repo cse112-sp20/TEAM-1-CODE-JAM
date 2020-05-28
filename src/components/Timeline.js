@@ -29,12 +29,17 @@ export default class Timeline extends Component {
 
     let newElement = (
       <tr>
-        <td id="time">{timelineElement.currTime}</td>
+        <td id="time">
+          <p style={{ fontWeight: 600 }}>{timelineElement.currTime}</p>
+        </td>
         <td>
           <img src={require(`../SVG/${animal}.svg`)}></img>
         </td>
         <td id="thirdElem" style={{ color: `${color}` }}>
-          {`${timelineElement.url}`}
+          <p
+            style={{ fontWeight: 600, textTransform: "capitalize" }}
+          >{`${timelineElement.url}`}</p>
+
           <br></br>
           {`${points}`}
         </td>
@@ -82,7 +87,7 @@ export default class Timeline extends Component {
                 <tr>
                   <th id="myHead">Time</th>
                   <th id="myHead">Person</th>
-                  <th>Earned</th>
+                  <th id="myHead">Earned</th>
                 </tr>
               </thead>
               <tbody>
