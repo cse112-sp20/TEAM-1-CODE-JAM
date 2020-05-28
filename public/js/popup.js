@@ -1,11 +1,10 @@
 /*
- * Author: Ivy Cheng
  * Impelementation of tab switching. Defines the current active tab
  */
 function openTab(evt, tabName) {
 
     // Declare all variables
-    var i, tabcontent, tablinks;
+    var i, tabcontent, tabs;
   
     // Get all elements with class="main_content" and hide them
     tabcontent = document.getElementsByClassName("main_content");
@@ -23,3 +22,13 @@ function openTab(evt, tabName) {
     document.getElementById(tabName).style.display = "block";
     evt.currentTarget.className += " active";
 }
+
+document.getElementById("authenticationsTab").onclick = function(event) {
+  openTab(event, 'Authentications');
+}
+
+document.getElementById("aboutTab").onclick = function(event) {
+  openTab(event, 'About');
+}
+
+document.getElementById("authenticationsTab").click();

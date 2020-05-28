@@ -178,7 +178,6 @@ function onUserInfoFetched(error, status, response) {
     console.log("Got the following user info: " + response);
     var user_info = JSON.parse(response);
     populateUserInfo(user_info);
-    hideButton(signin_button);
     showButton(revoke_button);
     fetchUserRepos(user_info["repos_url"]);
   } else {
@@ -194,8 +193,6 @@ function populateUserInfo(user_info) {
       + "Your github page is: " + user_info.html_url;
   elem.appendChild(nameElem);
 }
-
-
 
 function fetchUserRepos(repoUrl) {
   xhrWithAuth('GET', repoUrl, false, onUserReposFetched);
@@ -223,11 +220,13 @@ function onUserReposFetched(error, status, response) {
 
 // Handlers for the buttons's onclick events.
 function interactiveSignIn() {
-    disableButton(signin_button);
     tokenFetcher.getToken(true, function(error, access_token) {
       if (error) {
+          document.querySelector('#signin').innerHTML='SIGN IN';
           showButton(signin_button);
       } else {
+          document.querySelector('#signin').innerHTML='&#10004';
+          disableButton(signin_button);
           // console.log(access_token);
       //   getUserInfo(true);
       }
@@ -241,9 +240,13 @@ function revokeToken() {
   // If the user revokes the app authorization, they will be prompted to log
   // in again. If the user dismissed the page they were presented with,
   // Sign in button will simply sign them in.
-//   user_info_div.textContent = '';
+  // user_info_div.textContent = '';
   hideButton(revoke_button);
+  document.querySelector('#signin').innerHTML='SIGN IN';
   showButton(signin_button);
+  if(signin_button != null){
+    signin_button.onclick = interactiveSignIn;
+  }
 }
 
     
@@ -260,7 +263,7 @@ function revokeToken() {
 
   // console.log(signin_button, revoke_button, user_info_div);
 
-  if(signin_button != null){
+  if(signin_button != null) {
     showButton(signin_button);
   }
   
