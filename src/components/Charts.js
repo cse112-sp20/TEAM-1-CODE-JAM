@@ -6,35 +6,7 @@ export default class Charts extends Component {
     super(props);
     this.state = {
       chartData: "",
-      chartOptions: {
-        title: {
-          display: true,
-          text: "Team 1 vs Me",
-          fontSize: 20,
-        },
-        legend: {
-          display: true,
-          position: "bottom",
-        },
-        maintainAspectRatio: true,
-        scales: {
-          yAxes: [
-            {
-              stacked: true,
-              ticks: {
-                suggestedMin: 0,
-                suggestedMax: 100,
-              },
-            },
-          ],
-          xAxes: [
-            {
-              stacked: true,
-            },
-          ],
-        },
-      },
-      chartOptions2: {
+      chartOptions1: {
         title: {
           display: true,
           text: "Team X vs Me",
@@ -48,7 +20,6 @@ export default class Charts extends Component {
         scales: {
           yAxes: [
             {
-              // stacked: true,
               ticks: {
                 suggestedMin: 0,
                 suggestedMax: 100,
@@ -57,7 +28,6 @@ export default class Charts extends Component {
           ],
           xAxes: [
             {
-              //stacked: true
             },
           ],
         },
@@ -102,15 +72,15 @@ export default class Charts extends Component {
     let data = [];
     if (window.name !== "nodejs") {
       data = [
-        <Bar
-          key="1"
-          data={this.state.chartData}
-          options={this.state.chartOptions}
-        />,
+        // <Bar
+        //   key="1"
+        //   data={this.state.chartData}
+        //   options={this.state.chartOptions}
+        // />,
         <Bar
           key="2"
           data={this.state.chartData}
-          options={this.state.chartOptions2}
+          options={this.state.chartOptions1}
         />,
       ];
     }
@@ -121,3 +91,33 @@ export default class Charts extends Component {
     );
   }
 }
+
+
+      // chartOptions: {
+      //   title: {
+      //     display: true,
+      //     text: "Team 1 vs Me",
+      //     fontSize: 20,
+      //   },
+      //   legend: {
+      //     display: true,
+      //     position: "bottom",
+      //   },
+      //   maintainAspectRatio: true,
+      //   scales: {
+      //     yAxes: [
+      //       {
+      //         stacked: true,
+      //         ticks: {
+      //           suggestedMin: 0,
+      //           suggestedMax: 100,
+      //         },
+      //       },
+      //     ],
+      //     xAxes: [
+      //       {
+      //         stacked: true,
+      //       },
+      //     ],
+      //   },
+      // },
