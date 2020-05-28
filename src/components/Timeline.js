@@ -20,16 +20,16 @@ export default class Timeline extends Component {
     if (animal == undefined) {
       animal = "Predator";
     }
-    let color = "green";
-    let points = "+30";
-
+    let color = "#52d16d";
     if (this.state.black_listed.includes(timelineElement.url)) {
-      color = "red";
-      points = "-30";
+      color = "#ff7373";
     }
+    let points =
+      Math.round((timelineElement.points + Number.EPSILON) * 100) / 100;
+
     let newElement = (
       <tr>
-        <td>{timelineElement.currTime}</td>
+        <td id="time">{timelineElement.currTime}</td>
         <td>
           <img src={require(`../SVG/${animal}.svg`)}></img>
         </td>
@@ -40,6 +40,7 @@ export default class Timeline extends Component {
         </td>
       </tr>
     );
+
     return newElement;
   };
 
@@ -50,7 +51,7 @@ export default class Timeline extends Component {
     // new element for timeline
     if (request.for === "team info")
       this.setState({
-        timeline: request.message.timeWasted.reverse(),
+        timeline: request.message.timeWasted,
       });
 
     console.log(request);
@@ -72,18 +73,9 @@ export default class Timeline extends Component {
   };
 
   render() {
-    // let timeline = (
-    //   <div>
-    //     <tbody>
-    //       {this.state.timeline.map((eachTimeline) => {
-    //         return this.createTimelineElement(eachTimeline);
-    //       })}
-    //     </tbody>
-    //   </div>
-    // );
     return (
       <div className="row" id="myTimeline">
-        <div className="card e4e4e4 darken-1" id="myCard">
+        <div className="card blue-grey lighten-5" id="myCard">
           <div className="card-content black-text" id="myContent">
             <table className="highlight" id="myTable">
               <thead>

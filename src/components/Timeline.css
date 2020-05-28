@@ -5,6 +5,14 @@ td {
   border-top-width: 0px;
   width: 500px;
 }
+#time {
+  font-weight: 600;
+}
+
+thead,
+tr {
+  border: none;
+}
 
 #mycard {
   max-height: 544px;
