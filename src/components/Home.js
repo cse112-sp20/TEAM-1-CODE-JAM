@@ -79,6 +79,7 @@ export default class Home extends Component {
             teamMembers: teamInfo.members,
             teamPoints: teamPoints,
             timelineArr: timelineArr,
+            profilePic: teamInfo.userAnimal,
           });
         }
       });
@@ -205,6 +206,9 @@ export default class Home extends Component {
   };
   getProfilePic = (profilePic) => {
     console.log(profilePic);
+    if (profilePic == undefined) {
+      profilePic = "Predator";
+    }
     return require("../images/emojis/" + profilePic + ".svg");
   };
 

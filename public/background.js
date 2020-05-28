@@ -12,7 +12,7 @@ let currentDate = getDate();
 
 let updateToDatabase;
 let githubTracker;
-let currentSnapShot = () => { };
+let currentSnapShot = () => {};
 
 let blacklist = ["facebook", "twitter", "myspace", "youtube"];
 let userProfile = {
@@ -22,7 +22,30 @@ let teams;
 let userEmail;
 // limit of how long you can be on blacklisted site
 let threshold = 5000;
+setInterval(resetTeamInfo, 60000);
 
+async function resetTeamInfo() {
+  if (currTeamCode === undefined) return;
+
+  let animalsLeft = Array.from(animals);
+  let members = currentTeamInfo.members;
+  let numMem = currentTeamInfo.members.length;
+  let distributedAnimal = {};
+  for (let i = 0; i < numMem; i++) {
+    distributedAnimal[members[i]] = getAnimal(animalsLeft);
+  }
+
+  db.collection("teams")
+    .doc(currTeamCode)
+    .update({
+      currDate: new Date().toLocaleTimeString(),
+      distributedAnimal: distributedAnimal,
+      animalsLeft: animalsLeft,
+      teamPoints: 100,
+      timeWasted: [],
+    })
+    .catch((err) => {});
+}
 /**
  *  Gets the host name of a URL
  *
@@ -179,7 +202,7 @@ function setupListener() {
               currTeamCode: currTeamCode,
               profilePic: profilePic,
             };
-          } catch { }
+          } catch {}
           sendResponse(data);
         })();
       }
@@ -378,13 +401,13 @@ async function createTeamOnFirebase(teamName, userEmail) {
             teamPoints: initPoint,
             distributedAnimal: { [userEmail]: newAnimal },
             animalsLeft: copiedAnimal,
+            currDate: getDate(),
           },
           { merge: true }
         ),
     ]);
     createTeamPerformance(teamCode, initPoint);
     resolve(teamCode);
-
   });
 }
 
@@ -442,7 +465,7 @@ function deleteTeamFromUser(
       .update({
         ["joined_teams." + teamCode]: firebase.firestore.FieldValue.delete(),
       })
-      .catch((err) => { }),
+      .catch((err) => {}),
     db
       .collection("teams")
       .doc(teamCode)
@@ -451,7 +474,7 @@ function deleteTeamFromUser(
         distributedAnimal: distributedAnimal,
         animalsLeft: animalsLeft,
       })
-      .catch((err) => { }),
+      .catch((err) => {}),
   ]);
 }
 function deleteTeamEntirely(teamCode) {
@@ -611,7 +634,7 @@ function checkOff() {
 function initializeFirebase() {
   try {
     global.firebase = require("firebase");
-  } catch { }
+  } catch {}
 
   const firebaseConfig = {
     apiKey: "AIzaSyCJYc-PMIXdQxE2--bQI6Z1FGMKwMulEyc",
@@ -695,8 +718,7 @@ async function updateLocalStorage(tabUrl, timeSpend) {
     let data = { [tabUrl]: 0 };
     data = JSON.stringify(data);
     localStorage.setItem(currTeamCode, data);
-  }
-  else {
+  } else {
     currData = JSON.parse(currData);
     let newTime;
     // user visited a new url not in localstorage
@@ -744,7 +766,7 @@ async function updateLocalStorage(tabUrl, timeSpend) {
         .set(
           {
             user_points: {
-              [currTeamCode]: userPoints
+              [currTeamCode]: userPoints,
             },
           },
           { merge: true }
@@ -755,11 +777,10 @@ async function updateLocalStorage(tabUrl, timeSpend) {
         .set(
           {
             [userEmail]: userProfile.user_points,
-            totalTeamPoint: { [currTeamCode]: teamPoints},
+            totalTeamPoint: { [currTeamCode]: teamPoints },
           },
           { merge: true }
         );
-
     }
   }
 }
@@ -796,13 +817,13 @@ function checkDate() {
   }
 }
 /**
-  * @author: Xiang Liu & Youliang Liu
-  * get the current team points from the database
-  */
+ * @author: Xiang Liu & Youliang Liu
+ * get the current team points from the database
+ */
 async function getTeamPoint() {
   return new Promise(async function (resolve) {
     currTeamCode = await getTeamCode();
-    db.collection('teams')
+    db.collection("teams")
       .doc(currTeamCode)
       .get()
       .then(function (doc) {
@@ -829,10 +850,9 @@ function getCurrentUrl() {
           resolve(undefined);
         }
       }
-    );  
+    );
   });
 }
-
 
 async function myTimer() {
   currTabUrl = await getCurrentUrl();
@@ -842,6 +862,13 @@ async function myTimer() {
       updateLocalStorage(currTabUrl, updateInterval);
     }
   }
+
+  // if (
+  //   currentTeamInfo.currDate !== undefined &&
+  //   currentTeamInfo.currDate !== getDate()
+  // ) {
+  //   await resetTeamInfo();
+  // }
 }
 
 function getNameOfURL(currHost) {
@@ -872,11 +899,14 @@ function getTeamOnSnapshot() {
         .doc(currentTeam)
         .onSnapshot(function (doc) {
           currentTeamInfo = doc.data();
+          let userAnimal = currentTeamInfo.distributedAnimal[userEmail];
+          currentTeamInfo["userAnimal"] = userAnimal;
           let msg = {
             for: "team info",
             message: currentTeamInfo,
           };
           chrome.runtime.sendMessage(msg);
+          delete currentTeamInfo["userAnimal"];
           resolve();
           // return;
         });
@@ -922,4 +952,4 @@ try {
     createUser,
     deleteEverythingAboutAUser,
   };
-} catch { }
+} catch {}

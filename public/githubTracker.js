@@ -158,7 +158,7 @@ function sendToDB(teamCode, animal) {
         if (max != "00:00:00") {
           let msg = {
             for: "popup",
-            message: "timeline demo",
+            message: "team info",
             url: "GitHub",
             time: max,
             animal: "water-bottle",

@@ -48,7 +48,7 @@ export default class Timeline extends Component {
    */
   handleMessage = (request) => {
     // new element for timeline
-    if (request.for === "timeline demo")
+    if (request.for === "team info")
       this.setState({
         timeline: request.message.timeWasted.reverse(),
       });
@@ -72,6 +72,15 @@ export default class Timeline extends Component {
   };
 
   render() {
+    // let timeline = (
+    //   <div>
+    //     <tbody>
+    //       {this.state.timeline.map((eachTimeline) => {
+    //         return this.createTimelineElement(eachTimeline);
+    //       })}
+    //     </tbody>
+    //   </div>
+    // );
     return (
       <div className="row" id="myTimeline">
         <div className="card e4e4e4 darken-1" id="myCard">
