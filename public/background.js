@@ -720,8 +720,7 @@ async function updateLocalStorage(tabUrl, timeSpend) {
       let seconds = JSON.parse(currData)[tabUrl] / 1000;
       let score = threshold / (60 * 1000);
       let today = new Date();
-      let currTime =
-        today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+      let currTime = new Date().toLocaleTimeString();
       let teamCode = await getTeamCode();
       // let teamPoints = await getTeamPoint();
       let teamPoints = currentTeamInfo.teamPoints;
