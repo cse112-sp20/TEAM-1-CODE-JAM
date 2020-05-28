@@ -20,6 +20,9 @@ let userProfile = {
 };
 let teams;
 let userEmail;
+
+let dailyTeamPoints;
+
 // limit of how long you can be on blacklisted site
 let threshold = 5000;
 /**
@@ -157,7 +160,14 @@ function setupListener() {
         reverseTimelineArray().then((tabs) => {
           sendResponse(tabs);
         });
-      } else if (request.message === "set timeout to delete team") {
+      }
+      // VIVIAN
+      else if( request.message === "get team points"){
+        getUserDailyPoints().then(function(){
+          sendResponse(dailyTeamPoints);
+        });
+      } 
+      else if (request.message === "set timeout to delete team") {
         timeoutVars[request.teamCode] = setTimeout(async () => {
           let teamInfo = await getTeamInformation(request.teamCode);
           teamInfo = teamInfo.data();
@@ -215,6 +225,12 @@ function setupListener() {
     return true;
   });
 }
+//VIVIAN
+function getUserDailyPoints(){
+  let curDate = getDate();
+  dailyTeamPoints = db.collection("teamPerformance").doc(curDate).collection(totalTeamPoint).get();
+}
+
 
 function toggleCheckIn() {
   if (isCheckIn()) {
