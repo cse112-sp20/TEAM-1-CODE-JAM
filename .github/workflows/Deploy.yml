@@ -19,9 +19,9 @@ jobs:
         with:
           node-version: 12
       - name: Install Dependencies
-        run: |
-          npm install
-          make test-coverage
+        run: npm install
+      - name: Run cov tests
+        run: npm run test-cov
       - name: Coveralls
         uses: coverallsapp/github-action@master
         with:
