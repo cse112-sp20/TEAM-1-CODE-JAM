@@ -386,12 +386,7 @@ async function createTeamOnFirebase(teamName, userEmail) {
     resolve(teamCode);
 
   });
-
-
-
-
 }
-
 
 function createTeamPerformance(key, points) {
   let code = key;
@@ -399,7 +394,7 @@ function createTeamPerformance(key, points) {
     .doc(currentDate)
     .set(
       {
-        [code]: points,
+        totalTeamPoint: { [code]: points },
       },
       { merge: true }
     );
@@ -759,8 +754,8 @@ async function updateLocalStorage(tabUrl, timeSpend) {
         .doc(currentDate)
         .set(
           {
-            [currTeamCode]: teamPoints,
             [userEmail]: userProfile.user_points,
+            totalTeamPoint: { [currTeamCode]: teamPoints},
           },
           { merge: true }
         );
