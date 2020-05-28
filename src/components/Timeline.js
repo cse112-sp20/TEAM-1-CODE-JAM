@@ -15,6 +15,10 @@ export default class Timeline extends Component {
     chrome.runtime.onMessage.addListener(this.handleMessage);
   };
 
+  /**
+   * Creates a element for the timeline
+   * @author Brian Aguirre
+   */
   createTimelineElement = (timelineElement) => {
     let animal = timelineElement.animal;
     if (animal == undefined) {
@@ -51,6 +55,7 @@ export default class Timeline extends Component {
 
   /**
    * Updates timeline if a new element is created for the timeline.
+   * @author Brian Aguirre
    */
   handleMessage = (request) => {
     // new element for timeline
@@ -64,6 +69,7 @@ export default class Timeline extends Component {
   };
   /**
    * Loads the timeline. Only called once
+   * @author Brian Aguirre
    */
   timeline = async () => {
     const msg = {
