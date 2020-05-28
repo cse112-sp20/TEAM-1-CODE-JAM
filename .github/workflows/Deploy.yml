@@ -3,6 +3,9 @@ on:
   push:
     branches:
       - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
   build:
@@ -16,7 +19,13 @@ jobs:
         with:
           node-version: 12
       - name: Install Dependencies
-        run: npm install
+        run: |
+          npm install
+          make test-coverage
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }} 
       - name: Build
         run: CI=false npm run build
       - name: Deploy to Firebase
