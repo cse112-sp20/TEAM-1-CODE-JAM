@@ -20,5 +20,9 @@ export function initializeFirebase() {
   };
   // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
-  db = firebase.firestore();
+  setDB(firebase.firestore());
+}
+
+export function setDB(database) {
+  db = database;
 }
