@@ -1,20 +1,21 @@
+/* global chrome */
 'use strict';
 
-var signin_button;
-var revoke_button;
-var user_info_div;
+let signin_button;
+let revoke_button;
+let user_info_div;
 
-var tokenFetcher = (function() {
+let tokenFetcher = (function() {
   // Replace clientId and clientSecret with values obtained by you for your
   // application https://github.com/settings/applications.
-  var clientId = '825ffe9603a27981677a';
+  let clientId = '825ffe9603a27981677a';
   // Note that in a real-production app, you may not want to store
   // clientSecret in your App code.
-  var clientSecret = '0c4548e8c7cb92a85f868a14431d4f1fd29106ea';
-  var redirectUri = chrome.identity.getRedirectURL('provider_cb');
-  var redirectRe = new RegExp(redirectUri + '[#\?](.*)');
+  let clientSecret = '0c4548e8c7cb92a85f868a14431d4f1fd29106ea';
+  let redirectUri = chrome.identity.getRedirectURL('provider_cb');
+  let redirectRe = new RegExp(redirectUri + '[#\?](.*)');
 
-  var access_token = null;
+  let access_token = null;
   localStorage.removeItem("token")
 
   return {
@@ -25,7 +26,7 @@ var tokenFetcher = (function() {
         return;
       }
 
-      var options = {
+      let options = {
         'interactive': interactive,
         'url': 'https://github.com/login/oauth/authorize' +
                 '?client_id=' + clientId + "&scope=repo"+
@@ -46,7 +47,7 @@ var tokenFetcher = (function() {
         //     &refresh_token={value}
         // or:
         // https://{app_id}.chromiumapp.org/provider_cb#code={value}
-        var matches = redirectUri.match(redirectRe);
+        let matches = redirectUri.match(redirectRe);
         if (matches && matches.length > 1)
           handleProviderResponse(parseRedirectFragment(matches[1]));
         else
@@ -54,11 +55,11 @@ var tokenFetcher = (function() {
       });
 
       function parseRedirectFragment(fragment) {
-        var pairs = fragment.split(/&/);
-        var values = {};
+        let pairs = fragment.split(/&/);
+        let values = {};
 
         pairs.forEach(function(pair) {
-          var nameval = pair.split(/=/);
+          let nameval = pair.split(/=/);
           values[nameval[0]] = nameval[1];
         });
 
@@ -78,7 +79,7 @@ var tokenFetcher = (function() {
       }
 
       function exchangeCodeForToken(code) {
-        var xhr = new XMLHttpRequest();
+        let xhr = new XMLHttpRequest();
         xhr.open('GET',
                   'https://github.com/login/oauth/access_token?' +
                   'client_id=' + clientId +
@@ -91,7 +92,7 @@ var tokenFetcher = (function() {
           // When exchanging code for token, the response comes as json, which
           // can be easily parsed to an object.
           if (this.status === 200) {
-            var response = JSON.parse(this.responseText);
+            let response = JSON.parse(this.responseText);
             // console.log(response);
 
             if (response.hasOwnProperty('access_token')) {
@@ -126,8 +127,8 @@ var tokenFetcher = (function() {
 
 
 function xhrWithAuth(method, url, interactive, callback) {
-    var retry = true;
-    var access_token;
+    let retry = true;
+    let access_token;
 
     // console.log('xhrWithAuth', method, url, interactive);
     getToken();
@@ -146,7 +147,7 @@ function xhrWithAuth(method, url, interactive, callback) {
     }
 }
 
-function getUserInfo(interactive) {
+export function getUserInfo(interactive) {
   xhrWithAuth('GET',
               'https://api.github.com/user',
               interactive,
@@ -176,7 +177,7 @@ function disableButton(button) {
 function onUserInfoFetched(error, status, response) {
   if (!error && status == 200) {
     console.log("Got the following user info: " + response);
-    var user_info = JSON.parse(response);
+    let user_info = JSON.parse(response);
     populateUserInfo(user_info);
     showButton(revoke_button);
     fetchUserRepos(user_info["repos_url"]);
@@ -187,8 +188,8 @@ function onUserInfoFetched(error, status, response) {
 }
 
 function populateUserInfo(user_info) {
-  var elem = user_info_div;
-  var nameElem = document.createElement('div');
+  let elem = user_info_div;
+  let nameElem = document.createElement('div');
   nameElem.innerHTML = "<b>Hello " + user_info.name + "</b><br>"
       + "Your github page is: " + user_info.html_url;
   elem.appendChild(nameElem);
@@ -199,11 +200,11 @@ function fetchUserRepos(repoUrl) {
 }
 
 function onUserReposFetched(error, status, response) {
-  var elem = document.querySelector('#user_repos');
+  let elem = document.querySelector('#user_repos');
   elem.value='';
   if (!error && status == 200) {
     console.log("Got the following user repos:", response);
-    var user_repos = JSON.parse(response);
+    let user_repos = JSON.parse(response);
     user_repos.forEach(function(repo) {
       if (repo.private) {
         elem.value += "[private repo]";

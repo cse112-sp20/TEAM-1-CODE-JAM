@@ -1,9 +1,10 @@
 /*global firebase*/
+export let db;
 /**
  * Init Firebase configuration
  * @author Karl Wang
  */
-function initializeFirebase() {
+export function initializeFirebase() {
   try {
     global.firebase = require("firebase");
   } catch {}
@@ -19,10 +20,5 @@ function initializeFirebase() {
   };
   // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
+  db = firebase.firestore();
 }
-initializeFirebase();
-try {
-  module.exports = {
-    initializeFirebase,
-  };
-} catch {}

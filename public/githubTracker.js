@@ -1,3 +1,7 @@
+/* global firebase */
+import { db } from "./firebaseInit.js";
+import { getUserInfo } from "./github-oauth.js";
+import { userEmail } from "./userAndTeams.js";
 /**
  *  Fetches data from github using the Github REST API. Header
  * includes the token which was saved after user sign-in with Github.
@@ -133,7 +137,7 @@ async function getMostRecentCommit() {
  * @param {string} teamCode
  * @param {string} animal
  */
-function sendToDB(teamCode, animal) {
+export function sendToDB(teamCode, animal) {
   // console.log(teamCode)
   if (teamCode === undefined || animal === undefined) {
     return;
