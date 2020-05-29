@@ -20,12 +20,6 @@ jobs:
           node-version: 12
       - name: Install Dependencies
         run: npm install
-      - name: Run cov tests
-        run: npm run test-cov
-      - name: Coveralls
-        uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }} 
       - name: Build
         run: CI=false npm run build
       - name: Deploy to Firebase
