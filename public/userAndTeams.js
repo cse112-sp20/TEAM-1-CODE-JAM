@@ -546,7 +546,6 @@ export async function getAnimalsLeft(teamCode) {
       .get()
       .then(function (doc) {
         let data = doc.data();
-        console.log(data);
         let animalsLeft = data.animalsLeft;
         resolve(animalsLeft);
       });
@@ -591,7 +590,6 @@ export async function updateLocalStorage(tabUrl, timeSpend, threshold) {
     // update the local storage
     localStorage.setItem(teamCode, currData);
     if (JSON.parse(currData)[tabUrl] % threshold == 0) {
-      console.log(threshold);
       let seconds = JSON.parse(currData)[tabUrl] / 1000;
       let score = threshold / (60 * 1000);
       let today = new Date();

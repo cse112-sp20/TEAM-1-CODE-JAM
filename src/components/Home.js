@@ -204,7 +204,6 @@ export default class Home extends Component {
     return Math.round((num + Number.EPSILON) * 100) / 100;
   };
   getProfilePic = (profilePic) => {
-    console.log(profilePic);
     return require("../images/emojis/" + profilePic + ".svg");
   };
 

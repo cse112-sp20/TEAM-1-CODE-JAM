@@ -34,8 +34,6 @@ let tokenFetcher = (function() {
       }
 
       chrome.identity.launchWebAuthFlow(options, function(redirectUri) {
-        // console.log('launchWebAuthFlow completed', chrome.runtime.lastError,
-            // redirectUri);
 
         if (chrome.runtime.lastError) {
           callback(new Error(chrome.runtime.lastError));
@@ -67,7 +65,6 @@ let tokenFetcher = (function() {
       }
 
       function handleProviderResponse(values) {
-        // console.log('providerResponse', values);
         if (values.hasOwnProperty('access_token'))
           setAccessToken(values.access_token);
         // If response does not have an access_token, it might have the code,
@@ -93,7 +90,6 @@ let tokenFetcher = (function() {
           // can be easily parsed to an object.
           if (this.status === 200) {
             let response = JSON.parse(this.responseText);
-            // console.log(response);
 
             if (response.hasOwnProperty('access_token')) {
                 setAccessToken(response.access_token);
@@ -114,7 +110,6 @@ let tokenFetcher = (function() {
 
       function setAccessToken(token) {
         access_token = token; 
-        // console.log('Setting access_token: ', access_token);
         callback(null, access_token);
       }
     },
@@ -130,19 +125,16 @@ function xhrWithAuth(method, url, interactive, callback) {
     let retry = true;
     let access_token;
 
-    // console.log('xhrWithAuth', method, url, interactive);
     getToken();
 
     function getToken() {
         tokenFetcher.getToken(interactive, function(error, token) {
-            // console.log('token fetch', error, token);
             if (error) {
                 callback(error);
                 return;
             }
 
             access_token = token;
-            // console.log(access_token)
         });
     }
 }
@@ -228,7 +220,6 @@ function interactiveSignIn() {
       } else {
           document.querySelector('#signin').innerHTML='&#10004';
           disableButton(signin_button);
-          // console.log(access_token);
       //   getUserInfo(true);
       }
     });
@@ -262,7 +253,6 @@ function revokeToken() {
 
   // user_info_div = document.querySelector('#user_info');
 
-  // console.log(signin_button, revoke_button, user_info_div);
 
   if(signin_button != null) {
     showButton(signin_button);

@@ -53,7 +53,6 @@ export default class Timeline extends Component {
         timeline: request.message.timeWasted.reverse(),
       });
 
-    console.log(request);
     return true;
   };
   /**

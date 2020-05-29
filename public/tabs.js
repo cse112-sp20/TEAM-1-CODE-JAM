@@ -12,7 +12,6 @@ export function getCurrentUrl() {
           let currHost = getHostname(tab.url);
           resolve(getNameOfURL(currHost));
         } else {
-          console.log("here");
           resolve(undefined);
         }
       }

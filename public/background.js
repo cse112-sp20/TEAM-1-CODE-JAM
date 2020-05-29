@@ -25,7 +25,6 @@ async function main() {
   setUserEmail(userEmail);
   await validUserEmail(userEmail, createUser);
   await Promise.all([getUserProfile(userEmail), getTeamOnSnapshot()]);
-  console.log(updateDBParams);
   checkOff(updateDBParams);
   //Todo: Change later
   checkDate();
