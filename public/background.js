@@ -241,7 +241,32 @@ async function getUserDailyPoints() {
     resolve(res);
   });
 }
+// function recentDates(curDate){
+//   let i;
+//   let dateArray = new Array(4);
+//   dateArray[dateArray.length-1] = curDate;
+//   int newCurrentDate = curDate;
+//   for(i = dateArray.length-2; i >= 0 ; i--){
+//     newCurrentDate = getNewDate(newCurrentDate);
+//     const usersRef = db.collection('teamPerformance').doc(currentDate);
 
+//     usersRef.get()
+//       .then((docSnapshot) => {
+//         if (docSnapshot.exists) {
+//           usersRef.onSnapshot((doc) => {
+//             dateArray[i] = newCurrentDate;
+//           });
+//         } else {
+//           break;
+//         }
+//     });
+//   }
+
+// }
+// function getNewDate(someDate){
+
+
+// }
 function toggleCheckIn() {
   if (isCheckIn()) {
     checkOff(updateToDatabase);
