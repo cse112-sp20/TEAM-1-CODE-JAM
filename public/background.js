@@ -12,7 +12,7 @@ let currentDate = getDate();
 
 let updateToDatabase;
 let githubTracker;
-let currentSnapShot = () => {};
+let currentSnapShot = () => { };
 
 let blacklist = ["facebook", "twitter", "myspace", "youtube"];
 let userProfile = {
@@ -46,7 +46,7 @@ async function resetTeamInfo() {
       teamPoints: 100,
       timeWasted: [],
     })
-    .catch((err) => {});
+    .catch((err) => { });
 }
 /**
  *  Gets the host name of a URL
@@ -204,7 +204,7 @@ function setupListener() {
               currTeamCode: currTeamCode,
               profilePic: profilePic,
             };
-          } catch {}
+          } catch { }
           sendResponse(data);
         })();
       }
@@ -469,7 +469,7 @@ function deleteTeamFromUser(
       .update({
         ["joined_teams." + teamCode]: firebase.firestore.FieldValue.delete(),
       })
-      .catch((err) => {}),
+      .catch((err) => { }),
     db
       .collection("teams")
       .doc(teamCode)
@@ -478,7 +478,7 @@ function deleteTeamFromUser(
         distributedAnimal: distributedAnimal,
         animalsLeft: animalsLeft,
       })
-      .catch((err) => {}),
+      .catch((err) => { }),
   ]);
 }
 function deleteTeamEntirely(teamCode) {
@@ -638,7 +638,7 @@ function checkOff() {
 function initializeFirebase() {
   try {
     global.firebase = require("firebase");
-  } catch {}
+  } catch { }
 
   const firebaseConfig = {
     apiKey: "AIzaSyCJYc-PMIXdQxE2--bQI6Z1FGMKwMulEyc",
@@ -867,10 +867,7 @@ async function myTimer() {
     }
   }
   // resets teams data and creates
-  if (
-    currentTeamInfo.currDate !== undefined &&
-    currentTeamInfo.currDate !== getDate()
-  ) {
+  if (currentTeamInfo.currDate !== undefined && currentTeamInfo.currDate !== getDate()) {
     await resetTeamInfo();
     currentDate = getDate();
     createTeamPerformance(teamCode, 100);
@@ -958,4 +955,4 @@ try {
     createUser,
     deleteEverythingAboutAUser,
   };
-} catch {}
+} catch { }
