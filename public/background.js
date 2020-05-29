@@ -190,7 +190,10 @@ function setupListener() {
     return true;
   });
 }
-
+/**
+ * Handle check in, if currently check in, check off. If current check out, check in
+ * @author Karl Wang
+ */
 function toggleCheckIn() {
   if (isCheckIn()) {
     checkOff(updateToDatabase);
@@ -268,9 +271,6 @@ function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
       return;
     }
     let initPoint = 100;
-    // let points = await getTeamPoint();
-    // points = parseInt(points) + 100;
-
     let animalsLeft = await getAnimalsLeft(teamCode);
     let newAnimal = getAnimal(animalsLeft);
 
@@ -308,16 +308,16 @@ function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
           },
           { merge: true }
         ),
-      // db //me
-      //   .collection("teams")
-      //   .doc(teamCode)
-      //   .update({
-      //   }),
     ]);
     resolve("success");
     return;
   });
 }
+/**
+ * Delete the team if team has 0 members
+ * @author Karl Wang
+ * @param {string} teamCode the Team code to check
+ */
 function deleteIfNoMembers(teamCode) {
   return new Promise(async (resolve) => {
     let data = await getTeamInformation(teamCode);
@@ -385,7 +385,11 @@ async function createTeamOnFirebase(teamName, userEmail) {
     resolve(teamCode);
   });
 }
-
+/**
+ * Delete all the teams that user joined, created and in the end,
+ * delete the user doc from DB
+ * @param {string} userEmail the user email of the user
+ */
 function deleteEverythingAboutAUser(userEmail) {
   return new Promise(async (resolve, reject) => {
     let queryCreatedTeam = db
@@ -394,6 +398,7 @@ function deleteEverythingAboutAUser(userEmail) {
     let queryJoinedTeam = db
       .collection("teams")
       .where("members", "array-contains", userEmail);
+    // do these things parallely
     await Promise.all([
       queryCreatedTeam.get().then(function (querySnapshot) {
         querySnapshot.forEach(function (doc) {
@@ -410,7 +415,14 @@ function deleteEverythingAboutAUser(userEmail) {
     resolve();
   });
 }
-
+/**
+ * 
+ * @param {string} userEmail the email of the user
+ * @param {string} teamCode the team code to be deleted from
+ * @param {string} userAnimal the user animal of that team
+ * @param {string} animalsLeft the animals left from user
+ * @param {object} distributedAnimal the object containing all animals
+ */
 function deleteTeamFromUser(
   userEmail,
   teamCode,
