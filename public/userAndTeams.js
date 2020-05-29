@@ -140,7 +140,7 @@ export function getTeamNames(userProfile) {
   return new Promise(async (resolve) => {
     let promises = [];
     for (let key in userProfile.joined_teams) {
-      promises.push(getTeamName(key, userProfile));
+      promises.push(_.getTeamName(key, userProfile));
     }
     resolve(await Promise.all(promises));
   });
@@ -727,7 +727,7 @@ export function setUserEmail(email) {
   userEmail = email;
 }
 
-export const exportFunctions = {
+const _ = {
   getUserInformation,
   getTeamInformation,
   randomTeamCode,
@@ -737,3 +737,5 @@ export const exportFunctions = {
   getTeamNames,
   getTeamName,
 };
+
+export default _;

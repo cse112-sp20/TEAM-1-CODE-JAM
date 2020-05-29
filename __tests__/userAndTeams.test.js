@@ -1,7 +1,7 @@
 /* eslint-disable import/first */
 import { chrome } from "./chromeMock.js";
 global.chrome = chrome;
-import { exportFunctions as unit } from "../public/userAndTeams.js";
+import _ from "../public/userAndTeams.js";
 import { setDB } from "../public/firebaseInit.js";
 import { db, setExists } from "./databaseMock.js";
 jest.setTimeout(10000);
@@ -12,7 +12,7 @@ let dummyEmail = "test2@gmail.com";
 setDB(db);
 describe("getUserInformation", () => {
   test("get user info", async () => {
-    let doc = await unit.getUserInformation(userEmail);
+    let doc = await _.getUserInformation(userEmail);
     expect(doc.id).toBe(userEmail);
     expect(db.collection).toHaveBeenCalled();
     expect(db.collection).toHaveBeenCalledWith("users");
@@ -24,7 +24,7 @@ describe("getUserInformation", () => {
 
 describe("getTeamInformation", () => {
   test("get team info", async () => {
-    let doc = await unit.getTeamInformation("12345");
+    let doc = await _.getTeamInformation("12345");
     expect(db.collection).toHaveBeenCalled();
     expect(db.collection).toHaveBeenCalledWith("teams");
     expect(db.collection("teams").doc).toHaveBeenCalled();
@@ -36,12 +36,12 @@ describe("getTeamInformation", () => {
 describe("randomTeamCode", () => {
   const regex = /^[A-Z0-9]+$/i;
   test("length 5", () => {
-    const randomCode = unit.randomTeamCode(5);
+    const randomCode = _.randomTeamCode(5);
     expect(randomCode.length).toBe(5);
     expect(regex.test(randomCode)).toBe(true);
   });
   test("length 10", () => {
-    const randomCode = unit.randomTeamCode(10);
+    const randomCode = _.randomTeamCode(10);
     expect(randomCode.length).toBe(10);
     expect(regex.test(randomCode)).toBe(true);
   });
@@ -50,7 +50,7 @@ describe("randomTeamCode", () => {
 describe("isTeamCodeUnique", () => {
   test("not unique teamcode", async () => {
     setExists(true);
-    const result = await unit.isTeamCodeUnique("12345");
+    const result = await _.isTeamCodeUnique("12345");
     expect(result).toBe(false);
     expect(db.collection).toHaveBeenCalled();
     expect(db.collection).toHaveBeenCalledWith("teams");
@@ -60,7 +60,7 @@ describe("isTeamCodeUnique", () => {
   });
   test("unique teamcode", async () => {
     setExists(false);
-    const result = await unit.isTeamCodeUnique("123456");
+    const result = await _.isTeamCodeUnique("123456");
     expect(result).toBe(true);
     expect(db.collection).toHaveBeenCalled();
     expect(db.collection).toHaveBeenCalledWith("teams");
@@ -72,7 +72,7 @@ describe("isTeamCodeUnique", () => {
 describe("generateRandomTeamCode", () => {
   test("generate random team code", async () => {
     setExists(false);
-    const result = await unit.generateRandomTeamCode(5);
+    const result = await _.generateRandomTeamCode(5);
     const regex = /^[A-Z0-9]+$/i;
     expect(result.length).toBe(5);
     expect(regex.test(result)).toBe(true);
@@ -81,7 +81,7 @@ describe("generateRandomTeamCode", () => {
 
 describe("getUserEmail", () => {
   test("get user email", async () => {
-    const result = await unit.getUserEmail();
+    const result = await _.getUserEmail();
     expect(result).toBe(userEmail);
   });
 });
@@ -95,26 +95,24 @@ describe("getTeamNames", () => {
         33333: "3",
       },
     };
-    unit.getTeamName = jest.fn();
+    _.getTeamName = jest.fn();
     for (let key in userProfile.joined_teams) {
       let count = key[0];
-      unit.getTeamName.mockReturnValueOnce(
+      _.getTeamName.mockReturnValueOnce(
         Promise.resolve({
-          //   teamCode: key,
-          //   teamName: "team" + count,
-          //   joinedTime: userProfile.joined_teams[key],
+          teamCode: key,
+          teamName: "team" + count,
+          joinedTime: userProfile.joined_teams[key],
         })
       );
     }
-    const result = await unit.getTeamNames(userProfile);
-    console.log(result);
-    expect(unit.getTeamName).toHaveBeenCalledTimes(3);
-    // console.log(result);
-    // expect(result).toEqual([
-    //   { teamCode: "11111", teamName: "team1", joinedTime: "1" },
-    //   { teamCode: "22222", teamName: "team2", joinedTime: "2" },
-    //   { teamCode: "33333", teamName: "team3", joinedTime: "3" },
-    // ]);
+    const result = await _.getTeamNames(userProfile);
+    expect(_.getTeamName).toHaveBeenCalledTimes(3);
+    expect(result).toEqual([
+      { teamCode: "11111", teamName: "team1", joinedTime: "1" },
+      { teamCode: "22222", teamName: "team2", joinedTime: "2" },
+      { teamCode: "33333", teamName: "team3", joinedTime: "3" },
+    ]);
   });
 });
 

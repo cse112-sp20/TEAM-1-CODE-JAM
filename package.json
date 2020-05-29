@@ -1,6 +1,5 @@
 {
   "name": "chrome_extension_react",
-  "type": "module",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
