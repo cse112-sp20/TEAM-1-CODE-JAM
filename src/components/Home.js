@@ -4,8 +4,6 @@ import M from "materialize-css";
 import { Timeline, Icon, Button } from "rsuite";
 import "./Home.css";
 
-// const profilePics = require("../images/emojis");
-
 export default class Home extends Component {
   constructor(props) {
     super(props);
@@ -30,7 +28,7 @@ export default class Home extends Component {
    */
   componentDidMount = async () => {
     const profilePics = this.importAll(
-      require.context("../images/emojis", false, /\.(png|jpe?g|svg)$/)
+      require.context("../SVG", false, /\.(png|jpe?g|svg)$/)
     );
     this.setState({ profilePics: profilePics });
     var elems = document.querySelectorAll(".dropdown-trigger");
@@ -204,7 +202,7 @@ export default class Home extends Component {
     return Math.round((num + Number.EPSILON) * 100) / 100;
   };
   getProfilePic = (profilePic) => {
-    return require("../images/emojis/" + profilePic + ".svg");
+    return require("../SVG/" + profilePic + ".svg");
   };
 
   render() {

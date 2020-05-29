@@ -1,9 +1,9 @@
 /* eslint-disable import/first */
-import { chrome } from "./chromeMock.js";
+import { chrome } from "../__mocks__/chromeMock.js";
 global.chrome = chrome;
 import _ from "../public/userAndTeams.js";
 import { setDB } from "../public/firebaseInit.js";
-import { db, setExists } from "./databaseMock.js";
+import { db, setExists } from "../__mocks__/databaseMock.js";
 jest.setTimeout(10000);
 
 let userEmail = "test@gmail.com";
