@@ -1,12 +1,10 @@
 name: Build and Deploy
+
 on:
-  push:
-    branches:
-      - master
-      - Develop
   pull_request:
     branches:
       - master
+      - develop
 
 jobs:
   build:
