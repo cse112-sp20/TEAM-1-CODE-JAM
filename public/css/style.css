@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css?family=Josefin+Sans&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap');
 
-*{
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -10,11 +10,11 @@
   font-family: 'Josefin Sans', sans-serif;
 }
 
-body{
+body {
    background-color: #f3f5f9;
 }
 
-.sidebar{
+.sidebar {
   width: 12%;
   height: 100%;
   background: rgb(255, 211, 199); /* #4b4276; */
@@ -22,7 +22,7 @@ body{
 }
 
 /* sidebar logo */
-.sidebar h2{
+.sidebar h2 {
   color: #fff;
   text-transform: uppercase;
   text-align: center;
@@ -30,7 +30,7 @@ body{
 }
 
 /* each tab content */
-.sidebar ul li{
+.sidebar ul li {
   padding: 15px;
   border-bottom: 2px solid rgb(252, 209, 197); /* #bdb8d7; */
   border-bottom: 2px solid rgba(0,0,0,0.05);
@@ -41,37 +41,37 @@ body{
 }    
 
 /* each tab selected */
-.sidebar ul li a{
+.sidebar ul li a {
   color: rgb(252, 209, 197);/*#bdb8d7; */
   display: block;
   color: black;
 }
 
-#side-bar-icons{
+#side-bar-icons {
   width: 25px;
   height: 25px;
   margin-right: 1em;
 }
 
-.sidebar ul li:hover{
+.sidebar ul li:hover {
   background-color: rgb(233, 150, 128); /* #594f8d; */
 }
 
-.sidebar ul li:hover a{
+.sidebar ul li:hover a {
   color: #fff;
 }
 
-.main_content .header{
+.main_content .header {
   background: #fff;
   color: #717171;
   border-bottom: 1px solid #e0e4e8;
 }
 
-.main_content .container .row{
+.main_content .container .row {
   height: 130px;
 }
 
-#auth-desc{
+#auth-desc {
   display: block;
   margin-top: 1em;
   margin-bottom: 1em;
@@ -80,7 +80,7 @@ body{
   font-family: sans-serif;
 }
 
-button{
+button {
   margin-top: 4em;
 
 }
@@ -89,37 +89,37 @@ button{
   margin-top: 5em;
 }
 
-#appName{
+#appName {
   margin-left: 1em;
   font-size: 22px;
   font-weight: 900;
 }
 
 
-#signin{
+#signin {
   margin-top: 2em;
   margin-right: 1em;
   width: 120px;
 }
 
-#revoke{
+#revoke {
   margin-top: 2em;
   width: 120px;
 }
 
-#signedin{
+#signedin {
   margin-top: 2em;
   margin-right: 1em;
 }
 
-#coming-soon{
+#coming-soon {
   margin-top: 2em;
   margin-right: 1em;
   background-color: #717171;
   pointer-events: none;
 }
 
-#top-header{
+#top-header {
   padding: 20px;
   background: #fff;
   color: #717171;
@@ -132,31 +132,31 @@ button{
   font-size: 25px;
 }
 
-#main-logo{
+#main-logo {
   width: 150px;
   height: 150px;
 }
 
-#side-bar-icons{
+#side-bar-icons {
   width: 30px;
   height: 30px;
 }
 
-#auth-icons{
+#auth-icons {
   width: 150px;
   height: 150px;
   margin-right: 1em;
 }
 
-#left-text{
+#left-text {
   float: left;
 }
 
-#right-text{
+#right-text {
   float: right;
 }
 
-#About{
+#About {
   display: none;
 }
 
