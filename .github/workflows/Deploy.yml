@@ -6,10 +6,6 @@ on:
       - master
       - develop
 
-  push:
-    branches:
-      - feat/csslinter
-
 jobs:
   build:
     name: Build
