@@ -14,20 +14,10 @@ export default class SideNav extends Component {
           to="/"
         >
           {/* <span>Home</span> */}
-          <i className="white-text material-icons">home</i>
+          <i className="large white-text material-icons">home</i>
         </NavLink>
         <NavLink
-          className="btn tooltipped waves-effect waves-light card-panel center-align"
-          id="sidenav-background"
-          data-position="right"
-          data-tooltip="Teams"
-          to="/teams"
-        >
-          {/* <span>Teams</span> */}
-          <i className="white-text material-icons">group_add</i>
-        </NavLink>
-        <NavLink
-          className="btn tooltipped waves-effect waves-light card-panel center-align"
+          className="btn tooltipped waves-effect waves-light card-panel"
           id="sidenav-background"
           data-position="right"
           data-tooltip="Timeline"
@@ -45,6 +35,17 @@ export default class SideNav extends Component {
         >
           {/* <span>Charts</span> */}
           <i className="white-text material-icons">insert_chart</i>
+        </NavLink>
+        <NavLink
+          className="btn tooltipped waves-effect waves-light card-panel center-align"
+          id="sidenav-background"
+          data-position="right"
+          data-tooltip="Teams"
+          data-testid="SideNav-teams"
+          to="/teams"
+        >
+          {/* <span>Teams</span> */}
+          <i className="white-text material-icons">group_add</i>
         </NavLink>
       </div>
     );

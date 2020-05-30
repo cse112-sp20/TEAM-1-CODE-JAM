@@ -2,11 +2,18 @@
   padding-left: 0;
   padding-right: 0;
   background-color: rgb(59, 64, 86);
-  /* padding-bottom: %; */
-  min-height: 544px;
+  min-height: 550px;
   margin: 0;
 }
 
 #component {
   margin: 0;
+}
+
+a {
+  text-decoration: none !important;
+}
+
+a:hover {
+  color: #fff;
 }

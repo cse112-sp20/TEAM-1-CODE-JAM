@@ -1,0 +1,28 @@
+{
+  "timeSpend": {
+    "2020/05/22": {
+      "ABCDE": {
+        "test@gmail.com": {
+          "www.facebook.com": "30",
+          "www.twitter.com": "60"
+        },
+        "test2@gmail.com": {
+          "www.facebook.com": "30",
+          "www.twitter.com": "60"
+        }
+      }
+    }
+  },
+  "teams": {
+    "ABCDE": {
+      "members": ["test@gmail.com"],
+      "timeWasted": [
+        {
+          "user": "test@gmail.com",
+          "url": "www.facebook.com",
+          "timeSpend": "30"
+        }
+      ]
+    }
+  }
+}

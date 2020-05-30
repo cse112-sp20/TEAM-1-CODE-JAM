@@ -1,24 +1,19 @@
 import React, { Component } from "react";
-import {
-  Route,
-  Switch,
-  BrowserRouter as Router,
-  withRouter,
-} from "react-router-dom";
+import { Route, Switch, BrowserRouter as Router } from "react-router-dom";
+import "rsuite/dist/styles/rsuite-default.css";
+import "./components/materialize.min.css";
 import CreateJoinTeam from "./components/CreateJoinTeam";
 import NavBar from "./components/NavBar";
-import "./components/materialize.min.css";
 import SideNav from "./components/SideNav";
 import "./App.css";
 import Teams from "./components/Teams";
 import Home from "./components/Home";
 import Timeline from "./components/Timeline";
 import Charts from "./components/Charts";
+import TimelineDemo from "./components/TimelineDemo";
 
 // for Testing purpose
 class App extends Component {
-  componentDidMount = () => {};
-
   render() {
     return (
       <div className="app">
@@ -42,6 +37,11 @@ class App extends Component {
                 <Route exact path="/teams" component={Teams}></Route>
                 <Route exact path="/timeline" component={Timeline}></Route>
                 <Route exact path="/charts" component={Charts}></Route>
+                <Route
+                  exact
+                  path="/timelinedemo"
+                  component={TimelineDemo}
+                ></Route>
                 <Route path="/" component={Home}></Route>
               </Switch>
             </div>
