@@ -55,8 +55,11 @@
     "@babel/preset-react": "^7.9.4",
     "eslint": "^6.6.0",
     "jest-puppeteer": "^4.4.0",
+    "prettier": "2.0.5",
     "puppeteer": "^3.1.0",
-    "react-test-renderer": "^16.13.1"
+    "react-test-renderer": "^16.13.1",
+    "stylelint": "^13.5.0",
+    "stylelint-config-standard": "^20.0.0"
   },
   "jest": {
     "moduleNameMapper": {
