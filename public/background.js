@@ -1,18 +1,29 @@
-/*global chrome firebase flip*/
-let db;
+/*global chrome firebase getAnimal addAnimal sendToDB animals*/
 
-let black_listed = [
-  "www.youtube.com",
-  "www.facebook.com",
-  "twitter.com",
-  "myspace.com",
-];
+let db;
+let currTabUrl;
+let updateInterval = 1000;
+let flip = false;
+let teamCode;
+let timelineArray;
+let time;
+let currentTeamInfo;
+let currTeamCode;
+let userAnimal;
+let github_timeout = 15000;
+
+let updateToDatabase;
+let githubTracker;
+let currentSnapShot = () => {};
+
+let blacklist = ["facebook", "twitter", "myspace", "youtube"];
 let userProfile = {
   joined_teams: [],
 };
 let teams;
 let userEmail;
-let tabs;
+// limit of how long you can be on blacklisted site
+let threshold = 5000;
 
 /**
  *  Gets the host name of a URL
@@ -32,10 +43,11 @@ function getHostname(url) {
     return "invalid";
   }
   try {
-    var newUrl = new URL(url);
+    let newUrl = new URL(url);
     return newUrl.hostname;
   } catch (err) {
     console.log(err);
+    return "invalid";
   }
 }
 /**
@@ -45,25 +57,39 @@ function getHostname(url) {
  * @author Brian Aguirre
  * @return {Array} array of objects
  */
-function getAllTabs() {
-  return new Promise((resolve, reject) => {
-    tabs = [];
-    if (localStorage["oldElements"] != undefined) {
-      let oldElements = JSON.parse(
-        localStorage.getItem("oldElements")
-      ).reverse();
+// function getAllTabs() {
+//   return new Promise((resolve, reject) => {
+//     console.log(timelineArray);
+//     tabs = [];
+//     if (timelineArray != undefined) {
+//       let oldElements = JSON.parse(timelineArray).reverse();
 
-      oldElements.map((obj) => {
-        let tab = obj;
-        tab.flip = flip;
-        tabs.push(tab);
-        flip = !flip;
-      });
-      // tabs = oldElements;
-    }
+//       oldElements.map((obj) => {
+//         let tab = obj;
+//         tab.flip = flip;
+//         tabs.push(tab);
+//         flip = !flip;
+//       });
+//       console.log("The tabs is: ", tabs);
+//     }
+//     resolve(tabs);
+//   });
+// }
+
+async function reverseTimelineArray() {
+  return new Promise(function (resolve) {
+    let tabs = [];
+    let reverse = timelineArray.reverse();
+    reverse.map((obj) => {
+      let tab = obj;
+      tab.flip = flip;
+      tabs.push(tab);
+      flip = !flip;
+    });
     resolve(tabs);
   });
 }
+
 /**
  * setupListener listens for request coming from popup,
  * it then sends the response that the popup need
@@ -86,14 +112,7 @@ function setupListener() {
       // popup needs the user email
       if (request.message === "get email") {
         sendResponse({ email: userEmail });
-      }
-      //  else if (request.message === "get team code") {
-      //   // generate a random team code of length 5 then send it back
-      //   generateRandomTeamCode(5).then((teamCode) => {
-      //     sendResponse({ teamCode: teamCode });
-      //   });
-      // }
-      else if (request.message === "create team") {
+      } else if (request.message === "create team") {
         // create the team on database
         createTeamOnFirebase(request.teamName, userEmail).then((response) => {
           sendResponse(response);
@@ -108,20 +127,61 @@ function setupListener() {
       } else if (request.message === "get teams") {
         sendResponse(teams);
       } else if (request.message === "get team info") {
-        getTeamInformation(request.teamCode).then(function (doc) {
-          sendResponse(doc.data());
-        });
+        sendResponse(currentTeamInfo);
       } else if (request.message === "get timeline") {
-        getAllTabs().then((tabs) => {
+        reverseTimelineArray().then((tabs) => {
           sendResponse(tabs);
         });
       } else if (request.message === "set timeout to delete team") {
         timeoutVars[request.teamCode] = setTimeout(async () => {
-          await deleteTeamFromUser(userEmail, request.teamCode);
+          let teamInfo = await getTeamInformation(request.teamCode);
+          teamInfo = teamInfo.data();
+          let userAnimal = teamInfo.distributedAnimal[userEmail];
+          let animalsLeft = teamInfo.animalsLeft;
+          let distributedAnimal = teamInfo.distributedAnimal;
+          await deleteTeamFromUser(
+            userEmail,
+            request.teamCode,
+            userAnimal,
+            animalsLeft,
+            distributedAnimal
+          );
           await deleteIfNoMembers(request.teamCode);
         }, 4000);
       } else if (request.message === "clear timeout") {
         clearTimeout(timeoutVars[request.teamCode]);
+      } else if (request.message === "get timeline array") {
+        sendResponse(currentTeamInfo);
+      } else if (request.message === "switch team") {
+        (async () => {
+          checkOff();
+          currentSnapShot();
+          currTeamCode = await getTeamCode();
+          userAnimal = await getUserAnimal(userEmail, currTeamCode);
+          getTeamOnSnapshot().then(() => {
+            sendResponse("success");
+          });
+        })();
+      } else if (request.message === "toggle check in") {
+        toggleCheckIn();
+      } else if (request.message === "get home info") {
+        (async () => {
+          let currUrl = await getCurrentUrl();
+          let currTeamCode = await getTeamCode();
+          let data = {};
+          try {
+            let profilePic = currentTeamInfo.distributedAnimal[userEmail];
+            data = {
+              isCheckIn: isCheckIn(),
+              blacklist: blacklist,
+              teamInfo: currentTeamInfo,
+              currUrl: currUrl,
+              currTeamCode: currTeamCode,
+              profilePic: profilePic,
+            };
+          } catch {}
+          sendResponse(data);
+        })();
       }
     }
     // return true here is important, it makes sure that
@@ -130,6 +190,18 @@ function setupListener() {
     return true;
   });
 }
+/**
+ * Handle check in, if currently check in, check off. If current check out, check in
+ * @author Karl Wang
+ */
+function toggleCheckIn() {
+  if (isCheckIn()) {
+    checkOff(updateToDatabase);
+  } else {
+    checkIn(updateToDatabase, updateInterval);
+  }
+}
+
 /**
  * Return the team information on database
  * @author Karl Wang
@@ -198,6 +270,9 @@ function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
       resolve("team code not found");
       return;
     }
+    let initPoint = 100;
+    let animalsLeft = await getAnimalsLeft(teamCode);
+    let newAnimal = getAnimal(animalsLeft);
 
     // do both of these two things parallelly
     await Promise.all([
@@ -207,7 +282,10 @@ function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
         .doc(teamCode)
         .update({
           members: firebase.firestore.FieldValue.arrayUnion(userEmail),
+          animalsLeft: animalsLeft,
+          // teamPoints: points,
         }),
+
       // add the team code to the user
       db
         .collection("users")
@@ -215,6 +293,18 @@ function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
         .set(
           {
             joined_teams: { [teamCode]: currentTime },
+            user_points: {
+              [teamCode]: initPoint,
+            },
+          },
+          { merge: true }
+        ),
+      db //me
+        .collection("teams")
+        .doc(teamCode)
+        .set(
+          {
+            distributedAnimal: { [userEmail]: newAnimal },
           },
           { merge: true }
         ),
@@ -223,6 +313,11 @@ function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
     return;
   });
 }
+/**
+ * Delete the team if team has 0 members
+ * @author Karl Wang
+ * @param {string} teamCode the Team code to check
+ */
 function deleteIfNoMembers(teamCode) {
   return new Promise(async (resolve) => {
     let data = await getTeamInformation(teamCode);
@@ -244,8 +339,14 @@ async function createTeamOnFirebase(teamName, userEmail) {
   return new Promise(async (resolve, reject) => {
     // first generate a random length 5 id
     let teamCode = await generateRandomTeamCode(5);
+    currTeamCode = teamCode;
     // create a time stamp (used for sorting)
     let currentTime = Date.now();
+    let initPoint = 100;
+    // let host_animal = {`{userEmail: getAnimal()};
+
+    let copiedAnimal = Array.from(animals);
+    let newAnimal = getAnimal(copiedAnimal);
     // Do these parallelly
     await Promise.all([
       // add the team to the user
@@ -256,6 +357,9 @@ async function createTeamOnFirebase(teamName, userEmail) {
           {
             joined_teams: {
               [teamCode]: currentTime,
+            },
+            user_points: {
+              [teamCode]: initPoint,
             },
           },
           { merge: true }
@@ -270,6 +374,10 @@ async function createTeamOnFirebase(teamName, userEmail) {
             createdTime: currentTime,
             creator: userEmail,
             members: [userEmail],
+            timeWasted: [],
+            teamPoints: initPoint,
+            distributedAnimal: { [userEmail]: newAnimal },
+            animalsLeft: copiedAnimal,
           },
           { merge: true }
         ),
@@ -277,7 +385,11 @@ async function createTeamOnFirebase(teamName, userEmail) {
     resolve(teamCode);
   });
 }
-
+/**
+ * Delete all the teams that user joined, created and in the end,
+ * delete the user doc from DB
+ * @param {string} userEmail the user email of the user
+ */
 function deleteEverythingAboutAUser(userEmail) {
   return new Promise(async (resolve, reject) => {
     let queryCreatedTeam = db
@@ -286,6 +398,7 @@ function deleteEverythingAboutAUser(userEmail) {
     let queryJoinedTeam = db
       .collection("teams")
       .where("members", "array-contains", userEmail);
+    // do these things parallely
     await Promise.all([
       queryCreatedTeam.get().then(function (querySnapshot) {
         querySnapshot.forEach(function (doc) {
@@ -302,8 +415,24 @@ function deleteEverythingAboutAUser(userEmail) {
     resolve();
   });
 }
+/**
+ * 
+ * @param {string} userEmail the email of the user
+ * @param {string} teamCode the team code to be deleted from
+ * @param {string} userAnimal the user animal of that team
+ * @param {string} animalsLeft the animals left from user
+ * @param {object} distributedAnimal the object containing all animals
+ */
+function deleteTeamFromUser(
+  userEmail,
+  teamCode,
+  userAnimal,
+  animalsLeft,
+  distributedAnimal
+) {
+  delete distributedAnimal[userEmail];
+  addAnimal(animalsLeft, userAnimal);
 
-function deleteTeamFromUser(userEmail, teamCode) {
   return Promise.all([
     db
       .collection("users")
@@ -317,6 +446,8 @@ function deleteTeamFromUser(userEmail, teamCode) {
       .doc(teamCode)
       .update({
         members: firebase.firestore.FieldValue.arrayRemove(userEmail),
+        distributedAnimal: distributedAnimal,
+        animalsLeft: animalsLeft,
       })
       .catch((err) => {}),
   ]);
@@ -381,28 +512,28 @@ function isTeamCodeUnique(id) {
     });
   });
 }
-/**
- * Init Firebase configuration
- * @author Karl Wang
- */
-function initializeFirebase() {
-  try {
-    global.firebase = require("firebase");
-  } catch {}
+// /**
+//  * Init Firebase configuration
+//  * @author Karl Wang
+//  */
+// function initializeFirebase() {
+//   try {
+//     global.firebase = require("firebase");
+//   } catch {}
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyCJYc-PMIXdQxE2--bQI6Z1FGMKwMulEyc",
-    authDomain: "chrome-extension-cse-112.firebaseapp.com",
-    databaseURL: "https://chrome-extension-cse-112.firebaseio.com",
-    projectId: "chrome-extension-cse-112",
-    storageBucket: "chrome-extension-cse-112.appspot.com",
-    messagingSenderId: "275891630155",
-    appId: "1:275891630155:web:f238da778112200c815dce",
-  };
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  db = firebase.firestore();
-}
+//   const firebaseConfig = {
+//     apiKey: "AIzaSyCJYc-PMIXdQxE2--bQI6Z1FGMKwMulEyc",
+//     authDomain: "chrome-extension-cse-112.firebaseapp.com",
+//     databaseURL: "https://chrome-extension-cse-112.firebaseio.com",
+//     projectId: "chrome-extension-cse-112",
+//     storageBucket: "chrome-extension-cse-112.appspot.com",
+//     messagingSenderId: "275891630155",
+//     appId: "1:275891630155:web:f238da778112200c815dce",
+//   };
+//   // Initialize Firebase
+//   firebase.initializeApp(firebaseConfig);
+//   db = firebase.firestore();
+// }
 /**
  * Get the user email from chrome api
  * @author Karl Wang
@@ -421,6 +552,7 @@ function getUserEmail() {
  * @author Karl Wang
  * @param {string} userEmail The email of the current chrome user
  * @param {function} createUser The function that creates a new user on database
+ * @return {boolean} true if user originally exist, false if user did not exist
  */
 function validUserEmail(userEmail, createUser) {
   return new Promise(function (resolve, reject) {
@@ -430,8 +562,10 @@ function validUserEmail(userEmail, createUser) {
       .then(async function (doc) {
         if (!doc.exists) {
           await createUser(userEmail);
+          resolve(false);
+          return;
         }
-        resolve();
+        resolve(true);
       });
   });
 }
@@ -469,19 +603,382 @@ function getUserProfile(userEmail) {
       });
   });
 }
-// .then(function (userProfile) {});
+function isCheckIn() {
+  let data = localStorage.getItem("check in");
+  if (data == undefined) {
+    localStorage.setItem("check in", false);
+    return false;
+  }
+  return data === "true";
+}
+function checkIn() {
+  localStorage.setItem("check in", true);
+  updateToDatabase = setInterval(myTimer, updateInterval);
+  githubTracker = setInterval(function () {
+    sendToDB(currTeamCode, userAnimal);
+  }, github_timeout);
+}
+function checkOff() {
+  localStorage.setItem("check in", false);
+  clearInterval(updateToDatabase);
+  clearInterval(githubTracker);
+}
+/**
+ * Init Firebase configuration
+ * @author Karl Wang
+ */
+function initializeFirebase() {
+  try {
+    global.firebase = require("firebase");
+  } catch {}
 
+  const firebaseConfig = {
+    apiKey: "AIzaSyCJYc-PMIXdQxE2--bQI6Z1FGMKwMulEyc",
+    authDomain: "chrome-extension-cse-112.firebaseapp.com",
+    databaseURL: "https://chrome-extension-cse-112.firebaseio.com",
+    projectId: "chrome-extension-cse-112",
+    storageBucket: "chrome-extension-cse-112.appspot.com",
+    messagingSenderId: "275891630155",
+    appId: "1:275891630155:web:f238da778112200c815dce",
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  return firebase;
+}
+
+/*
+ *
+ * realTime.js
+ *
+ */
+
+function minToMillisecond(min) {
+  return min * 60 * 1000;
+}
+
+function millisecondToMin(millisecond) {
+  return millisecond / (60 * 1000);
+}
+/**
+ * @return user's personal animal
+ */
+async function getUserAnimal(userEmail, teamCode) {
+  return new Promise(function (resolve) {
+    db.collection("teams")
+      .doc(teamCode)
+      .get()
+      .then(function (doc) {
+        let data = doc.data();
+        let userAnimal = data.distributedAnimal[userEmail];
+        resolve(userAnimal);
+      });
+  });
+}
+
+/**
+ * @return animal remaining in the database
+ */
+async function getAnimalsLeft(teamCode) {
+  return new Promise(function (resolve) {
+    db.collection("teams")
+      .doc(teamCode)
+      .get()
+      .then(function (doc) {
+        let data = doc.data();
+        console.log(data);
+        let animalsLeft = data.animalsLeft;
+        resolve(animalsLeft);
+      });
+  });
+}
+async function getDistributedAnimal(teamCode) {
+  return new Promise(function (resolve) {
+    db.collection("teams")
+      .doc(teamCode)
+      .get()
+      .then(function (doc) {
+        let data = doc.data();
+        let distributedAnimal = data.distributedAnimal;
+        resolve(distributedAnimal);
+      });
+  });
+}
+
+//Get team code everytime
+async function updateLocalStorage(tabUrl, timeSpend) {
+  teamCode = await getTeamCode();
+  //console.log(teamCode);
+  //console.log("test: ", localStorage.getItem(teamCode));
+  let currData = localStorage.getItem(teamCode);
+  if (currData == undefined) {
+    let data = { [tabUrl]: 0 };
+    data = JSON.stringify(data);
+    localStorage.setItem(teamCode, data);
+  } else {
+    currData = JSON.parse(currData);
+    let newTime;
+    // user visited a new url not in localstorage
+    if (!(tabUrl in currData)) {
+      currData[tabUrl] = Number(0);
+    } else {
+      let time = currData[tabUrl];
+      newTime = parseInt(time) + parseInt(timeSpend);
+      currData[tabUrl] = newTime;
+    }
+    currData = JSON.stringify(currData);
+
+    localStorage.setItem(teamCode, currData);
+    if (JSON.parse(currData)[tabUrl] % threshold == 0) {
+      let seconds = JSON.parse(currData)[tabUrl] / 1000;
+      let score = threshold / (60 * 1000);
+      let today = new Date();
+      let currTime =
+        today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+      let teamCode = await getTeamCode();
+      // let teamPoints = await getTeamPoint();
+      let teamPoints = currentTeamInfo.teamPoints;
+      // we will be using teamCode and userEmail to retrieve userPoints and update these
+      teamPoints = teamPoints - score;
+      // let userPoints = await getUserPoint();
+      let userPoints = userProfile.user_points[teamCode];
+      userPoints = userPoints - score;
+
+      let userAnimal = await getUserAnimal(userEmail, teamCode);
+      db.collection("teams")
+        .doc(teamCode)
+        .update({
+          timeWasted: firebase.firestore.FieldValue.arrayUnion({
+            user: userEmail,
+            url: tabUrl,
+            time: seconds,
+            points: -score,
+            currTime: currTime,
+            animal: userAnimal,
+          }),
+          teamPoints: teamPoints,
+        });
+      db.collection("users")
+        .doc(userEmail)
+        .set(
+          {
+            user_points: {
+              [teamCode]: userPoints,
+            },
+          },
+          { merge: true }
+        );
+    }
+  }
+}
+
+/**
+ * @author: Youliang Liu
+ * check if it is the current date, otherwise clear the localStorage and cloud storage
+ */
+
+function checkDate() {
+  let d = new Date();
+  let date = d.getDate();
+  let month = d.getMonth() + 1; // Since getMonth() returns month from 0-11 not 1-12
+  let year = d.getFullYear();
+  let dateStr = month + "/" + date + "/" + year;
+  if (localStorage.getItem("date") == undefined) {
+    localStorage.setItem("date", dateStr);
+  } else if (localStorage.getItem("date") != dateStr) {
+    localStorage.clear();
+    localStorage.setItem("date", dateStr);
+  }
+}
+/**
+ * @author: Xiang Liu & Youliang Liu
+ * get the current team points from the database
+ */
+async function getTeamPoint() {
+  return new Promise(async function (resolve) {
+    teamCode = await getTeamCode();
+    db.collection("teams")
+      .doc(teamCode)
+      .get()
+      .then(function (doc) {
+        let data = doc.data();
+        resolve(data.teamPoints);
+      });
+  });
+}
+/**
+ * @author: Xiang Liu
+ * get the current user points from the database
+ */
+async function getUserPoint() {
+  return new Promise(async function (resolve) {
+    teamCode = await getTeamCode();
+    db.collection("users")
+      .doc(userEmail)
+      .get()
+      .then(function (doc) {
+        let data = doc.data();
+        resolve(data.user_points[teamCode]);
+      });
+  });
+}
+
+/**
+ * Inserts a new element to the timeline if a user has been on a blacklisted
+ * site longer than the set time limit (threshold)
+ * @author Brian Aguirre
+ * @param {URL} currTabUrl url of blacklisted site
+ */
+function updateTimeline(currTabUrl) {
+  return new Promise((resolve, reject) => {
+    let currTime = new Date().toLocaleTimeString(); // needs to be local storage time
+
+    let seconds = localStorage.getItem(currTabUrl) / 1000;
+    //threshold / 1000;
+    let time = `${currTabUrl}: ${seconds} seconds`;
+    let msg = {
+      for: "popup",
+      message: "timeline",
+      url: currTabUrl,
+      time: time,
+      flip: flip,
+    };
+    flip = !flip;
+
+    if (localStorage["oldElements"] == undefined) {
+      // localStorage["oldElements"] = [];
+      let firstItem = [{ url: currTabUrl, time: time }];
+      localStorage.setItem("oldElements", JSON.stringify(firstItem));
+    } else {
+      let oldElements = JSON.parse(localStorage.getItem("oldElements"));
+      oldElements.push({ url: currTabUrl, time: time });
+      localStorage.setItem("oldElements", JSON.stringify(oldElements));
+    }
+    chrome.runtime.sendMessage(msg, function (response) {
+      console.log(response);
+      resolve(response);
+    });
+  });
+}
+
+async function updateTimelineFB() {
+  teamCode = await getTeamCode();
+  db.collection("teams")
+    .doc(teamCode)
+    .onSnapshot(async function (doc) {
+      timelineArray = await getTimelineArrayFB();
+      // console.log(timelineArray);
+      let msg = {
+        for: "popup",
+        message: "timeline",
+        url: currTabUrl,
+        time: time,
+        flip: flip,
+      };
+      flip = !flip;
+      chrome.runtime.sendMessage(msg, (response) => {
+        // console.log("Send message success!");
+      });
+    });
+}
+
+async function getTimelineArrayFB() {
+  return new Promise(function (resolve) {
+    db.collection("teams")
+      .doc(teamCode)
+      .get()
+      .then(function (doc) {
+        let data = doc.data();
+        resolve(data.timeWasted);
+      });
+  });
+}
+function getCurrentUrl() {
+  return new Promise((resolve) => {
+    chrome.tabs.query(
+      {
+        active: true,
+        lastFocusedWindow: true,
+      },
+      function (tabs) {
+        let tab = tabs[0];
+        if (tab !== undefined) {
+          let currHost = getHostname(tab.url);
+          resolve(getNameOfURL(currHost));
+        } else {
+          console.log("here");
+          resolve(undefined);
+        }
+      }
+    );
+  });
+}
+async function myTimer() {
+  currTabUrl = await getCurrentUrl();
+  console.log(currTabUrl);
+  if (currTabUrl !== undefined || currTabUrl !== "invalid") {
+    if (blacklist.includes(currTabUrl)) {
+      updateLocalStorage(currTabUrl, updateInterval);
+    }
+  }
+}
+
+function getNameOfURL(currHost) {
+  if (currHost == "invalid") return currHost;
+  let splitArr = currHost.split(".");
+  if (splitArr.length <= 2) return splitArr[0];
+  else return splitArr[1];
+}
+
+chrome.tabs.onRemoved.addListener(function () {
+  currTabUrl = "Closed";
+});
+
+function getTeamCode() {
+  return new Promise(function (resolve) {
+    chrome.storage.local.get("prevTeam", function (data) {
+      resolve(data.prevTeam);
+    });
+  });
+}
+
+function getTeamOnSnapshot() {
+  return new Promise(async function (resolve, reject) {
+    const currentTeam = await getTeamCode();
+    if (currentTeam != undefined) {
+      currentSnapShot = db
+        .collection("teams")
+        .doc(currentTeam)
+        .onSnapshot(function (doc) {
+          currentTeamInfo = doc.data();
+          let msg = {
+            for: "team info",
+            message: currentTeamInfo,
+          };
+          chrome.runtime.sendMessage(msg);
+          resolve();
+          // return;
+        });
+    } else {
+      resolve();
+    }
+  });
+}
 // main
 /**
  * The main of background script
  * @author Karl Wang
  */
 async function main() {
-  initializeFirebase();
+  db = firebase.firestore();
   userEmail = await getUserEmail();
+  // for puppetter usage only!
+  if (userEmail === "") userEmail = "agent@gmail.com";
   await validUserEmail(userEmail, createUser);
-  await getUserProfile(userEmail);
-
+  await Promise.all([getUserProfile(userEmail), getTeamOnSnapshot()]);
+  //Todo: Change later
+  checkOff();
+  checkDate();
+  //deleteEverythingAboutAUser(userEmail);
   setupListener();
 }
 main();
