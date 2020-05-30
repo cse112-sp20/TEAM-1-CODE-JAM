@@ -1,6 +1,8 @@
 import chrome from "sinon-chrome";
 global.chrome = chrome;
 
+require("../public/firebaseInit");
+
 const {
   randomTeamCode,
   getHostname,
