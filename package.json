@@ -31,7 +31,8 @@
     "test1": "react-scripts test",
     "eject": "react-scripts eject",
     "eslint:github-action": "node ./node_modules/eslint/bin/eslint . --ignore-path .gitignore",
-    "lint:css": "stylelint 'src/**/*.css && src/components/**/*.css' ",
+    "lint:css": "stylelint 'src/**/*.css', 'public/css/**/*.css' ; exit 0",
+    "lint:fix": "stylelint 'src/**/*.css && public/css/**/*.css' --fix",
     "prettier": "prettier 'src/**/*.js'"
   },
   "eslintConfig": {

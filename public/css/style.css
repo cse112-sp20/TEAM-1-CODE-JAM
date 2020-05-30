@@ -11,7 +11,7 @@
 }
 
 body {
-   background-color: #f3f5f9;
+  background-color: #f3f5f9;
 }
 
 .sidebar {
@@ -44,7 +44,6 @@ body {
 .sidebar ul li a {
   color: rgb(252, 209, 197);/*#bdb8d7; */
   display: block;
-  color: black;
 }
 
 #side-bar-icons {
@@ -135,11 +134,6 @@ button {
 #main-logo {
   width: 150px;
   height: 150px;
-}
-
-#side-bar-icons {
-  width: 30px;
-  height: 30px;
 }
 
 #auth-icons {
