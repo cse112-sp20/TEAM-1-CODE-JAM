@@ -6,10 +6,6 @@ on:
       - master
       - develop
 
-  push:
-    branches:
-      - feat/csslinter
-
 jobs:
   integrate:
     runs-on: ubuntu-latest
@@ -34,4 +30,3 @@ jobs:
           github_token: ${{ secrets.github_token }}
           # Enable linters
           stylelint: true
-          prettier: true
