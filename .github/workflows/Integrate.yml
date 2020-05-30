@@ -6,6 +6,10 @@ on:
       - master
       - develop
 
+  push:
+    branches:
+      - feat/csslinter
+
 jobs:
   integrate:
     runs-on: ubuntu-latest
