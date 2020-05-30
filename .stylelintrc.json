@@ -1,7 +1,6 @@
 {
     "extends": ["prettier"],
     "rules": {
-        "max-empty-lines": 2,
-        "unit-whitelist": ["em", "rem", "%", "s"]
+        "max-empty-lines": 2
     }
 }
