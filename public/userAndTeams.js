@@ -11,7 +11,6 @@ export let userEmail;
 export let currTeamCode;
 export let userAnimal;
 export let blacklist = ["facebook", "twitter", "myspace", "youtube"];
-
 // everything regarding to updating to local storage and firebase
 export let updateDBParams = {
   updateInterval: 1000,
