@@ -17,5 +17,4 @@ jobs:
         node-version: 12
     - run: npm install
     - run: CI=false npm run build
-    - run: npm run eslint:github-action 
     - run: npm -s test
