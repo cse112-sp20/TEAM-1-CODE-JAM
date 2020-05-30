@@ -11,8 +11,12 @@ import {
   updateDBParams,
   checkDate,
   setupListener,
+  setTeamCode,
+  getDate,
+  getTeamCode,
 } from "./userAndTeams.js";
 
+const ONE_MIN = 60000;
 /**
  * The main of background script
  * @author Karl Wang
@@ -24,10 +28,13 @@ async function main() {
   if (userEmail === "") userEmail = "agent@gmail.com";
   setUserEmail(userEmail);
   await validUserEmail(userEmail, createUser);
+  let currTeamCode = await getTeamCode();
+  await setTeamCode(currTeamCode);
   await Promise.all([getUserProfile(userEmail), getTeamOnSnapshot()]);
   checkOff(updateDBParams);
-  //Todo: Change later
   checkDate();
+  // check every one min
+  setInterval(() => checkDate(), ONE_MIN);
   //deleteEverythingAboutAUser(userEmail);
   setupListener();
 }

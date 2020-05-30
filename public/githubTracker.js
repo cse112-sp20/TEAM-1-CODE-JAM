@@ -158,7 +158,7 @@ export function sendToDB(teamCode, animal) {
         if (max != "00:00:00") {
           let msg = {
             for: "popup",
-            message: "timeline demo",
+            message: "team info",
             url: "GitHub",
             time: max,
             animal: "water-bottle",
@@ -178,18 +178,35 @@ export function sendToDB(teamCode, animal) {
             //time = `${tabUrl}: ${seconds} seconds`;
             console.log("in update local storage");
             // let userAnimal = await getUserAnimal(userEmail, teamCode);
+            let teamPoints = currentTeamInfo.teamPoints;
+            // we will be using teamCode and userEmail to retrieve userPoints and update these
+            teamPoints = teamPoints + 3;
+            let userPoints = userProfile.user_points[teamCode];
+            userPoints = userPoints + 3;
             let userAnimal = animal;
             db.collection("teams")
               .doc(teamCode)
               .update({
                 timeWasted: firebase.firestore.FieldValue.arrayUnion({
-                  point: "+1",
+                  points: +3,
                   user: userEmail,
-                  url: "www.GitHub.com",
-                  time: seconds,
+                  url: "Git Push",
+                  currTime: seconds,
                   animal: userAnimal,
                 }),
+                teamPoints: teamPoints,
               });
+
+            db.collection("users")
+              .doc(userEmail)
+              .set(
+                {
+                  user_points: {
+                    [teamCode]: userPoints,
+                  },
+                },
+                { merge: true }
+              );
           } else {
             let item = { url: "github.com", time: max };
             let oldElements = JSON.parse(localStorage.getItem("oldElements"));
@@ -215,18 +232,36 @@ export function sendToDB(teamCode, animal) {
               // parseInt(JSON.parse(localStorage.getItem(teamCode)).time) / 1000;
               //time = `${tabUrl}: ${seconds} seconds`;
               console.log("in update local storage");
+              let teamPoints = currentTeamInfo.teamPoints;
+              // we will be using teamCode and userEmail to retrieve userPoints and update these
+              teamPoints = teamPoints + 3;
+              let userPoints = userProfile.user_points[teamCode];
+              userPoints = userPoints + 3;
               // let userAnimal = await getUserAnimal(userEmail, teamCode);
               let userAnimal = animal;
               db.collection("teams")
                 .doc(teamCode)
                 .update({
                   timeWasted: firebase.firestore.FieldValue.arrayUnion({
+                    points: +3,
                     user: userEmail,
                     url: "Git Push",
-                    time: seconds,
+                    currTime: seconds,
                     animal: userAnimal,
                   }),
+                  teamPoints: teamPoints,
                 });
+
+              db.collection("users")
+                .doc(userEmail)
+                .set(
+                  {
+                    user_points: {
+                      [teamCode]: userPoints,
+                    },
+                  },
+                  { merge: true }
+                );
             }
           }
         }

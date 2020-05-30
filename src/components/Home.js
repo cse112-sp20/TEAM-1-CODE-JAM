@@ -77,6 +77,7 @@ export default class Home extends Component {
             teamMembers: teamInfo.members,
             teamPoints: teamPoints,
             timelineArr: timelineArr,
+            profilePic: teamInfo.userAnimal,
           });
         }
       });
@@ -202,7 +203,10 @@ export default class Home extends Component {
     return Math.round((num + Number.EPSILON) * 100) / 100;
   };
   getProfilePic = (profilePic) => {
-    return require("../SVG/" + profilePic + ".svg");
+    if (profilePic == undefined) {
+      profilePic = "Predator";
+    }
+    return require("../images/emojis/" + profilePic + ".svg");
   };
 
   render() {
