@@ -8,7 +8,7 @@ on:
 
   push:
     branches:
-      - feat/linters
+      - feat/lintersAndcov
 jobs:
   integrate:
     runs-on: ubuntu-latest
