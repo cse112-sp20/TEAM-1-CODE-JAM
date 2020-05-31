@@ -32,7 +32,11 @@
     "eject": "react-scripts eject",
     "eslint:github-action": "node ./node_modules/eslint/bin/eslint . --ignore-path .gitignore",
     "lint:css": "stylelint 'src/**/*.css', 'public/css/**/*.css'",
-    "lint:fix-css": "stylelint 'src/**/*.css'  'public/css/**/*.css' --fix"
+    "lint:fix-css": "stylelint 'src/**/*.css'  'public/css/**/*.css' --fix",
+    "lint": "eslint 'src/**/*.js' 'public/**/*.js' '__mocks__/**/*.js' '__tests__/**/*.js'",
+    "linttest": "eslint 'src/components/**/*.js'",
+    "lintt": "eslint 'src/**/*.js'",
+    "prettier": "prettier 'public/js/**/*.js'"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -54,7 +58,12 @@
     "@babel/plugin-transform-runtime": "^7.9.6",
     "@babel/preset-env": "^7.9.6",
     "@babel/preset-react": "^7.9.4",
+    "babel-eslint": "^10.1.0",
     "eslint": "^6.6.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.3",
+    "eslint-plugin-react": "^7.20.0",
+    "eslint-plugin-standard": "^4.0.1",
     "jest-puppeteer": "^4.4.0",
     "prettier": "2.0.5",
     "puppeteer": "^3.1.0",

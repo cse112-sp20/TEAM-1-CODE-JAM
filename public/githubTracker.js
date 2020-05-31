@@ -47,7 +47,9 @@ async function getCommits(url, repo) {
     method: "GET",
     headers: headers,
   });
+  /*eslint-disable */
   return (result = await response.json());
+  /*eslint-enable */
 }
 
 /**

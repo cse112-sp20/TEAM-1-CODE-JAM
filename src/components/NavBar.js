@@ -8,7 +8,6 @@ export default class NavBar extends Component {
     M.AutoInit();
   }
 
-
   openSettingsPage = () => {
     chrome.tabs.create({ url: "/popup.html" });
   };
