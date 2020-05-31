@@ -22,7 +22,7 @@ export default class Charts extends Component {
   // load data from function getChartData() into this.state.chartData
   componentDidMount = async () => {
     this.getBackgroundData();
-    this.getChartData();
+    //this.getChartData();
   };
   getBackgroundData() {
     // variable to hold finished parsed array for all team info
@@ -66,23 +66,23 @@ export default class Charts extends Component {
     });
   }
   // function to insert data into chart
-  getChartData() {
-    this.setState({
-      // replace object in chartData with Firebase data
-      chartData: {
-        labels: ["My Contributions", "Team Contributions"],
-        datasets: [
-          {
-            type: "doughnut",
-            label: "My Contributions",
-            data: [10, 20],
-            backgroundColor: ["rgba(11, 113, 126, 0.7)",
-            "rgba(255,206,86,0.6)"]
-          }
-        ]
-      },
-    });
-  }
+  // getChartData() {
+  //   this.setState({
+  //     // replace object in chartData with Firebase data
+  //     chartData: {
+  //       labels: ["My Contributions", "Team Contributions"],
+  //       datasets: [
+  //         {
+  //           type: "doughnut",
+  //           label: "My Contributions",
+  //           data: [10, 20],
+  //           backgroundColor: ["rgba(11, 113, 126, 0.7)",
+  //           "rgba(255,206,86,0.6)"]
+  //         }
+  //       ]
+  //     },
+  //   });
+  // }
   render() {
     let data = [];
     if (window.name !== "nodejs") {
