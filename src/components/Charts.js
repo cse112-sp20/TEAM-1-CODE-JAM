@@ -39,6 +39,7 @@ export default class Charts extends Component {
       if (response == undefined) {
         return;
       }
+      console.log(response);
       // parse through response that grabs the day's team and user points
       response.forEach((element) => {
         let newElement = Object.values(element);
@@ -76,10 +77,12 @@ export default class Charts extends Component {
             type: "doughnut",
             label: "My Contributions",
             data: [10, 20],
-            backgroundColor: ["rgba(11, 113, 126, 0.7)",
-            "rgba(255,206,86,0.6)"]
-          }
-        ]
+            backgroundColor: [
+              "rgba(11, 113, 126, 0.7)",
+              "rgba(255,206,86,0.6)",
+            ],
+          },
+        ],
       },
     });
   }
@@ -94,7 +97,7 @@ export default class Charts extends Component {
         // grab points associated to person and team
         let pointsPair = this.state.points[curTeamCode];
         // get out of something is undefined ( a deleted team )
-        if(pointsPair == undefined){
+        if (pointsPair == undefined) {
           break;
         }
         // create array for graphing
@@ -102,7 +105,7 @@ export default class Charts extends Component {
         pointsPair = Object.entries(pointsPair);
         tempArray.push(pointsPair[0][1]);
         tempArray.push(pointsPair[1][1]);
-        
+
         // create doughnuts based on number of teams
         data.push(
           <Doughnut
@@ -114,10 +117,12 @@ export default class Charts extends Component {
                   type: "doughnut",
                   label: "My Contributions",
                   data: tempArray,
-                  backgroundColor: ["rgba(11, 113, 126, 0.7)",
-                  "rgba(255,206,86,0.6)"]
-                }
-              ]
+                  backgroundColor: [
+                    "rgba(11, 113, 126, 0.7)",
+                    "rgba(255,206,86,0.6)",
+                  ],
+                },
+              ],
             }}
             options={{
               title: {
@@ -130,7 +135,6 @@ export default class Charts extends Component {
                 position: "bottom",
               },
               maintainAspectRatio: true,
-
             }}
           />
         );

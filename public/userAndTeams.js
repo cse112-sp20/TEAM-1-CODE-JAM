@@ -72,6 +72,12 @@ export function setupListener() {
       } else if (request.message === "get team info") {
         sendResponse(currentTeamInfo);
       }
+      // VIVIAN
+      else if (request.message === "get team points") {
+        getUserDailyPoints().then((res) => {
+          sendResponse(res);
+        });
+      }
       // else if (request.message === "get timeline") {
       //   reverseTimelineArray().then((tabs) => {
       //     sendResponse(tabs);
@@ -133,6 +139,27 @@ export function setupListener() {
     // it waits for the database to finish before ending
     // the port for messaging
     return true;
+  });
+}
+//VIVIAN
+export function getUserDailyPoints() {
+  return new Promise(async (resolve) => {
+    let curDate = getDate();
+    let dbTeamPoints = await db
+      .collection("teamPerformance")
+      .doc(curDate)
+      .get();
+    dbTeamPoints = dbTeamPoints.data();
+    let userTeamsPoints = dbTeamPoints[userEmail];
+    let allTeamsPoints = dbTeamPoints.totalTeamPoint;
+    let res = {};
+    for (let team of Object.keys(userTeamsPoints)) {
+      res[team] = {
+        userPoints: userTeamsPoints[team],
+        teamPoints: allTeamsPoints[team],
+      };
+    }
+    resolve(res);
   });
 }
 /**
@@ -200,7 +227,7 @@ export function checkDate() {
     console.log("reset");
     resetTeamInfo();
     // currentDate = getDate();
-    // createTeamPerformance(teamCode, 100);
+    createTeamPerformance(currTeamCode, 100);
   }
 }
 
@@ -350,6 +377,7 @@ function createTeamPerformance(key, points) {
     .doc(currentDate)
     .set(
       {
+        [userEmail]: { [code]: points },
         totalTeamPoint: { [code]: points },
       },
       { merge: true }
