@@ -1,13 +1,42 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`App is set up correctly 1`] = `
-<div
-  id="timeline"
-/>
-`;
-
 exports[`Timeline is set up correctly 1`] = `
 <div
-  id="timeline"
-/>
+  className="row"
+  id="myTimeline"
+>
+  <div
+    className="card e4e4e4 darken-1"
+    id="myCard"
+  >
+    <div
+      className="card-content black-text"
+      id="myContent"
+    >
+      <table
+        className="highlight"
+        id="myTable"
+      >
+        <thead>
+          <tr>
+            <th
+              id="myHead"
+            >
+              Time
+            </th>
+            <th
+              id="myHead"
+            >
+              Person
+            </th>
+            <th>
+              Earned
+            </th>
+          </tr>
+        </thead>
+        <tbody />
+      </table>
+    </div>
+  </div>
+</div>
 `;

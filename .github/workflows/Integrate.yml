@@ -3,10 +3,8 @@ name: Continuous Integration
 on:
   pull_request:
     branches: 
-        - master
-  push:
-    branches:
-        - Develop
+      - master
+      - develop
 
 jobs:
   integrate:
@@ -19,5 +17,4 @@ jobs:
         node-version: 12
     - run: npm install
     - run: CI=false npm run build
-    - run: npm run eslint:github-action 
     - run: npm -s test

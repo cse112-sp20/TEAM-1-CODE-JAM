@@ -51,7 +51,6 @@ class Teams extends Component {
           });
         }
         let toastElement = document.querySelector(".toast" + teamCode);
-        console.log(toastElement);
         let toastInstance = M.Toast.getInstance(toastElement);
         toastInstance.dismiss();
       }
