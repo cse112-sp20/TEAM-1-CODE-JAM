@@ -1,7 +1,7 @@
 /* global firebase */
 import { db } from "./firebaseInit.js";
 import { getUserInfo } from "./github-oauth.js";
-import { userEmail } from "./userAndTeams.js";
+import { userEmail, currentTeamInfo, userProfile } from "./userAndTeams.js";
 /**
  *  Fetches data from github using the Github REST API. Header
  * includes the token which was saved after user sign-in with Github.
@@ -47,7 +47,8 @@ async function getCommits(url, repo) {
     method: "GET",
     headers: headers,
   });
-  return (result = await response.json());
+  // return (result = await response.json());
+  return await response.json();
 }
 
 /**
