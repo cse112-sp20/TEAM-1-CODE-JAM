@@ -15,48 +15,60 @@ export default class Timeline extends Component {
     chrome.runtime.onMessage.addListener(this.handleMessage);
   };
 
+  /**
+   * Creates a element for the timeline
+   * @author Brian Aguirre
+   */
   createTimelineElement = (timelineElement) => {
     let animal = timelineElement.animal;
     if (animal == undefined) {
       animal = "Predator";
     }
-    let color = "green";
-    let points = "+30";
-
+    let color = "#52d16d";
     if (this.state.black_listed.includes(timelineElement.url)) {
-      color = "red";
-      points = "-30";
+      color = "#ff7373";
     }
+    let points =
+      Math.round((timelineElement.points + Number.EPSILON) * 100) / 100;
+
     let newElement = (
       <tr>
-        <td>{timelineElement.currTime}</td>
+        <td id="time">
+          <p style={{ fontWeight: 600 }}>{timelineElement.currTime}</p>
+        </td>
         <td>
           <img src={require(`../SVG/${animal}.svg`)}></img>
         </td>
         <td id="thirdElem" style={{ color: `${color}` }}>
-          {`${timelineElement.url}`}
+          <p
+            style={{ fontWeight: 600, textTransform: "capitalize" }}
+          >{`${timelineElement.url}`}</p>
+
           <br></br>
           {`${points}`}
         </td>
       </tr>
     );
+
     return newElement;
   };
 
   /**
    * Updates timeline if a new element is created for the timeline.
+   * @author Brian Aguirre
    */
   handleMessage = (request) => {
     // new element for timeline
-    if (request.for === "timeline demo")
+    if (request.for === "team info")
       this.setState({
-        timeline: request.message.timeWasted.reverse(),
+        timeline: request.message.timeWasted,
       });
 
     return true;
   };
   /**
    * Loads the timeline. Only called once
+   * @author Brian Aguirre
    */
   timeline = async () => {
     const msg = {
@@ -73,14 +85,14 @@ export default class Timeline extends Component {
   render() {
     return (
       <div className="row" id="myTimeline">
-        <div className="card e4e4e4 darken-1" id="myCard">
+        <div className="card blue-grey lighten-5" id="myCard">
           <div className="card-content black-text" id="myContent">
             <table className="highlight" id="myTable">
               <thead>
                 <tr>
                   <th id="myHead">Time</th>
                   <th id="myHead">Person</th>
-                  <th>Earned</th>
+                  <th id="myHead">Earned</th>
                 </tr>
               </thead>
               <tbody>

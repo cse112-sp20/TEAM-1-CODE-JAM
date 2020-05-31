@@ -2,7 +2,7 @@ import { chrome } from "../__mocks__/chromeMock.js";
 global.chrome = chrome;
 import _ from "../public/userAndTeams.js";
 import { setDB } from "../public/firebaseInit.js";
-import { db, setExists } from "../__mocks__/databaseMock.js";
+import { db, setExists, get } from "../__mocks__/databaseMock.js";
 jest.setTimeout(10000);
 
 let userEmail = "test@gmail.com";
@@ -24,12 +24,22 @@ describe("getUserInformation", () => {
 
 describe("getTeamInformation", () => {
   test("get team info", async () => {
+    get.mockReturnValueOnce(
+      Promise.resolve({
+        id: "12345",
+        data: jest.fn(() => {
+          return true;
+        }),
+      })
+    );
     let doc = await _.getTeamInformation("12345");
     expect(db.collection).toHaveBeenCalled();
     expect(db.collection).toHaveBeenCalledWith("teams");
     expect(db.collection("teams").doc).toHaveBeenCalled();
     expect(db.collection("teams").doc).toHaveBeenCalledWith("12345");
     expect(db.collection("teams").doc("12345").get).toHaveBeenCalled();
+    expect(doc.id).toBe("12345");
+    expect(doc.data()).toBe(true);
   });
 });
 
