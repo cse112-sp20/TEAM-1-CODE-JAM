@@ -1,11 +1,12 @@
 /* global firebase */
 import { db } from "./firebaseInit.js";
-import { getUserInfo } from "./github-oauth.js";
+import { getUserGithubToken } from "./github-oauth.js";
 import { userEmail } from "./userAndTeams.js";
 /**
  *  Fetches data from github using the Github REST API. Header
  * includes the token which was saved after user sign-in with Github.
  *  It gets all the user repositories.
+ * @author Gen Barcenas
  * @param {string} url
  */
 async function getRepos(url) {
@@ -65,6 +66,7 @@ async function getMostRecentCommit() {
   const curr_day = curr_date.getDate();
   const curr_year = curr_date.getFullYear();
   const curr_month = curr_date.getMonth() + 1;
+  getUserGithubToken(false);
 
   // Adds a zero to the front of the day and month
   // if it less than 2 digits
@@ -127,7 +129,6 @@ async function getMostRecentCommit() {
       }
     })
   );
-
   return arr;
 }
 
@@ -142,35 +143,69 @@ export function sendToDB(teamCode, animal) {
     return;
   }
   console.log("update");
-  // Sets the token for the github if authorization has been given
-  getUserInfo(false);
-  let token = localStorage.getItem("token");
-  if (token != null) {
-    getMostRecentCommit()
-      .then((arr) => {
-        let max = "00:00:00";
-        arr.forEach((e) => {
-          if (e > max) {
-            max = e;
-          }
-        });
+  getMostRecentCommit()
+    .then((arr) => {
+      let max = "00:00:00";
+      arr.forEach((e) => {
+        if (e > max) {
+          max = e;
+        }
+      });
 
-        if (max != "00:00:00") {
-          let msg = {
-            for: "popup",
-            message: "timeline demo",
-            url: "GitHub",
-            time: max,
-            animal: "water-bottle",
-          };
+      if (max != "00:00:00") {
+        let msg = {
+          for: "popup",
+          message: "timeline demo",
+          url: "GitHub",
+          time: max,
+          animal: "water-bottle",
+        };
 
-          if (localStorage.getItem("oldElements") == null) {
-            let item = [{ url: "github.com", time: max }];
-            localStorage.setItem("oldElements", JSON.stringify(item));
+        if (localStorage.getItem("oldElements") == null) {
+          let item = [{ url: "github.com", time: max }];
+          localStorage.setItem("oldElements", JSON.stringify(item));
 
-            // chrome.runtime.sendMessage(msg, function (response) {
-            //     resolve(response);
-            // });
+          // chrome.runtime.sendMessage(msg, function (response) {
+          //     resolve(response);
+          // });
+          // let seconds = JSON.parse(currData)[tabUrl] / 1000;
+          let seconds = new Date().toLocaleTimeString();
+          //let seconds =
+          // parseInt(JSON.parse(localStorage.getItem(teamCode)).time) / 1000;
+          //time = `${tabUrl}: ${seconds} seconds`;
+          console.log("in update local storage");
+          // let userAnimal = await getUserAnimal(userEmail, teamCode);
+          let userAnimal = animal;
+          db.collection("teams")
+            .doc(teamCode)
+            .update({
+              timeWasted: firebase.firestore.FieldValue.arrayUnion({
+                point: "+1",
+                user: userEmail,
+                url: "www.GitHub.com",
+                time: seconds,
+                animal: userAnimal,
+              }),
+            });
+        } else {
+          let item = { url: "github.com", time: max };
+          let oldElements = JSON.parse(localStorage.getItem("oldElements"));
+
+          // Checks if an item exists in the local storage
+          let itemExists = false;
+          oldElements.forEach((e) => {
+            if (e.time == max) {
+              itemExists = true;
+            }
+          });
+          console.log(itemExists);
+
+          if (itemExists) {
+          } else {
+            console.log("Item is not in Local Storage...");
+            oldElements.push(item);
+            localStorage.setItem("oldElements", JSON.stringify(oldElements));
+            console.log("here");
             // let seconds = JSON.parse(currData)[tabUrl] / 1000;
             let seconds = new Date().toLocaleTimeString();
             //let seconds =
@@ -183,56 +218,15 @@ export function sendToDB(teamCode, animal) {
               .doc(teamCode)
               .update({
                 timeWasted: firebase.firestore.FieldValue.arrayUnion({
-                  point: "+1",
                   user: userEmail,
-                  url: "www.GitHub.com",
+                  url: "Git Push",
                   time: seconds,
                   animal: userAnimal,
                 }),
               });
-          } else {
-            let item = { url: "github.com", time: max };
-            let oldElements = JSON.parse(localStorage.getItem("oldElements"));
-
-            // Checks if an item exists in the local storage
-            let itemExists = false;
-            oldElements.forEach((e) => {
-              if (e.time == max) {
-                itemExists = true;
-              }
-            });
-            console.log(itemExists);
-
-            if (itemExists) {
-            } else {
-              console.log("Item is not in Local Storage...");
-              oldElements.push(item);
-              localStorage.setItem("oldElements", JSON.stringify(oldElements));
-              console.log("here");
-              // let seconds = JSON.parse(currData)[tabUrl] / 1000;
-              let seconds = new Date().toLocaleTimeString();
-              //let seconds =
-              // parseInt(JSON.parse(localStorage.getItem(teamCode)).time) / 1000;
-              //time = `${tabUrl}: ${seconds} seconds`;
-              console.log("in update local storage");
-              // let userAnimal = await getUserAnimal(userEmail, teamCode);
-              let userAnimal = animal;
-              db.collection("teams")
-                .doc(teamCode)
-                .update({
-                  timeWasted: firebase.firestore.FieldValue.arrayUnion({
-                    user: userEmail,
-                    url: "Git Push",
-                    time: seconds,
-                    animal: userAnimal,
-                  }),
-                });
-            }
           }
         }
-      })
-      .catch((err) => console.log(err));
-  } else {
-    console.log("No authorization given by github");
-  }
+      }
+    })
+    .catch((err) => console.log(err));
 }
