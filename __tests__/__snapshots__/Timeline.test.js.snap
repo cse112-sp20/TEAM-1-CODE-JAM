@@ -6,7 +6,7 @@ exports[`Timeline is set up correctly 1`] = `
   id="myTimeline"
 >
   <div
-    className="card e4e4e4 darken-1"
+    className="card blue-grey lighten-5"
     id="myCard"
   >
     <div
@@ -29,7 +29,9 @@ exports[`Timeline is set up correctly 1`] = `
             >
               Person
             </th>
-            <th>
+            <th
+              id="myHead"
+            >
               Earned
             </th>
           </tr>

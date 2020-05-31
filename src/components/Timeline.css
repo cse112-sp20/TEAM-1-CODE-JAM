@@ -5,6 +5,19 @@ td {
   border-top-width: 0px;
   width: 500px;
 }
+#time,
+#thirdElem,
+#myHead {
+  font-weight: 600;
+  text-transform: "capitalize";
+  /* fontWeight: 600, */
+}
+
+thead,
+tr {
+  font-weight: 600;
+  border: none;
+}
 
 #mycard {
   max-height: 544px;
