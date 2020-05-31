@@ -28,14 +28,14 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "jest",
+    "test:coverage": "jest --coverage",
     "test1": "react-scripts test",
     "eject": "react-scripts eject",
     "eslint:github-action": "node ./node_modules/eslint/bin/eslint . --ignore-path .gitignore",
-    "lint:css": "stylelint 'src/**/*.css', 'public/css/**/*.css'",
-    "lint:fix-css": "stylelint 'src/**/*.css'  'public/css/**/*.css' --fix",
+    "stylelint": "stylelint 'src/**/*.css', 'public/css/**/*.css'",
+    "stylelint:fix": "stylelint 'src/**/*.css'  'public/css/**/*.css' --fix",
     "lint": "eslint 'src/**/*.js' 'public/**/*.js' '__mocks__/**/*.js' '__tests__/**/*.js'",
-    "linttest": "eslint 'src/components/**/*.js'",
-    "lintt": "eslint 'src/**/*.js'",
+    "lint:fix": "eslint 'src/**/*.js' 'public/**/*.js' '__mocks__/**/*.js' '__tests__/**/*.js' -- fix",
     "prettier": "prettier 'public/js/**/*.js'"
   },
   "eslintConfig": {
