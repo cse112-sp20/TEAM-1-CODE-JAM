@@ -1,4 +1,3 @@
-/* eslint-disable import/first */
 import { chrome } from "../__mocks__/chromeMock.js";
 global.chrome = chrome;
 import _ from "../public/userAndTeams.js";
@@ -8,6 +7,7 @@ jest.setTimeout(10000);
 
 let userEmail = "test@gmail.com";
 let dummyEmail = "test2@gmail.com";
+
 // mock database
 setDB(db);
 describe("getUserInformation", () => {

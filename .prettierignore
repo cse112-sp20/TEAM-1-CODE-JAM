@@ -1,0 +1,17 @@
+.github/
+build/
+coverage/
+public/manifest.json
+src/serviceWorker.js
+src/setupTests.js
+src/components/materialize.min.css
+.eslintrc.json
+.prettierrc.json
+.stylelintrc.json
+firebase.json
+README.md
+
+
+public/css/style.css#L1 
+public/js/popup.js#L1 
+public/js/popup.html#L1 

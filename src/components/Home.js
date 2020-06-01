@@ -86,7 +86,7 @@ export default class Home extends Component {
   importAll = (r) => {
     return r.keys().map(r);
   };
-  onClickBlacklistButton = (e) => {
+  onClickBlacklistButton = () => {
     if (!this.state.isInBlacklist) {
       this.setState({
         isInBlacklist: true,
@@ -132,7 +132,7 @@ export default class Home extends Component {
       </Button>
     );
   };
-  handleCheckIn = (e) => {
+  handleCheckIn = () => {
     this.setState({
       isCheckIn: !this.state.isCheckIn,
     });
