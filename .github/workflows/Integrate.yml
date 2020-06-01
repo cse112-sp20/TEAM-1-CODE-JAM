@@ -27,12 +27,13 @@ jobs:
       - name: Run tests
         run: npm -s test
 
+      - 
       - name: Run linters
         uses: samuelmeuli/lint-action@v1
         with:
           github_token: ${{ secrets.github_token }}
           # Enable linters
           stylelint: true
-          # eslint: true
+          eslint: true
           # eslint_dir: src/ __tests__/ __mocks__/
-          # prettier: true
+          
