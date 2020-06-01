@@ -1,27 +1,30 @@
 {
-    "extends": [
-        "eslint:recommended",
-        "plugin:react/recommended",
-        "plugin:prettier/recommended",
-        // "prettier",
-        "prettier/flowtype",
-        "prettier/react",
-        "prettier/standard"
-    ],
-    "plugins": [
-        "flowtype",
-        "react",
-        "prettier",
-        "standard"
-    ],
     "env": {
+        "browser": true,
         "es6": true,
         "node": true,
-        "browser": true,
         "jest": true
     },
+    "extends": [
+        "eslint:recommended",
+        "plugin:react/recommended"
+    ],
+    "globals": {
+        "Atomics": "readonly",
+        "SharedArrayBuffer": "readonly"
+    },
+    "parser": "babel-eslint",
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true,
+            "modules": true
+        },
+        "ecmaVersion": 11
+    },
+    "plugins": [
+        "react"
+    ],
     "rules": {
-        "prettier/prettier": ["error"],
         "avoidEscape": 0,
         "allowTemplateLiterals": 0,
         "no-empty": 0,
@@ -32,14 +35,6 @@
         "no-prototype-builtins": 0,
         "react/jsx-uses-react": "error",   
         "react/jsx-uses-vars": "error"
-    },
-    // "quotes": ["single"],
-    "parser": "babel-eslint",
-    "parserOptions": {
-        "ecmaFeatures": {
-            "jsx": true,
-            "modules": true
-        }
     },
 
     "settings": {
@@ -65,5 +60,4 @@
         {"name": "Link", "linkAttribute": "to"}
         ]
     }
-
 }
