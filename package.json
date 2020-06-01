@@ -34,9 +34,8 @@
     "eslint:github-action": "node ./node_modules/eslint/bin/eslint . --ignore-path .gitignore",
     "stylelint": "stylelint 'src/**/*.css', 'public/css/**/*.css'",
     "stylelint:fix": "stylelint 'src/**/*.css'  'public/css/**/*.css' --fix",
-    "lint": "eslint 'src/**/*.js' 'public/**/*.js' '__mocks__/**/*.js' '__tests__/**/*.js'",
-    "lint:fix": "eslint 'src/**/*.js' 'public/**/*.js' '__mocks__/**/*.js' '__tests__/**/*.js' -- fix",
-    "prettier": "prettier 'public/js/**/*.js'"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "eslintConfig": {
     "extends": "react-app"
