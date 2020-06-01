@@ -6,9 +6,6 @@ on:
       - master
       - develop
 
-  push:
-    branches:
-      - feat/lintersAndcov
 jobs:
   integrate:
     runs-on: ubuntu-latest
