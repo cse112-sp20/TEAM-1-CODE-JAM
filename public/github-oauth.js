@@ -146,7 +146,7 @@ function xhrWithAuth(method, url, interactive, callback) {
   }
 }
 
-export function getUserInfo(interactive) {
+function getUserInfo(interactive) {
   xhrWithAuth(
     "GET",
     "https://api.github.com/user",
