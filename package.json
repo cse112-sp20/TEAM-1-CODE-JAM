@@ -35,7 +35,8 @@
     "stylelint": "stylelint 'src/**/*.css', 'public/css/**/*.css'",
     "stylelint:fix": "stylelint 'src/**/*.css'  'public/css/**/*.css' --fix",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "prettier": "prettier --write ."
   },
   "eslintConfig": {
     "extends": "react-app"

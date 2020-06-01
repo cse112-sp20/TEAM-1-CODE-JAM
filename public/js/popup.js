@@ -21,11 +21,11 @@ function openTab(evt, tabName) {
   evt.currentTarget.className += " active";
 }
 
-document.getElementById("authenticationsTab").onclick = function(event) {
+document.getElementById("authenticationsTab").onclick = function (event) {
   openTab(event, "Authentications");
 };
 
-document.getElementById("aboutTab").onclick = function(event) {
+document.getElementById("aboutTab").onclick = function (event) {
   openTab(event, "About");
 };
 
