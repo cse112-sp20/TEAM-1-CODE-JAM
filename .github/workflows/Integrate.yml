@@ -27,7 +27,6 @@ jobs:
       - name: Run tests
         run: npm -s test
 
-      - 
       - name: Run linters
         uses: samuelmeuli/lint-action@v1
         with:
