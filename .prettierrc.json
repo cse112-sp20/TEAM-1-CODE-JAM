@@ -1,8 +1,7 @@
 {
-    "extends": [
-      "plugin:prettier/recommended",
-      "prettier/flowtype",
-      "prettier/react",
-      "prettier/standard"
+    "overrides": [
+      {
+        "files": "*.js"
+      }
     ]
-  }
+}

@@ -1,2 +1,8 @@
 src/serviceWorker.js
 src/setupTests.js
+build/
+coverage/
+.eslintrc.json
+.github/
+.prettierrc.json
+README.md
