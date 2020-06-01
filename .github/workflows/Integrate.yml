@@ -34,5 +34,5 @@ jobs:
           # Enable linters
           stylelint: true
           eslint: true
-          # eslint_dir: src/ __tests__/ __mocks__/
+          eslint_dir: src/ __tests__/ __mocks__/
           
