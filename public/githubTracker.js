@@ -47,6 +47,7 @@ async function getCommits(url, repo) {
     method: "GET",
     headers: headers,
   });
+
   // return (result = await response.json());
   return await response.json();
 }

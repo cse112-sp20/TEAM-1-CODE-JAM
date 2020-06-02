@@ -126,7 +126,7 @@ class CreateJoinTeam extends Component {
                   className="validate"
                   data-testid="CreateJoinTeam-createinput"
                 />
-                <label for="teamName">Team Name</label>
+                <label htmlFor="teamName">Team Name</label>
               </div>
             </div>
             {/* <!-- Row for CREATE --> */}
@@ -149,12 +149,12 @@ class CreateJoinTeam extends Component {
             <div className="row">
               <div className="input-field col s12">
                 <input
-                  maxlength="5"
+                  maxLength="5"
                   id="teamCode"
                   type="text"
                   className="validate"
                 />
-                <label for="teamCode">Team Code</label>
+                <label htmlFor="teamCode">Team Code</label>
               </div>
             </div>
 
