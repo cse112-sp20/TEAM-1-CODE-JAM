@@ -12,7 +12,7 @@ on:
       - pipeline-test
 
 jobs:
-  Unit Test:
+  Unit-Test:
     runs-on: ubuntu-latest
     
     steps:
@@ -30,7 +30,7 @@ jobs:
       - name: Run unit-test
         run: npm test __tests__
 
-  End-to-End Test:
+  End-to-End-Test:
     runs-on: ubuntu-latest
     
     steps:
@@ -50,7 +50,7 @@ jobs:
     
 
 
-  Stylelint, Eslint, Prettier:
+  Stylelint-Eslint-Prettier:
     runs-on: ubuntu-latest
     
     steps:
@@ -73,7 +73,7 @@ jobs:
           eslint: true
           prettier: true
 
-  Code Coverage:
+  Code-Coverage:
     runs-on: ubuntu-latest
     
     steps:
@@ -90,5 +90,3 @@ jobs:
     
       - name: Running jest coverage
         run: npm run test:coverage
-
-
