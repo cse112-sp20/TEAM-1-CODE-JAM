@@ -125,6 +125,16 @@ describe("getTeamNames", () => {
     ]);
   });
 });
+describe("getAnimal", () => {
+  test("get animals", () => {
+    let animalsLeft = Array.from(animals);
+    let randAnimal = getAnimal(animalsLeft);
+    let numAnimals = animalsLeft.length;
+
+    expect(numAnimals).toBe(animals.length - 1);
+    expect(!animalsLeft.includes(randAnimal)).toBe(true);
+  });
+});
 
 // describe("joinTeamOnFirebase", () => {
 //   let userProfile;
