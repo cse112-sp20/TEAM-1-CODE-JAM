@@ -40,4 +40,5 @@ async function main() {
   let res = await generateRandomTeamCode(5);
   console.log(res);
 }
+
 main();

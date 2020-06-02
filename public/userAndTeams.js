@@ -551,6 +551,7 @@ export function createUser(userEmail) {
       });
   });
 }
+
 /**
  * This listens for any changes of the user then update it to
  * local variable userProfile
@@ -570,8 +571,14 @@ export function getUserProfile(userEmail) {
       });
   });
 }
+
 /**
- * @return user's personal animal
+ * return the user icon base on his email and the
+ * team he is in
+ * @author Brian Aguirre, William Lui
+ * @param {string} userEmail, the email of the current user
+ * @param {string} teamCode, the team code of the current team
+ * @return return the icon of the user
  */
 export async function getUserAnimal(userEmail, teamCode) {
   return new Promise(function (resolve) {
@@ -587,7 +594,11 @@ export async function getUserAnimal(userEmail, teamCode) {
 }
 
 /**
- * @return animal remaining in the database
+ * return the list of remaining icons avaliable
+ * from the database for the current team
+ * @author Brian Aguirre, William Lui
+ * @param {string} teamCode, the team code of the current team
+ * @return return the list of icons remaining
  */
 export async function getAnimalsLeft(teamCode) {
   return new Promise(function (resolve) {
@@ -795,7 +806,8 @@ export function isCheckIn() {
 }
 
 /**
- * Resets timeline elements and redistributes a new animal for each teammember
+ * Resets timeline elements and redistributes a
+ * new animal for each teammember
  * @author Brian Aguirre & William Lui
  */
 function resetTeamInfo() {

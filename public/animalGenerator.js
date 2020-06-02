@@ -56,19 +56,20 @@ export let animals = [
  */
 export function getAnimal(animalsLeft) {
   if (animalsLeft.length === 0) {
-    throw "ERROR";
+    return "Predator";
   }
   let index = Math.floor(Math.random() * animalsLeft.length); // returns a random integer from 0 to 9
   let animal = animalsLeft[index];
   animalsLeft.splice(index, 1);
   return animal;
 }
+
 /**
  * Puts animal back if a user leaves team
  * @param {string} animal
  */
 export function addAnimal(animalsLeft, animal) {
-  if (animals.includes(animal)) {
+  if (animals.includes(animal) && !animalsLeft.includes(animal)) {
     animalsLeft.push(animal);
   }
 }
