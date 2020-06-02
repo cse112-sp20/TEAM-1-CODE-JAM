@@ -25,12 +25,11 @@ jobs:
       - name: Install Node.js dependencies
         run: npm install
       - name: Build
-      - run: CI=false npm run build
+        run: CI=false npm run build
 
       - name: Run unit-test
         run: npm test __tests__
 
-jobs:
   End-to-End Test:
     runs-on: ubuntu-latest
     
@@ -44,13 +43,13 @@ jobs:
       - name: Install Node.js dependencies
         run: npm install
       - name: Build
-      - run: CI=false npm run build
+        run: CI=false npm run build
 
       - name: Run unit-test
         run: npm test __end2endTest__
     
 
-jobs:
+
   Stylelint, Eslint, Prettier:
     runs-on: ubuntu-latest
     
@@ -64,18 +63,16 @@ jobs:
       - name: Install Node.js dependencies
         run: npm install
       - name: Build
-      - run: CI=false npm run build
+        run: CI=false npm run build
 
       - name: Run linters
         uses: samuelmeuli/lint-action@v1
         with:
           github_token: ${{ secrets.github_token }}
-          # Enable linters
           stylelint: true
           eslint: true
           prettier: true
 
-jobs:
   Code Coverage:
     runs-on: ubuntu-latest
     
@@ -89,8 +86,9 @@ jobs:
       - name: Install Node.js dependencies
         run: npm install
       - name: Build
-      - run: CI=false npm run build
+        run: CI=false npm run build
     
       - name: Running jest coverage
-      - run: npm run test:coverage
+        run: npm run test:coverage
+
 
