@@ -3,7 +3,8 @@
     "rules": {
         "indentation": 2,
         "color-no-invalid-hex": true,
-        "selector-type-no-unknown": null
+        "selector-type-no-unknown": null,
+        "declaration-block-no-duplicate-properties": null
     },
     "ignoreFiles": ["src/components/materialize.min.css", "build/**/*.css"]
 }

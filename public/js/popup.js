@@ -4,7 +4,7 @@
  * Reference: w3schools.com/howto/howto_js_veritcal_tabs.asp
  */
 function openTab(evt, tabName) {
-  var i, tabcontent, tabs;
+  var i, tabcontent, settingTabs;
 
   // Get all elements with class="main_content" and hide them
   tabcontent = document.getElementsByClassName("main-content");
@@ -14,8 +14,8 @@ function openTab(evt, tabName) {
 
   // Get all elements with class="tabs" and remove the class "active"
   settingTabs = document.getElementsByClassName("tabs");
-  for (i = 0; i <  settingTabs.length; i++) {
-    settingTabs[i].className =  settingTabs[i].className.replace(" active", "");
+  for (i = 0; i < settingTabs.length; i++) {
+    settingTabs[i].className = settingTabs[i].className.replace(" active", "");
   }
 
   // Show the current tab, and add an "active" class to the link that opened the tab

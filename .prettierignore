@@ -10,8 +10,3 @@ src/components/materialize.min.css
 .stylelintrc.json
 firebase.json
 README.md
-
-
-public/css/style.css#L1 
-public/js/popup.js#L1 
-public/js/popup.html#L1 
