@@ -1,8 +1,9 @@
-/* global chrome */
+/* global chrome*/
 
 let signin_button;
 let revoke_button;
 let user_info_div;
+let access_token = null;
 
 let tokenFetcher = (function () {
   // Replace clientId and clientSecret with values obtained by you for your
@@ -14,7 +15,6 @@ let tokenFetcher = (function () {
   let redirectUri = chrome.identity.getRedirectURL("provider_cb");
   let redirectRe = new RegExp(redirectUri + "[#?](.*)");
 
-  let access_token = null;
   localStorage.removeItem("token");
 
   return {
@@ -66,11 +66,13 @@ let tokenFetcher = (function () {
       }
 
       function handleProviderResponse(values) {
-        if (values.hasOwnProperty("access_token"))
+        // if (values.hasOwnProperty("access_token"))
+        if (Object.prototype.hasOwnProperty.call(values, "access_token"))
           setAccessToken(values.access_token);
         // If response does not have an access_token, it might have the code,
         // which can be used in exchange for token.
-        else if (values.hasOwnProperty("code"))
+        // else if (values.hasOwnProperty("code"))
+        else if (Object.prototype.hasOwnProperty.call(values, "code"))
           exchangeCodeForToken(values.code);
         else callback(new Error("Neither access_token nor code avialable."));
       }
@@ -100,7 +102,10 @@ let tokenFetcher = (function () {
           if (this.status === 200) {
             let response = JSON.parse(this.responseText);
 
-            if (response.hasOwnProperty("access_token")) {
+            // if (response.hasOwnProperty("access_token")) {
+            if (
+              Object.prototype.hasOwnProperty.call(response, "access_token")
+            ) {
               setAccessToken(response.access_token);
               // let item = { "token" : response.access_token };
               localStorage.setItem("token", response.access_token);
@@ -129,11 +134,10 @@ let tokenFetcher = (function () {
 })();
 
 function xhrWithAuth(method, url, interactive, callback) {
-  let retry = true;
-  let access_token;
+  // let retry = true;
+  // let access_token;
 
   getToken();
-
   function getToken() {
     tokenFetcher.getToken(interactive, function (error, token) {
       if (error) {
@@ -225,7 +229,7 @@ function onUserReposFetched(error, status, response) {
 
 // Handlers for the buttons's onclick events.
 function interactiveSignIn() {
-  tokenFetcher.getToken(true, function (error, access_token) {
+  tokenFetcher.getToken(true, function (error) {
     if (error) {
       document.querySelector("#signin").innerHTML = "SIGN IN";
       showButton(signin_button);

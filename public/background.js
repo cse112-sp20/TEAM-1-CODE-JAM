@@ -12,8 +12,8 @@ import {
   checkDate,
   setupListener,
   setTeamCode,
-  getDate,
   getTeamCode,
+  generateRandomTeamCode,
 } from "./userAndTeams.js";
 
 const ONE_MIN = 60000;
@@ -37,5 +37,7 @@ async function main() {
   setInterval(() => checkDate(), ONE_MIN);
   //deleteEverythingAboutAUser(userEmail);
   setupListener();
+  let res = await generateRandomTeamCode(5);
+  console.log(res);
 }
 main();

@@ -25,15 +25,15 @@
             "endOfLine": "auto"
           }],
         "avoidEscape": 0,
-        "allowTemplateLiterals": 0,
-        "no-empty": 0,
-        "no-unused-vars": 0,
-        "no-async-promise-executor": 0,
-        "react/jsx-key": 0,
-        "react/prop-types": 0,
-        "no-prototype-builtins": 0,
-        "react/jsx-uses-react": "error",   
-        "react/jsx-uses-vars": "error"
+        "allowTemplateLiterals": 0
+        // "no-empty": 0,
+        // "no-unused-vars": 0,
+        // "no-async-promise-executor": 0,
+        // "react/jsx-key": 0,
+        // "react/prop-types": 0,
+        // "no-prototype-builtins": 0,
+        // "react/jsx-uses-react": "error",   
+        // "react/jsx-uses-vars": "error"
     },
     "parser": "babel-eslint",
     "parserOptions": {
