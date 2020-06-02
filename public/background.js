@@ -38,4 +38,5 @@ async function main() {
   //deleteEverythingAboutAUser(userEmail);
   setupListener();
 }
+
 main();

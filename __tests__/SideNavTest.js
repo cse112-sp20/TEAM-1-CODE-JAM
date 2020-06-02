@@ -5,17 +5,6 @@ import renderer from "react-test-renderer";
 const chrome = require("sinon-chrome");
 window.chrome = chrome;
 
-test("Testing side navigation bar", () => {
-  const component = renderer.create(<App />);
-
-  let tree = component.toJSON();
-
-  console.log(findDOMComponent(tree, "SideNav"));
-  expect(tree).toMatchSnapshot();
-
-  // Continue testing side nav bar, click each tab
-});
-
 /*eslint-disable*/
 // Function to find DOM components recursively
 function findDOMComponent(component, searchName) {
