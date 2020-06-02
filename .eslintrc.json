@@ -3,7 +3,7 @@
         "eslint:recommended",
         "plugin:react/recommended",
         "plugin:prettier/recommended",
-        // "prettier",
+        "prettier",
         "prettier/flowtype",
         "prettier/react",
         "prettier/standard"
@@ -21,7 +21,9 @@
         "jest": true
     },
     "rules": {
-        "prettier/prettier": ["error"],
+        "prettier/prettier": ["error", {
+            "endOfLine": "auto"
+          }],
         "avoidEscape": 0,
         "allowTemplateLiterals": 0
         // "no-empty": 0,
@@ -33,7 +35,6 @@
         // "react/jsx-uses-react": "error",   
         // "react/jsx-uses-vars": "error"
     },
-    // "quotes": ["single"],
     "parser": "babel-eslint",
     "parserOptions": {
         "ecmaFeatures": {
