@@ -4,7 +4,9 @@ import App from "../src/App";
 import renderer from "react-test-renderer";
 const chrome = require("sinon-chrome");
 window.chrome = chrome;
-
+describe("need to take out snapshot", () => {
+  test("delete later", () => {});
+});
 /*eslint-disable*/
 // Function to find DOM components recursively
 function findDOMComponent(component, searchName) {
