@@ -3,6 +3,7 @@ import React, { Component } from "react";
 import M from "materialize-css";
 import { withRouter } from "react-router-dom";
 import "./CreateJoinTeam.css";
+import PropTypes from "prop-types";
 // var $ = require("jquery");
 
 class CreateJoinTeam extends Component {
@@ -13,28 +14,6 @@ class CreateJoinTeam extends Component {
   componentDidMount = () => {
     this.setupButtonListener();
   };
-  // /**
-  //  * Get the email from background page and update the html
-  //  * @author : Karl Wang
-  //  * @param {function} setEmailCallback Send the email to the html
-  //  */
-  // getEmail = (setEmailCallback) => {
-  //   // the message to be sent
-  //   let msg = { for: "background", message: "get email" };
-  //   chrome.runtime.sendMessage(msg, function (response) {
-  //     // set the email on html
-  //     setEmailCallback(response.email);
-  //   });
-  // };
-  // /**
-  //  * Get the prefix of the email and show it on html
-  //  * @author : Karl Wang
-  //  * @param {string} email The email to be shown on html
-  //  */
-  // setHeaderEmail = (email) => {
-  //   let insertEmail = document.querySelector("#insertEmail");
-  //   insertEmail.textContent = email.substr(0, email.indexOf("@"));
-  // };
 
   /**
    * Setup the listener for create team and join team button
@@ -64,12 +43,9 @@ class CreateJoinTeam extends Component {
       message: "create team",
       teamName: teamName,
     };
-    let that = this;
     //   send to background page
     chrome.runtime.sendMessage(msg, (response) => {
-      console.log(response);
-      chrome.storage.local.set({ prevTeam: response });
-      that.props.history.push("/");
+      this.props.redirect(response);
     });
   };
   /**
@@ -110,15 +86,7 @@ class CreateJoinTeam extends Component {
         });
         return;
       } else if (response === "success") {
-        chrome.storage.local.set(
-          {
-            prevTeam: teamCode,
-          },
-          () => {
-            // if succeed go to home page.
-            this.props.history.push("/");
-          }
-        );
+        this.props.redirect(teamCode);
         return;
       } else if (response === "already joined the group") {
         M.toast({
@@ -135,7 +103,7 @@ class CreateJoinTeam extends Component {
       <div>
         <div className="row">
           <div className="col s12">
-            <ul className="tabs">
+            <ul id="body" className="tabs">
               <li className="tab col s6">
                 {/* <!-- First Tab --> */}
                 <a className="active" href="#createTeam">
@@ -153,8 +121,13 @@ class CreateJoinTeam extends Component {
         <!-- Row for Team Name --> */}
             <div className="row">
               <div className="input-field col s12">
-                <input id="teamName" type="text" className="validate" />
-                <label for="teamName">Team Name</label>
+                <input
+                  id="teamName"
+                  type="text"
+                  className="validate"
+                  data-testid="CreateJoinTeam-createinput"
+                />
+                <label htmlFor="teamName">Team Name</label>
               </div>
             </div>
             {/* <!-- Row for CREATE --> */}
@@ -163,6 +136,7 @@ class CreateJoinTeam extends Component {
                 <button
                   id="createButton"
                   className="waves-effect waves-light btn-large red accent-1"
+                  data-testid="CreateJoinTeam-createbutton"
                 >
                   Create
                 </button>
@@ -176,12 +150,12 @@ class CreateJoinTeam extends Component {
             <div className="row">
               <div className="input-field col s12">
                 <input
-                  maxlength="5"
+                  maxLength="5"
                   id="teamCode"
                   type="text"
                   className="validate"
                 />
-                <label for="teamCode">Team Code</label>
+                <label htmlFor="teamCode">Team Code</label>
               </div>
             </div>
 
@@ -202,4 +176,7 @@ class CreateJoinTeam extends Component {
     );
   }
 }
+CreateJoinTeam.propTypes = {
+  redirect: PropTypes.func,
+};
 export default withRouter(CreateJoinTeam);
