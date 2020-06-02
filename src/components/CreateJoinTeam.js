@@ -3,6 +3,7 @@ import React, { Component } from "react";
 import M from "materialize-css";
 import { withRouter } from "react-router-dom";
 import "./CreateJoinTeam.css";
+import PropTypes from "prop-types";
 // var $ = require("jquery");
 
 class CreateJoinTeam extends Component {
@@ -175,4 +176,7 @@ class CreateJoinTeam extends Component {
     );
   }
 }
+CreateJoinTeam.propTypes = {
+  redirect: PropTypes.func,
+};
 export default withRouter(CreateJoinTeam);

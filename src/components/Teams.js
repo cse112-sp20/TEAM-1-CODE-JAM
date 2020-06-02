@@ -4,6 +4,7 @@ import "./Teams.css";
 import M from "materialize-css";
 import CreateJoinTeam from "./CreateJoinTeam";
 import { withRouter } from "react-router-dom";
+import PropTypes from "prop-types";
 
 class Teams extends Component {
   constructor(props) {
@@ -113,7 +114,7 @@ class Teams extends Component {
           if (!team.visable) return;
 
           return (
-            <div className="col s3" id="team-and-delete">
+            <div key={team.teamCode} className="col s3" id="team-and-delete">
               {/* This is the button of each team */}
               <button
                 onClick={this.onClickTeam.bind(this, team.teamCode)}
@@ -172,5 +173,8 @@ class Teams extends Component {
     );
   }
 }
+Teams.propTypes = {
+  history: PropTypes.object,
+};
 
 export default withRouter(Teams);

@@ -72,6 +72,12 @@ export function setupListener() {
       } else if (request.message === "get team info") {
         sendResponse(currentTeamInfo);
       }
+      // VIVIAN
+      else if (request.message === "get team points") {
+        getUserDailyPoints().then((res) => {
+          sendResponse(res);
+        });
+      }
       // else if (request.message === "get timeline") {
       //   reverseTimelineArray().then((tabs) => {
       //     sendResponse(tabs);
@@ -124,7 +130,9 @@ export function setupListener() {
               currTeamCode: currTeamCode,
               profilePic: profilePic,
             };
-          } catch {}
+          } catch (err) {
+            console.error(err);
+          }
           sendResponse(data);
         })();
       }
@@ -134,6 +142,22 @@ export function setupListener() {
     // the port for messaging
     return true;
   });
+}
+//VIVIAN
+export async function getUserDailyPoints() {
+  let curDate = getDate();
+  let dbTeamPoints = await db.collection("teamPerformance").doc(curDate).get();
+  dbTeamPoints = dbTeamPoints.data();
+  let userTeamsPoints = dbTeamPoints[userEmail];
+  let allTeamsPoints = dbTeamPoints.totalTeamPoint;
+  let res = {};
+  for (let team of Object.keys(userTeamsPoints)) {
+    res[team] = {
+      userPoints: userTeamsPoints[team],
+      teamPoints: allTeamsPoints[team],
+    };
+  }
+  return res;
 }
 /**
  * Return the team information on database
@@ -149,14 +173,12 @@ export function getTeamInformation(teamCode) {
  * @param teams The global variable to be assigned to
  * @param userProfile Contains all the team user has joined
  */
-export function getTeamNames(userProfile) {
-  return new Promise(async (resolve) => {
-    let promises = [];
-    for (let key in userProfile.joined_teams) {
-      promises.push(_.getTeamName(key, userProfile));
-    }
-    resolve(await Promise.all(promises));
-  });
+export async function getTeamNames(userProfile) {
+  let promises = [];
+  for (let key in userProfile.joined_teams) {
+    promises.push(_.getTeamName(key, userProfile));
+  }
+  return await Promise.all(promises);
 }
 /**
  * Get the team name with such team code
@@ -165,7 +187,7 @@ export function getTeamNames(userProfile) {
  * @param {object} userProfile The user data from database
  */
 export function getTeamName(teamCode, userProfile) {
-  return new Promise(function (resolve, reject) {
+  return new Promise((resolve) => {
     db.collection("teams")
       .doc(teamCode)
       .get()
@@ -200,7 +222,7 @@ export function checkDate() {
     console.log("reset");
     resetTeamInfo();
     // currentDate = getDate();
-    // createTeamPerformance(teamCode, 100);
+    createTeamPerformance(currTeamCode, 100);
   }
 }
 
@@ -213,78 +235,72 @@ export function checkDate() {
  * "already joined the group" if user has joined the group already,
  * "team code not found" if the team code does not exist
  */
-export function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
-  return new Promise(async function (resolve, reject) {
-    //   user already join the group
-    if (teamCode in userProfile.joined_teams) {
-      resolve("already joined the group");
-      return;
-    }
-    let unique = await isTeamCodeUnique(teamCode);
-    const currentTime = Date.now();
-    // unique means team code doesn't exist
-    if (unique) {
-      resolve("team code not found");
-      return;
-    }
-    let initPoint = 100;
-    let animalsLeft = await getAnimalsLeft(teamCode);
-    let newAnimal = getAnimal(animalsLeft);
+export async function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
+  //   user already join the group
+  if (teamCode in userProfile.joined_teams) {
+    return "already joined the group";
+  }
+  let unique = await isTeamCodeUnique(teamCode);
+  const currentTime = Date.now();
+  // unique means team code doesn't exist
+  if (unique) {
+    return "team code not found";
+  }
+  let initPoint = 100;
+  let animalsLeft = await getAnimalsLeft(teamCode);
+  let newAnimal = getAnimal(animalsLeft);
 
-    // do both of these two things parallelly
-    await Promise.all([
-      // add the user to the team
-      db
-        .collection("teams")
-        .doc(teamCode)
-        .update({
-          members: firebase.firestore.FieldValue.arrayUnion(userEmail),
-          animalsLeft: animalsLeft,
-          // teamPoints: points,
-        }),
+  // do both of these two things parallelly
+  await Promise.all([
+    // add the user to the team
+    db
+      .collection("teams")
+      .doc(teamCode)
+      .update({
+        members: firebase.firestore.FieldValue.arrayUnion(userEmail),
+        animalsLeft: animalsLeft,
+        // teamPoints: points,
+      }),
 
-      // add the team code to the user
-      db
-        .collection("users")
-        .doc(userEmail)
-        .set(
-          {
-            joined_teams: { [teamCode]: currentTime },
-            user_points: {
-              [teamCode]: initPoint,
-            },
+    // add the team code to the user
+    db
+      .collection("users")
+      .doc(userEmail)
+      .set(
+        {
+          joined_teams: { [teamCode]: currentTime },
+          user_points: {
+            [teamCode]: initPoint,
           },
-          { merge: true }
-        ),
-      db //me
-        .collection("teams")
-        .doc(teamCode)
-        .set(
-          {
-            distributedAnimal: { [userEmail]: newAnimal },
-          },
-          { merge: true }
-        ),
-    ]);
-    resolve("success");
-    return;
-  });
+        },
+        { merge: true }
+      ),
+    db //me
+      .collection("teams")
+      .doc(teamCode)
+      .set(
+        {
+          distributedAnimal: { [userEmail]: newAnimal },
+        },
+        { merge: true }
+      ),
+  ]);
+  return "success";
 }
 /**
  * Delete the team if team has 0 members
  * @author Karl Wang
  * @param {string} teamCode the Team code to check
  */
-export function deleteIfNoMembers(teamCode) {
-  return new Promise(async (resolve) => {
-    let data = await getTeamInformation(teamCode);
-    data = data.data();
-    if (data.members.length === 0) {
-      await deleteTeamEntirely(teamCode);
-      resolve();
-    }
-    resolve();
-  });
+export async function deleteIfNoMembers(teamCode) {
+  let data = await getTeamInformation(teamCode);
+  data = data.data();
+  if (data.members.length === 0) {
+    await deleteTeamEntirely(teamCode);
+    return;
+  } else {
+    return;
+  }
 }
 /**
  * Create the team on the database
@@ -293,55 +309,52 @@ export function deleteIfNoMembers(teamCode) {
  * @param {string} userEmail current user email
  */
 export async function createTeamOnFirebase(teamName, userEmail) {
-  return new Promise(async (resolve, reject) => {
-    // first generate a random length 5 id
-    let teamCode = await generateRandomTeamCode(5);
-    // create a time stamp (used for sorting)
-    let currentTime = Date.now();
-    let initPoint = 100;
+  // first generate a random length 5 id
+  let teamCode = await generateRandomTeamCode(5);
+  // create a time stamp (used for sorting)
+  let currentTime = Date.now();
+  let initPoint = 100;
 
-    let copiedAnimal = Array.from(animals);
-    let newAnimal = getAnimal(copiedAnimal);
-    // Do these parallelly
-    await Promise.all([
-      // add the team to the user
-      db
-        .collection("users")
-        .doc(userEmail)
-        .set(
-          {
-            joined_teams: {
-              [teamCode]: currentTime,
-            },
-            user_points: {
-              [teamCode]: initPoint,
-            },
+  let copiedAnimal = Array.from(animals);
+  let newAnimal = getAnimal(copiedAnimal);
+  // Do these parallelly
+  await Promise.all([
+    // add the team to the user
+    db
+      .collection("users")
+      .doc(userEmail)
+      .set(
+        {
+          joined_teams: {
+            [teamCode]: currentTime,
           },
-          { merge: true }
-        ),
-      // add the team to teams collection
-      db
-        .collection("teams")
-        .doc(teamCode)
-        .set(
-          {
-            teamName: teamName,
-            createdTime: currentTime,
-            creator: userEmail,
-            members: [userEmail],
-            timeWasted: [],
-            teamPoints: initPoint,
-            distributedAnimal: { [userEmail]: newAnimal },
-            animalsLeft: copiedAnimal,
-            currDate: getDate(),
+          user_points: {
+            [teamCode]: initPoint,
           },
-          { merge: true }
-        ),
-    ]);
-    createTeamPerformance(teamCode, initPoint);
-    currTeamCode = teamCode;
-    resolve(teamCode);
-  });
+        },
+        { merge: true }
+      ),
+    // add the team to teams collection
+    db
+      .collection("teams")
+      .doc(teamCode)
+      .set(
+        {
+          teamName: teamName,
+          createdTime: currentTime,
+          creator: userEmail,
+          members: [userEmail],
+          timeWasted: [],
+          teamPoints: initPoint,
+          distributedAnimal: { [userEmail]: newAnimal },
+          animalsLeft: copiedAnimal,
+          currDate: getDate(),
+        },
+        { merge: true }
+      ),
+  ]);
+  createTeamPerformance(teamCode, initPoint);
+  return teamCode;
 }
 function createTeamPerformance(key, points) {
   let code = key;
@@ -350,6 +363,7 @@ function createTeamPerformance(key, points) {
     .doc(currentDate)
     .set(
       {
+        [userEmail]: { [code]: points },
         totalTeamPoint: { [code]: points },
       },
       { merge: true }
@@ -360,30 +374,28 @@ function createTeamPerformance(key, points) {
  * delete the user doc from DB
  * @param {string} userEmail the user email of the user
  */
-export function deleteEverythingAboutAUser(userEmail) {
-  return new Promise(async (resolve, reject) => {
-    let queryCreatedTeam = db
-      .collection("teams")
-      .where("creator", "==", userEmail);
-    let queryJoinedTeam = db
-      .collection("teams")
-      .where("members", "array-contains", userEmail);
-    // do these things parallely
-    await Promise.all([
-      queryCreatedTeam.get().then(function (querySnapshot) {
-        querySnapshot.forEach(function (doc) {
-          deleteTeamEntirely(doc.id);
-        });
-      }),
-      queryJoinedTeam.get().then(function (querySnapshot) {
-        querySnapshot.forEach(function (doc) {
-          deleteTeamFromUser(userEmail, doc.id);
-        });
-      }),
-      db.collection("users").doc(userEmail).delete(),
-    ]);
-    resolve();
-  });
+export async function deleteEverythingAboutAUser(userEmail) {
+  let queryCreatedTeam = db
+    .collection("teams")
+    .where("creator", "==", userEmail);
+  let queryJoinedTeam = db
+    .collection("teams")
+    .where("members", "array-contains", userEmail);
+  // do these things parallely
+  await Promise.all([
+    queryCreatedTeam.get().then(function (querySnapshot) {
+      querySnapshot.forEach(function (doc) {
+        deleteTeamEntirely(doc.id);
+      });
+    }),
+    queryJoinedTeam.get().then(function (querySnapshot) {
+      querySnapshot.forEach(function (doc) {
+        deleteTeamFromUser(userEmail, doc.id);
+      });
+    }),
+    db.collection("users").doc(userEmail).delete(),
+  ]);
+  return;
 }
 /**
  *
@@ -393,7 +405,7 @@ export function deleteEverythingAboutAUser(userEmail) {
  * @param {string} animalsLeft the animals left from user
  * @param {object} distributedAnimal the object containing all animals
  */
-export function deleteTeamFromUser(
+export async function deleteTeamFromUser(
   userEmail,
   teamCode,
   userAnimal,
@@ -403,14 +415,16 @@ export function deleteTeamFromUser(
   delete distributedAnimal[userEmail];
   addAnimal(animalsLeft, userAnimal);
 
-  return Promise.all([
+  return await Promise.all([
     db
       .collection("users")
       .doc(userEmail)
       .update({
         ["joined_teams." + teamCode]: firebase.firestore.FieldValue.delete(),
       })
-      .catch((err) => {}),
+      .catch((err) => {
+        console.error(err);
+      }),
     db
       .collection("teams")
       .doc(teamCode)
@@ -419,7 +433,9 @@ export function deleteTeamFromUser(
         distributedAnimal: distributedAnimal,
         animalsLeft: animalsLeft,
       })
-      .catch((err) => {}),
+      .catch((err) => {
+        console.error(err);
+      }),
   ]);
 }
 /**
@@ -436,17 +452,15 @@ export function deleteTeamEntirely(teamCode) {
  * @param {int} length Specifies the length of the team code, should be 5
  * @returns {string} The randomly generated unique team code
  */
-export function generateRandomTeamCode(length) {
-  return new Promise(async function (resolve, reject) {
-    let unique = false;
-    let teamCode;
-    while (unique === false) {
-      teamCode = randomTeamCode(length);
-      // check if such team code exists on the database
-      unique = await isTeamCodeUnique(teamCode);
-    }
-    resolve(teamCode);
-  });
+export async function generateRandomTeamCode(length) {
+  let unique = false;
+  let teamCode;
+  while (unique === false) {
+    teamCode = randomTeamCode(length);
+    // check if such team code exists on the database
+    unique = await isTeamCodeUnique(teamCode);
+  }
+  return teamCode;
 }
 /**
  * Get the user information on firebase
@@ -476,9 +490,9 @@ export function randomTeamCode(length) {
  * @param {string} id The team code to be checked
  * @returns {boolean} True if the team code is unique, else False
  */
-export function isTeamCodeUnique(id) {
+export async function isTeamCodeUnique(id) {
   let idRef = db.collection("teams").doc(id);
-  return new Promise(function (resolve, reject) {
+  return new Promise((resolve) => {
     idRef.get().then(function (doc) {
       if (doc.exists) {
         resolve(false);
@@ -490,8 +504,8 @@ export function isTeamCodeUnique(id) {
     });
   });
 }
-export function validUserEmail(userEmail, createUser) {
-  return new Promise(function (resolve, reject) {
+export async function validUserEmail(userEmail, createUser) {
+  return new Promise((resolve) => {
     db.collection("users")
       .doc(userEmail)
       .get()
@@ -499,9 +513,9 @@ export function validUserEmail(userEmail, createUser) {
         if (!doc.exists) {
           await createUser(userEmail);
           resolve(false);
-          return;
+        } else {
+          resolve(true);
         }
-        resolve(true);
       });
   });
 }
@@ -512,7 +526,7 @@ export function validUserEmail(userEmail, createUser) {
  * @returns {string} the email of the user
  */
 export function getUserEmail() {
-  return new Promise(function (resolve, reject) {
+  return new Promise((resolve) => {
     chrome.identity.getProfileUserInfo(function (info) {
       let email = info.email;
       resolve(email);
@@ -525,14 +539,16 @@ export function getUserEmail() {
  * @param {string} userEmail The id of the new document on database
  */
 export function createUser(userEmail) {
-  return new Promise(async function (resolve, reject) {
+  return new Promise((resolve) => {
     let userRef = db.collection("users").doc(userEmail);
     userRef
       .set({
         joined_teams: {},
         user_points: {},
       })
-      .then(resolve());
+      .then(() => {
+        resolve();
+      });
   });
 }
 
@@ -545,7 +561,7 @@ export function createUser(userEmail) {
 //  * @param {teams} teams The team names of all the joined teams
  */
 export function getUserProfile(userEmail) {
-  return new Promise(function (resolve, reject) {
+  return new Promise((resolve) => {
     db.collection("users")
       .doc(userEmail)
       .onSnapshot(async function (doc) {
@@ -689,34 +705,33 @@ export async function updateLocalStorage(tabUrl, timeSpend, threshold) {
 /**
  * Get the latest information of the current team on database
  */
-export function getTeamOnSnapshot() {
-  return new Promise(async function (resolve, reject) {
-    const currentTeam = await getTeamCode();
-    if (currentTeam === undefined) {
-      resolve();
-      return;
-    }
-    if (currentTeam != undefined) {
-      currentTeamSnapshot = db
-        .collection("teams")
-        .doc(currentTeam)
-        .onSnapshot(function (doc) {
-          currentTeamInfo = doc.data();
-          let userAnimal = currentTeamInfo.distributedAnimal[userEmail];
-          currentTeamInfo["userAnimal"] = userAnimal;
-          let msg = {
-            for: "team info",
-            message: currentTeamInfo,
-          };
-          chrome.runtime.sendMessage(msg);
-          // check if its day is old
-          checkDate();
+export async function getTeamOnSnapshot() {
+  const currentTeam = await getTeamCode();
+  if (currentTeam === undefined) {
+    return;
+  }
+  return new Promise(function (resolve) {
+    currentTeamSnapshot = db
+      .collection("teams")
+      .doc(currentTeam)
+      .onSnapshot(function (doc) {
+        if (!doc.exists) {
+          console.log("here");
           resolve();
-          // return;
-        });
-    } else {
-      resolve();
-    }
+        }
+        currentTeamInfo = doc.data();
+        let userAnimal = currentTeamInfo.distributedAnimal[userEmail];
+        currentTeamInfo["userAnimal"] = userAnimal;
+        let msg = {
+          for: "team info",
+          message: currentTeamInfo,
+        };
+        chrome.runtime.sendMessage(msg);
+        // check if its day is old
+        checkDate();
+        resolve();
+        // return;
+      });
   });
 }
 
@@ -814,7 +829,9 @@ function resetTeamInfo() {
       teamPoints: 100,
       timeWasted: [],
     })
-    .catch((err) => {});
+    .catch((err) => {
+      console.error(err);
+    });
 }
 /**
  * @author: Youliang Liu & Xiang Liu

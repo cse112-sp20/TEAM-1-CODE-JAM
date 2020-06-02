@@ -1,7 +1,4 @@
-import React from "react";
 import "babel-polyfill";
-import App from "../src/App";
-import renderer from "react-test-renderer";
 const chrome = require("sinon-chrome");
 window.chrome = chrome;
 describe("need to take out snapshot", () => {
