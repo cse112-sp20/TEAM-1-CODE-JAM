@@ -251,7 +251,11 @@ export default class Home extends Component {
             {/* <!-- Dropdown Structure --> */}
             <ul id="people" className="dropdown-content collection">
               {this.state.teamMembers.map((teamMember) => {
-                return <li className="collection-item">{teamMember}</li>;
+                return (
+                  <li key={teamMember} className="collection-item">
+                    {teamMember}
+                  </li>
+                );
               })}
             </ul>
           </div>

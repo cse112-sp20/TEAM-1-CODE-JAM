@@ -6,7 +6,7 @@ import { db, setExists, get } from "../__mocks__/databaseMock.js";
 jest.setTimeout(10000);
 
 let userEmail = "test@gmail.com";
-let dummyEmail = "test2@gmail.com";
+// let dummyEmail = "test2@gmail.com";
 
 // mock database
 setDB(db);
