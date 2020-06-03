@@ -160,6 +160,39 @@ describe("testing addAnimal() from animalGenerator.js", () => {
   });
 });
 
+describe("getUserAnimal", () => {
+  test("gets the user's animal", async () => {
+    let userEmail = "user@ucsd.edu";
+    let teams = {
+      11111: {
+        distributedAnimal: {
+          "user@ucsd.edu": "Predator",
+          "user2@ucsd.edu": "android",
+        },
+      },
+      22222: {
+        distributedAnimal: {
+          "user@ucsd.edu": "android",
+          "user2@ucsd.edu": "Predator",
+        },
+      },
+    };
+
+    _.getUserAnimal = jest.fn();
+    let userTeamCodes = Object.keys(teams);
+    for (let key in userTeamCodes) {
+      let teamCode = userTeamCodes[key];
+      let userAnimal = teams[teamCode].distributedAnimal[userEmail];
+      _.getUserAnimal.mockReturnValueOnce(Promise.resolve(userAnimal));
+    }
+
+    const result = await _.getUserAnimals(userEmail, teams);
+    console.log(result);
+    expect(_.getUserAnimal).toHaveBeenCalledTimes(2);
+    expect(result).toEqual(["Predator", "android"]);
+  });
+});
+
 // describe("joinTeamOnFirebase", () => {
 //   let userProfile;
 //   beforeEach(() => {

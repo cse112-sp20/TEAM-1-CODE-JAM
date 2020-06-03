@@ -572,6 +572,27 @@ export function getUserProfile(userEmail) {
   });
 }
 
+export async function getUserAnimals(userEmail, teams) {
+  let promises = [];
+  let userTeamCodes = Object.keys(teams);
+  for (let key in userTeamCodes) {
+    let teamCode = userTeamCodes[key];
+    promises.push(_.getUserAnimal(userEmail, teamCode));
+  }
+  return await Promise.all(promises);
+}
+// export async function getUserAnimals(userProfile, teams) {
+//   let promises = [];
+//   for (let key in userProfile.teams) {
+//     let members = userProfile.teams[key].members;
+//     for (let member in members) {
+//       let email = member;
+//       promises.push(_.getUserAnimal(email, key));
+//     }
+//   }
+//   return await Promise.all(promises);
+// }
+
 /**
  * return the user icon base on his email and the
  * team he is in
@@ -863,6 +884,8 @@ const _ = {
   getTeamNames,
   getTeamName,
   setCurrentTeamCode: setTeamCode,
+  getUserAnimals,
+  getUserAnimal,
 };
 
 export default _;
