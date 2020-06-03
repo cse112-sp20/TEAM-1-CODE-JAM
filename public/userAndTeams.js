@@ -178,7 +178,9 @@ export async function getTeamNames(userProfile) {
   for (let key in userProfile.joined_teams) {
     promises.push(_.getTeamName(key, userProfile));
   }
-  return await Promise.all(promises);
+  let res = await Promise.all(promises);
+  res = res.filter(Boolean);
+  return res;
 }
 /**
  * Get the team name with such team code
@@ -192,6 +194,10 @@ export function getTeamName(teamCode, userProfile) {
       .doc(teamCode)
       .get()
       .then(function (doc) {
+        if (!doc.exists) {
+          resolve(undefined);
+          return;
+        }
         let data = doc.data();
         resolve({
           teamCode: teamCode,
@@ -222,7 +228,7 @@ export function checkDate() {
     console.log("reset");
     resetTeamInfo();
     // currentDate = getDate();
-    createTeamPerformance(currTeamCode, 100);
+    createTeamPerformance(currTeamCode, 100, userEmail);
   }
 }
 
@@ -310,7 +316,7 @@ export async function deleteIfNoMembers(teamCode) {
  */
 export async function createTeamOnFirebase(teamName, userEmail) {
   // first generate a random length 5 id
-  let teamCode = await generateRandomTeamCode(5);
+  let teamCode = await _.generateRandomTeamCode(5);
   // create a time stamp (used for sorting)
   let currentTime = Date.now();
   let initPoint = 100;
@@ -352,14 +358,15 @@ export async function createTeamOnFirebase(teamName, userEmail) {
         },
         { merge: true }
       ),
+    createTeamPerformance(teamCode, initPoint, userEmail),
   ]);
-  createTeamPerformance(teamCode, initPoint);
   return teamCode;
 }
-function createTeamPerformance(key, points) {
+export async function createTeamPerformance(key, points, userEmail) {
   let code = key;
   let currentDate = getDate();
-  db.collection("teamPerformance")
+  return db
+    .collection("teamPerformance")
     .doc(currentDate)
     .set(
       {
@@ -866,6 +873,7 @@ const _ = {
   validUserEmail,
   createUser,
   getUserProfile,
+  createTeamOnFirebase,
 };
 
 export default _;

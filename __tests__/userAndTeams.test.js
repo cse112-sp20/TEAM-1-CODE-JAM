@@ -68,8 +68,6 @@ describe("isTeamCodeUnique", () => {
       })
     );
     const result = await _.isTeamCodeUnique("12345");
-    console.log("HERE");
-    console.log(result);
     expect(result).toBe(false);
     expect(db.collection).toHaveBeenCalled();
     expect(db.collection).toHaveBeenCalledWith("teams");
@@ -113,10 +111,49 @@ describe("getUserEmail", () => {
     expect(chrome.identity.getProfileUserInfo).toHaveBeenCalled();
   });
 });
-
+describe("getTeamName", () => {
+  test("get valid team name", async () => {
+    get.mockResolvedValueOnce({
+      exists: true,
+      data: () => {
+        return {
+          teamName: "jest mock",
+        };
+      },
+    });
+    let userProfile = {
+      joined_teams: {
+        12345: "now",
+      },
+    };
+    const res = await _.getTeamName("12345", userProfile);
+    expect(res).toEqual({
+      teamCode: "12345",
+      teamName: "jest mock",
+      joinedTime: "now",
+    });
+  });
+  test("get invalid team name", async () => {
+    get.mockResolvedValueOnce({
+      exists: false,
+      data: () => {
+        return {
+          teamName: "jest mock",
+        };
+      },
+    });
+    let userProfile = {
+      joined_teams: {
+        12345: "now",
+      },
+    };
+    const res = await _.getTeamName("12345", userProfile);
+    expect(res).toEqual(undefined);
+  });
+});
 describe("getTeamNames", () => {
   test("get valid team names", async () => {
-    let originalFunc = _.getTeamName.bind({});
+    // let originalFunc = _.getTeamName.bind({});
     let userProfile = {
       joined_teams: {
         11111: "1",
@@ -145,15 +182,40 @@ describe("getTeamNames", () => {
       { teamCode: "22222", teamName: "team2", joinedTime: "2" },
       { teamCode: "33333", teamName: "team3", joinedTime: "3" },
     ]);
-    _.getTeamName = originalFunc;
+    _.getTeamName.mockRestore();
   });
   test("get empty team names", async () => {
-    let originalFunc = _.getTeamName.bind({});
+    // let originalFunc = _.getTeamName.bind({});
     let userProfile = {};
     _.getTeamName = jest.fn(() => Promise.resolve());
     const result = await _.getTeamNames(userProfile);
     expect(result).toEqual([]);
-    _.getTeamName = originalFunc;
+    // _.getTeamName = originalFunc;
+    _.getTeamName.mockRestore();
+  });
+  test("get invalid team names", async () => {
+    // let originalFunc = _.getTeamName.bind({});
+    let userProfile = {
+      joined_teams: {
+        11111: "1",
+        22222: "2",
+        33333: "3",
+      },
+    };
+    _.getTeamName = jest.fn();
+    _.getTeamName.mockResolvedValueOnce({
+      teamCode: "11111",
+      teamName: "jest mock",
+      joinedTime: "1",
+    });
+    _.getTeamName.mockResolvedValueOnce(undefined);
+    _.getTeamName.mockResolvedValueOnce(undefined);
+    const result = await _.getTeamNames(userProfile);
+    expect(result).toEqual([
+      { teamCode: "11111", teamName: "jest mock", joinedTime: "1" },
+    ]);
+    // _.getTeamName = originalFunc;
+    _.getTeamName.mockRestore();
   });
 });
 describe("validUserEmail", () => {
@@ -200,6 +262,71 @@ describe("createUser", () => {
     expect(db.collection("users").doc).toHaveBeenCalledWith(userEmail);
   });
 });
+describe("createTeamOnFirebase", () => {
+  test("create a new team", async () => {
+    let userRes = {
+      joined_teams: {
+        11111: "now",
+      },
+      user_points: {
+        11111: 100,
+      },
+    };
+    _.generateRandomTeamCode = jest.fn(() => "22222");
+    set.mockImplementationOnce((dictionary) => {
+      return new Promise((resolve) => {
+        userRes = {
+          joined_teams: { ...userRes.joined_teams, ...dictionary.joined_teams },
+          user_points: {
+            ...userRes.user_points,
+            ...dictionary.user_points,
+          },
+        };
+        resolve();
+      });
+    });
+    let teamRes = {};
+    set.mockImplementationOnce((dictionary) => {
+      return new Promise((resolve) => {
+        teamRes = dictionary;
+        resolve();
+      });
+    });
+    let teamPerforamnceRes = {};
+    set.mockImplementationOnce((dictionary) => {
+      return new Promise((resolve) => {
+        teamPerforamnceRes = dictionary;
+        resolve();
+      });
+    });
+    const res = await _.createTeamOnFirebase("jest mock", userEmail);
+    expect(res).toBe("22222");
+    expect("11111" in userRes.joined_teams).toBe(true);
+    expect("22222" in userRes.joined_teams).toBe(true);
+    expect("11111" in userRes.user_points).toBe(true);
+    expect("22222" in userRes.user_points).toBe(true);
+    expect(userRes.user_points["11111"]).toBe(100);
+    expect(userRes.user_points["22222"]).toBe(100);
+    expect(teamRes.teamName).toBe("jest mock");
+    expect(teamRes.creator).toBe(userEmail);
+    expect(teamRes.members).toEqual([userEmail]);
+    expect(teamRes.timeWasted).toEqual([]);
+    expect(teamRes.teamPoints).toEqual(100);
+    expect(userEmail in teamRes.distributedAnimal).toBe(true);
+    expect("animalsLeft" in teamRes).toBe(true);
+    expect("currDate" in teamRes).toBe(true);
+    expect(teamPerforamnceRes).toEqual({
+      [userEmail]: {
+        22222: 100,
+      },
+      totalTeamPoint: {
+        22222: 100,
+      },
+    });
+    _.generateRandomTeamCode.mockRestore();
+  });
+});
+
 // describe("joinTeamOnFirebase", () => {
 //   let userProfile;
 //   beforeEach(() => {
