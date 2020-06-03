@@ -82,7 +82,7 @@ jobs:
       - name: Running jest coverage
         run: npm run test:coverage
 
-  check-quality:
+  Code-Quality:
     runs-on: ubuntu-latest
     steps:
     - name: Check code meets quality standards
