@@ -490,7 +490,7 @@ export function randomTeamCode(length) {
  * @param {string} id The team code to be checked
  * @returns {boolean} True if the team code is unique, else False
  */
-export async function isTeamCodeUnique(id) {
+export function isTeamCodeUnique(id) {
   let idRef = db.collection("teams").doc(id);
   return new Promise((resolve) => {
     idRef.get().then(function (doc) {
@@ -504,7 +504,7 @@ export async function isTeamCodeUnique(id) {
     });
   });
 }
-export async function validUserEmail(userEmail, createUser) {
+export function validUserEmail(userEmail, createUser) {
   return new Promise((resolve) => {
     db.collection("users")
       .doc(userEmail)
@@ -862,7 +862,10 @@ const _ = {
   getUserEmail,
   getTeamNames,
   getTeamName,
-  setCurrentTeamCode: setTeamCode,
+  setTeamCode,
+  validUserEmail,
+  createUser,
+  getUserProfile,
 };
 
 export default _;

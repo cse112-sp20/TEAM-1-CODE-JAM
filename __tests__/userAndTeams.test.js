@@ -2,18 +2,19 @@ import { chrome } from "../__mocks__/chromeMock.js";
 global.chrome = chrome;
 import _ from "../public/userAndTeams.js";
 import { setDB } from "../public/firebaseInit.js";
-import { db, setExists, get } from "../__mocks__/databaseMock.js";
-import { animals, getAnimal, addAnimal } from "../public/animalGenerator.js";
-
-jest.setTimeout(10000);
+import { db, get, set } from "../__mocks__/databaseMock.js";
 
 let userEmail = "test@gmail.com";
 // let dummyEmail = "test2@gmail.com";
-
 // mock database
 setDB(db);
 describe("getUserInformation", () => {
   test("get user info", async () => {
+    get.mockReturnValueOnce(
+      Promise.resolve({
+        id: userEmail,
+      })
+    );
     let doc = await _.getUserInformation(userEmail);
     expect(doc.id).toBe(userEmail);
     expect(db.collection).toHaveBeenCalled();
@@ -61,8 +62,14 @@ describe("randomTeamCode", () => {
 
 describe("isTeamCodeUnique", () => {
   test("not unique teamcode", async () => {
-    setExists(true);
+    get.mockReturnValueOnce(
+      Promise.resolve({
+        exists: true,
+      })
+    );
     const result = await _.isTeamCodeUnique("12345");
+    console.log("HERE");
+    console.log(result);
     expect(result).toBe(false);
     expect(db.collection).toHaveBeenCalled();
     expect(db.collection).toHaveBeenCalledWith("teams");
@@ -71,7 +78,11 @@ describe("isTeamCodeUnique", () => {
     expect(db.collection("teams").doc("12345").get).toHaveBeenCalled();
   });
   test("unique teamcode", async () => {
-    setExists(false);
+    get.mockReturnValueOnce(
+      Promise.resolve({
+        exists: false,
+      })
+    );
     const result = await _.isTeamCodeUnique("123456");
     expect(result).toBe(true);
     expect(db.collection).toHaveBeenCalled();
@@ -83,7 +94,11 @@ describe("isTeamCodeUnique", () => {
 });
 describe("generateRandomTeamCode", () => {
   test("generate random team code", async () => {
-    setExists(false);
+    get.mockReturnValueOnce(
+      Promise.resolve({
+        exists: false,
+      })
+    );
     const result = await _.generateRandomTeamCode(5);
     const regex = /^[A-Z0-9]+$/i;
     expect(result.length).toBe(5);
@@ -95,11 +110,13 @@ describe("getUserEmail", () => {
   test("get user email", async () => {
     const result = await _.getUserEmail();
     expect(result).toBe(userEmail);
+    expect(chrome.identity.getProfileUserInfo).toHaveBeenCalled();
   });
 });
 
 describe("getTeamNames", () => {
-  test("get team names", async () => {
+  test("get valid team names", async () => {
+    let originalFunc = _.getTeamName.bind({});
     let userProfile = {
       joined_teams: {
         11111: "1",
@@ -120,46 +137,69 @@ describe("getTeamNames", () => {
     }
     const result = await _.getTeamNames(userProfile);
     expect(_.getTeamName).toHaveBeenCalledTimes(3);
+    expect(_.getTeamName).toHaveBeenCalledWith("11111", userProfile);
+    expect(_.getTeamName).toHaveBeenCalledWith("22222", userProfile);
+    expect(_.getTeamName).toHaveBeenCalledWith("33333", userProfile);
     expect(result).toEqual([
       { teamCode: "11111", teamName: "team1", joinedTime: "1" },
       { teamCode: "22222", teamName: "team2", joinedTime: "2" },
       { teamCode: "33333", teamName: "team3", joinedTime: "3" },
     ]);
+    _.getTeamName = originalFunc;
+  });
+  test("get empty team names", async () => {
+    let originalFunc = _.getTeamName.bind({});
+    let userProfile = {};
+    _.getTeamName = jest.fn(() => Promise.resolve());
+    const result = await _.getTeamNames(userProfile);
+    expect(result).toEqual([]);
+    _.getTeamName = originalFunc;
   });
 });
-
-describe("testing getAnimal() from animalGenerator.js", () => {
-  test("get animals", () => {
-    let animalsLeft = Array.from(animals);
-    let randAnimal = getAnimal(animalsLeft);
-    let numAnimals = animalsLeft.length;
-    expect(numAnimals).toBe(animals.length - 1);
-    expect(!animalsLeft.includes(randAnimal)).toBe(true);
-
-    let predator = getAnimal([]);
-    expect(predator).toBe("Predator");
+describe("validUserEmail", () => {
+  test("test existing user", async () => {
+    get.mockReturnValueOnce(
+      Promise.resolve({
+        exists: true,
+      })
+    );
+    const res = await _.validUserEmail(userEmail);
+    expect(res).toBe(true);
+    expect(db.collection).toHaveBeenCalled();
+    expect(db.collection).toHaveBeenCalledWith("users");
+    expect(db.collection("users").doc).toHaveBeenCalledWith(userEmail);
+  });
+  test("test non existing user", async () => {
+    get.mockReturnValueOnce(
+      Promise.resolve({
+        exists: false,
+      })
+    );
+    const mockCallback = jest.fn();
+    const res = await _.validUserEmail(userEmail, mockCallback);
+    expect(res).toBe(false);
+    expect(mockCallback).toHaveBeenCalled();
+    expect(mockCallback).toHaveBeenCalledWith(userEmail);
   });
 });
-
-describe("testing addAnimal() from animalGenerator.js", () => {
-  test("add animals", () => {
-    let animalsLeft = Array.from(animals);
-    addAnimal(animalsLeft, "random");
-    expect(animalsLeft.length).toBe(animals.length);
-
-    let randAnimal = getAnimal(animalsLeft);
-    addAnimal(animalsLeft, randAnimal);
-    expect(animalsLeft.includes(randAnimal)).toBe(true);
-    addAnimal(animalsLeft, randAnimal);
-
-    let newArray = animalsLeft.filter((animal) => {
-      return randAnimal == animal;
+describe("createUser", () => {
+  test("create a new user", async () => {
+    let obj = {};
+    set.mockImplementationOnce((dictionary) => {
+      return new Promise((resolve) => {
+        obj = dictionary;
+        resolve();
+      });
     });
-
-    expect(newArray.length).toBe(1);
+    await _.createUser(userEmail);
+    expect(obj).toEqual({
+      joined_teams: {},
+      user_points: {},
+    });
+    expect(db.collection).toHaveBeenCalledWith("users");
+    expect(db.collection("users").doc).toHaveBeenCalledWith(userEmail);
   });
 });
-
 // describe("joinTeamOnFirebase", () => {
 //   let userProfile;
 //   beforeEach(() => {
