@@ -22,15 +22,18 @@ tr {
 #mycard {
   max-height: 544px;
 }
+
 #myContent {
   width: 400px;
   height: 500px;
 }
+
 #myTimeline {
   margin-left: 5px;
   width: 430px;
   height: 500px;
 }
+
 table {
   max-width: 500px;
   overflow-y: scroll;
@@ -47,10 +50,12 @@ tbody {
 table.highlight > tbody > tr  {
   border: none;
 }
+
 #myHead,
 th {
   display: inline-block;
 }
+
 #myHead:nth-child(even) {
   margin-left: 100px;
   margin-right: 100px;
@@ -61,14 +66,17 @@ img {
   width: 50px;
   height: 50px;
 }
+
 #points {
   color: green;
   word-wrap: break-word;
   scrollbar-width: none;
 }
+
 #component {
   padding: 10px;
 }
+
 table,
 td {
   border: none;
@@ -91,10 +99,8 @@ td {
   overflow-y: scroll;
   max-height: 544px;
   scrollbar-width: none;
-}
 
-/* Hide scrollbar for IE and Edge */
-#timeline {
+  /* Hide scrollbar for IE and Edge */
   -ms-overflow-style: none;
 }
 

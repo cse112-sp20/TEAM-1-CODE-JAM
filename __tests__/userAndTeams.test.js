@@ -1,13 +1,15 @@
-/* eslint-disable import/first */
 import { chrome } from "../__mocks__/chromeMock.js";
 global.chrome = chrome;
 import _ from "../public/userAndTeams.js";
 import { setDB } from "../public/firebaseInit.js";
 import { db, setExists, get } from "../__mocks__/databaseMock.js";
+import { animals, getAnimal, addAnimal } from "../public/animalGenerator.js";
+
 jest.setTimeout(10000);
 
 let userEmail = "test@gmail.com";
-let dummyEmail = "test2@gmail.com";
+// let dummyEmail = "test2@gmail.com";
+
 // mock database
 setDB(db);
 describe("getUserInformation", () => {
@@ -123,6 +125,38 @@ describe("getTeamNames", () => {
       { teamCode: "22222", teamName: "team2", joinedTime: "2" },
       { teamCode: "33333", teamName: "team3", joinedTime: "3" },
     ]);
+  });
+});
+
+describe("testing getAnimal() from animalGenerator.js", () => {
+  test("get animals", () => {
+    let animalsLeft = Array.from(animals);
+    let randAnimal = getAnimal(animalsLeft);
+    let numAnimals = animalsLeft.length;
+    expect(numAnimals).toBe(animals.length - 1);
+    expect(!animalsLeft.includes(randAnimal)).toBe(true);
+
+    let predator = getAnimal([]);
+    expect(predator).toBe("Predator");
+  });
+});
+
+describe("testing addAnimal() from animalGenerator.js", () => {
+  test("add animals", () => {
+    let animalsLeft = Array.from(animals);
+    addAnimal(animalsLeft, "random");
+    expect(animalsLeft.length).toBe(animals.length);
+
+    let randAnimal = getAnimal(animalsLeft);
+    addAnimal(animalsLeft, randAnimal);
+    expect(animalsLeft.includes(randAnimal)).toBe(true);
+    addAnimal(animalsLeft, randAnimal);
+
+    let newArray = animalsLeft.filter((animal) => {
+      return randAnimal == animal;
+    });
+
+    expect(newArray.length).toBe(1);
   });
 });
 

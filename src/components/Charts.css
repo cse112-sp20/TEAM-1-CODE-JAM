@@ -2,11 +2,11 @@
   overflow-y: scroll;
   max-height: 544px;
   scrollbar-width: none;
+
+  /* Hide scrollbar for IE and Edge */
+  -ms-overflow-style: none;
 }
+
 #chart::-webkit-scrollbar {
   display: none;
-}
-/* Hide scrollbar for IE and Edge */
-#chart {
-  -ms-overflow-style: none;
 }

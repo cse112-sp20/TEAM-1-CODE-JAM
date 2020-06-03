@@ -3,6 +3,7 @@ import React, { Component } from "react";
 import M from "materialize-css";
 import { withRouter } from "react-router-dom";
 import "./CreateJoinTeam.css";
+import PropTypes from "prop-types";
 // var $ = require("jquery");
 
 class CreateJoinTeam extends Component {
@@ -126,7 +127,7 @@ class CreateJoinTeam extends Component {
                   className="validate"
                   data-testid="CreateJoinTeam-createinput"
                 />
-                <label for="teamName">Team Name</label>
+                <label htmlFor="teamName">Team Name</label>
               </div>
             </div>
             {/* <!-- Row for CREATE --> */}
@@ -149,12 +150,12 @@ class CreateJoinTeam extends Component {
             <div className="row">
               <div className="input-field col s12">
                 <input
-                  maxlength="5"
+                  maxLength="5"
                   id="teamCode"
                   type="text"
                   className="validate"
                 />
-                <label for="teamCode">Team Code</label>
+                <label htmlFor="teamCode">Team Code</label>
               </div>
             </div>
 
@@ -175,4 +176,7 @@ class CreateJoinTeam extends Component {
     );
   }
 }
+CreateJoinTeam.propTypes = {
+  redirect: PropTypes.func,
+};
 export default withRouter(CreateJoinTeam);

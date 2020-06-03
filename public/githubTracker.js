@@ -47,6 +47,7 @@ async function getCommits(url, repo) {
     method: "GET",
     headers: headers,
   });
+
   // return (result = await response.json());
   return await response.json();
 }
@@ -157,13 +158,13 @@ export function sendToDB(teamCode, animal) {
         });
 
         if (max != "00:00:00") {
-          let msg = {
-            for: "popup",
-            message: "team info",
-            url: "GitHub",
-            time: max,
-            animal: "water-bottle",
-          };
+          // let msg = {
+          //   for: "popup",
+          //   message: "team info",
+          //   url: "GitHub",
+          //   time: max,
+          //   animal: "water-bottle",
+          // };
 
           if (localStorage.getItem("oldElements") == null) {
             let item = [{ url: "github.com", time: max }];
@@ -219,14 +220,11 @@ export function sendToDB(teamCode, animal) {
                 itemExists = true;
               }
             });
-            console.log(itemExists);
 
-            if (itemExists) {
-            } else {
+            if (!itemExists) {
               console.log("Item is not in Local Storage...");
               oldElements.push(item);
               localStorage.setItem("oldElements", JSON.stringify(oldElements));
-              console.log("here");
               // let seconds = JSON.parse(currData)[tabUrl] / 1000;
               let seconds = new Date().toLocaleTimeString();
               //let seconds =

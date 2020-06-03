@@ -5,10 +5,6 @@ export let db;
  * @author Karl Wang
  */
 export function initializeFirebase() {
-  try {
-    global.firebase = require("firebase");
-  } catch {}
-
   const firebaseConfig = {
     apiKey: "AIzaSyCJYc-PMIXdQxE2--bQI6Z1FGMKwMulEyc",
     authDomain: "chrome-extension-cse-112.firebaseapp.com",

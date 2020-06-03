@@ -8,12 +8,14 @@ export let get = jest.fn(() => {
     }),
   });
 });
-export let doc = jest.fn((document) => {
+// input should be document
+export let doc = jest.fn(() => {
   return {
     get: get,
   };
 });
-export let collection = jest.fn((collect) => {
+// input should be collection string
+export let collection = jest.fn(() => {
   return {
     doc: doc,
   };
