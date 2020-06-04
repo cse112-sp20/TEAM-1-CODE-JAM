@@ -1,6 +1,6 @@
-/* global chrome*/
-
-import { sendToDB } from "./githubTracker.js";
+/* global firebase chrome sendToDB*/
+const chrome = require("sinon-chrome");
+window.chrome = chrome;
 
 /**
  * For the original code please visit:
