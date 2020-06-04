@@ -1,8 +1,14 @@
 import { chrome } from "../__mocks__/chromeMock.js";
 global.chrome = chrome;
+import {localStorageMock, store} from "../__mocks__/testMock.js";
 import _ from "../public/userAndTeams.js";
 import { setDB } from "../public/firebaseInit.js";
 import { db, get, set } from "../__mocks__/databaseMock.js";
+
+
+
+//localStorageMock.setItem("test", 2);
+//console.log(store);
 
 let userEmail = "test@gmail.com";
 // let dummyEmail = "test2@gmail.com";
@@ -10,6 +16,7 @@ let userEmail = "test@gmail.com";
 setDB(db);
 describe("getUserInformation", () => {
   test("get user info", async () => {
+    
     get.mockReturnValueOnce(
       Promise.resolve({
         id: userEmail,
@@ -327,6 +334,34 @@ describe("createTeamOnFirebase", () => {
   });
 });
 
+describe("testing checkDate()", ()=>{
+  test("checkDate for empty localStorage", ()=>{
+    _.checkDate();
+    let date = _.getDate();
+    expect(localStorageMock.setItem).toHaveBeenCalled();
+    expect(localStorageMock.setItem).toHaveBeenCalledTimes(1);
+    expect(localStorageMock.setItem).toHaveBeenCalledWith("date", date);
+  })
+  test("checkDate for different date", ()=>{
+    localStorageMock.setItem("date", "test");
+    expect(localStorageMock.getItem("date")).toBe("test");
+    _.checkDate();
+    //_.updateLocalStorage();
+    let date = _.getDate();
+    expect(localStorageMock.setItem).toHaveBeenCalledTimes(3);
+    expect(localStorageMock.setItem).toHaveBeenLastCalledWith("date", date);
+    expect(localStorageMock.getItem("date")).toBe(date);
+  })
+  test("checkDate for clearing localStorage", ()=>{
+    localStorageMock.setItem("date", "test");
+    expect(localStorageMock.getItem("date")).toBe("test");
+    localStorageMock.setItem("toBeCleared", "value");
+    expect(localStorageMock.getItem("toBeCleared")).toBe("value");
+    _.checkDate();
+    expect(localStorageMock.getItem("toBeCleared")).toBe(null);
+  })
+});
+
 // describe("joinTeamOnFirebase", () => {
 //   let userProfile;
 //   beforeEach(() => {
@@ -434,3 +469,4 @@ describe("createTeamOnFirebase", () => {
 //   await deleteEverythingAboutAUser(userEmail);
 //   global.firebase.app().delete();
 // });
+

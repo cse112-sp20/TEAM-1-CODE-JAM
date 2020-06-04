@@ -8,3 +8,4 @@ let identity = {
 export const chrome = {
   identity: identity,
 };
+

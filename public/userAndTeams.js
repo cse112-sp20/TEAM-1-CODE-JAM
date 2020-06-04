@@ -874,6 +874,9 @@ const _ = {
   createUser,
   getUserProfile,
   createTeamOnFirebase,
+  checkDate,
+  getDate,
+  updateLocalStorage,
 };
 
 export default _;
