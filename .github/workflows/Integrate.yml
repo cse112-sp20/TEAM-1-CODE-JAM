@@ -7,8 +7,12 @@ on:
       - develop
       - staging
 
+  push:
+    branches: 
+      - test/pipeline
+
 jobs:
-  integrate:
+  Unit-Test:
     runs-on: ubuntu-latest
     
     steps:
@@ -20,17 +24,60 @@ jobs:
           node-version: 12
       - name: Install Node.js dependencies
         run: npm install
-      - run: CI=false npm run build
 
-      - name: Run tests
-        run: npm -s test
+      - name: Run unit-test
+        run: npm test __tests__
+
+  End-to-End-Test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@master
+        with:
+          node-version: 12
+      - name: Install Node.js dependencies
+        run: npm install
+
+      - name: Run unit-test
+        run: npm test __end2endTest__
+    
+
+  Stylelint-Eslint-Prettier:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@master
+        with:
+          node-version: 12
+      - name: Install Node.js dependencies
+        run: npm install
 
       - name: Run linters
         uses: samuelmeuli/lint-action@v1
         with:
           github_token: ${{ secrets.github_token }}
-          # Enable linters
           stylelint: true
           eslint: true
           prettier: true
-          
+
+  Code-Coverage:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@master
+        with:
+          node-version: 12
+      - name: Install Node.js dependencies
+        run: npm install
+    
+      - name: Running jest coverage
+        run: npm run test:coverage
