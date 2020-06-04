@@ -247,8 +247,8 @@ export async function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
     return "team code not found";
   }
   let initPoint = 100;
-  let animalsLeft = await getAnimalsLeft(teamCode);
-  let newAnimal = getAnimal(animalsLeft);
+  let animalsLeft = await _.getAnimalsLeft(teamCode);
+  let newAnimal = _.getAnimal(animalsLeft);
 
   // do both of these two things parallelly
   await Promise.all([
@@ -869,6 +869,8 @@ const _ = {
   getUserProfile,
   createTeamOnFirebase,
   joinTeamOnFirebase,
+  getAnimalsLeft,
+  getAnimal,
 };
 
 export default _;
