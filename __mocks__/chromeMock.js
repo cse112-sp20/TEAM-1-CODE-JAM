@@ -1,15 +1,14 @@
 // Define a tabs array
 var openTabs = [];
 
-// Define teams array
-var teams = [];
-
 // Push a new tab
 const pushTabs = (data) => {
   openTabs.push(data);
 };
 
 // Define identity
+export let sendMessage = jest.fn();
+
 let identity = {
   getProfileUserInfo: jest.fn((callback) => {
     callback({ email: "test@gmail.com" });
@@ -23,32 +22,24 @@ let tabs = {
   pages: openTabs,
 };
 
-// Define the runtime
 let runtime = {
-  sendMessage: (msgObj, callback) => {
-    const { for: sendTo, message } = msgObj;
-
-    // If get teams, then get a fake team
-    if (sendTo === "background" && message === "get teams") {
-      teams.push({
-        visable: true,
-        teamCode: "TEST_TEAM_CODE",
-        teamName: "TEST_TEAM",
-      });
-
-      // Return teams to runtime
-      callback(teams);
-    }
-    // Otherwise return undefined
-    else {
-      callback(undefined);
-    }
-  },
+  sendMessage,
 };
 
-// Export chrome
+export let set = jest.fn();
+export let get = jest.fn();
+let local = {
+  set: set,
+  get: get,
+};
+
+let storage = {
+  local: local,
+};
+
 export const chrome = {
-  identity: identity,
-  tabs: tabs,
-  runtime: runtime,
+  identity,
+  runtime,
+  storage,
+  tabs,
 };

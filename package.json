@@ -65,6 +65,7 @@
     "eslint-plugin-react": "^7.20.0",
     "eslint-plugin-standard": "^4.0.1",
     "jest-puppeteer": "^4.4.0",
+    "jsdoc": "^3.6.4",
     "prettier": "2.0.5",
     "puppeteer": "^3.1.0",
     "react-test-renderer": "^16.13.1",
