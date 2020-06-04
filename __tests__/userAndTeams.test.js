@@ -151,6 +151,8 @@ describe("getTeamName", () => {
     expect(res).toEqual(undefined);
   });
 });
+describe("getUserAnimal", () => {});
+
 describe("getTeamNames", () => {
   test("get valid team names", async () => {
     // let originalFunc = _.getTeamName.bind({});

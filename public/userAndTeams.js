@@ -890,17 +890,14 @@ const _ = {
   getUserEmail,
   getTeamNames,
   getTeamName,
-<<<<<<< HEAD
   setCurrentTeamCode: setTeamCode,
   getUserAnimals,
   getUserAnimal,
-=======
   setTeamCode,
   validUserEmail,
   createUser,
   getUserProfile,
   createTeamOnFirebase,
->>>>>>> origin/develop
 };
 
 export default _;
