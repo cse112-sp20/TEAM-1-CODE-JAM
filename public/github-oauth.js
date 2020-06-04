@@ -1,5 +1,7 @@
 /* global chrome */
 
+import { sendToDB } from "./githubTracker.js";
+
 /**
  * For the original code please visit:
  * www.github.com/GoogleChrome/chrome-app-samples/tree/master/samples/github-auth
@@ -148,11 +150,9 @@ let tokenFetcher = (function () {
  * @param {function pointer} callback
  */
 function xhrWithAuth(method, url, interactive, callback) {
-  console.log("xhrWithAuth", method, url, interactive);
   getToken();
   function getToken() {
     tokenFetcher.getToken(interactive, function (error, token) {
-      console.log("token fetch", error, token);
       if (error) {
         callback(error);
         return;
@@ -267,5 +267,6 @@ revoke_button = document.querySelector("#revoke");
  */
 if (signin_button || revoke_button) {
   signin_button.onclick = interactiveSignIn;
+  // revoke_button.onclick = revokeToken;
   revoke_button.onclick = revokeToken;
 }
