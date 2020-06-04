@@ -163,17 +163,18 @@ describe("testing addAnimal() from animalGenerator.js", () => {
 describe("getUserAnimal", () => {
   test("gets the user's animal", async () => {
     let userEmail = "user@ucsd.edu";
+    let userEmail2 = "user2@ucsd.edu";
     let teams = {
       11111: {
         distributedAnimal: {
           "user@ucsd.edu": "Predator",
-          "user2@ucsd.edu": "android",
+          "user2@ucsd.edu": "banana",
         },
       },
       22222: {
         distributedAnimal: {
           "user@ucsd.edu": "android",
-          "user2@ucsd.edu": "Predator",
+          "user2@ucsd.edu": "apple",
         },
       },
     };
@@ -186,10 +187,24 @@ describe("getUserAnimal", () => {
       _.getUserAnimal.mockReturnValueOnce(Promise.resolve(userAnimal));
     }
 
+    for (let key in userTeamCodes) {
+      let teamCode = userTeamCodes[key];
+      let userAnimal2 = teams[teamCode].distributedAnimal[userEmail2];
+      _.getUserAnimal.mockReturnValueOnce(Promise.resolve(userAnimal2));
+    }
+
     const result = await _.getUserAnimals(userEmail, teams);
+    const result2 = await _.getUserAnimals(userEmail2, teams);
     console.log(result);
-    expect(_.getUserAnimal).toHaveBeenCalledTimes(2);
+    console.log(result2);
+
+    expect(_.getUserAnimal).toHaveBeenCalledTimes(4);
+    expect(_.getUserAnimal).toHaveBeenCalledWith("user@ucsd.edu", "11111");
+    expect(_.getUserAnimal).toHaveBeenCalledWith("user@ucsd.edu", "22222");
+    expect(_.getUserAnimal).toHaveBeenCalledWith("user2@ucsd.edu", "11111");
+    expect(_.getUserAnimal).toHaveBeenCalledWith("user2@ucsd.edu", "22222");
     expect(result).toEqual(["Predator", "android"]);
+    expect(result2).toEqual(["banana", "apple"]);
   });
 });
 
