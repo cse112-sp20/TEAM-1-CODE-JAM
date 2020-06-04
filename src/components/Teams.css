@@ -1,0 +1,47 @@
+.rounded-btn {
+  width: 100%;
+  padding-top: 100%;
+  position: relative;
+  border-radius: 15px;
+  background-color: #5d5d5d;
+}
+
+.inside-btn {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  text-align: center;
+}
+.flexbox-centering {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#add-btn {
+  font-size: 50px;
+}
+
+.col {
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+#team-and-delete {
+  position: relative;
+  /* float: left; */
+}
+#delete {
+  position: absolute;
+  left: 75%;
+  top: -15%;
+  opacity: 0;
+  visibility: hidden;
+}
+#team-and-delete:hover #delete {
+  opacity: 1;
+  visibility: visible;
+}

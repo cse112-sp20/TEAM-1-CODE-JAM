@@ -1,0 +1,106 @@
+#card-content {
+  padding: 0;
+}
+#row {
+  margin: 0;
+}
+#col {
+  margin: 0;
+}
+#profile {
+  padding: 5px;
+  width: 100%;
+  height: auto;
+}
+#top {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+#bottom {
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+#title {
+  margin: 0px;
+  font-size: 30px;
+}
+
+.divider {
+  margin-top: 16px;
+  margin-bottom: 10px;
+}
+
+#blacklist label input[type="checkbox"]:checked + .lever:after {
+  background-color: rgba(255, 82, 82, 0.8) !important;
+}
+#blacklist label input[type="checkbox"]:checked + .lever {
+  background-color: rgba(255, 82, 82, 0.6) !important;
+}
+
+#checkin label input[type="checkbox"]:checked + .lever:after {
+  background-color: rgba(82, 209, 109, 0.8) !important;
+}
+#checkin label input[type="checkbox"]:checked + .lever {
+  background-color: rgba(82, 209, 109, 0.6) !important;
+}
+#checkin {
+  top: 30%;
+  position: absolute;
+  padding-left: 15px;
+}
+div .card-action {
+  padding-left: 16px !important;
+  padding-right: 0 !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+}
+
+#example {
+  margin: 0;
+  width: 100%;
+}
+
+#mini-timeline-wrapper {
+  margin: 0;
+  min-height: 335px;
+  padding-left: 20px;
+}
+
+#mini-timeline {
+  width: 100%;
+}
+
+.rs-timeline-align-left .rs-timeline-item-tail {
+  left: 8px;
+}
+.rs-timeline-item:first-child .rs-timeline-item-tail {
+  top: 18px;
+}
+
+.rs-timeline-item-dot {
+  position: absolute;
+  top: 14px;
+}
+
+#blacklist-button {
+  color: #ff7373;
+  border-color: #ff7373;
+  background-color: transparent;
+  transition: 0.5s linear all;
+  padding: 5px 5px;
+  margin: 0px;
+}
+
+/* #unblacklist-button {
+  color: #fff;
+  background-color: #ff7373;
+  transition: 0.5s linear all;
+  padding: 5px 5px;
+  margin: 0px;
+} */
+
+#top-row {
+  display: flex;
+}
