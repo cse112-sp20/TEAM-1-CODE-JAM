@@ -1,33 +1,69 @@
+import React from "react";
 import "babel-polyfill";
-const chrome = require("sinon-chrome");
-window.chrome = chrome;
+import SideNav from "../src/components/SideNav";
+import { render, fireEvent, waitFor, screen } from "@testing-library/react";
+import "@testing-library/jest-dom/extend-expect";
+import { Route, Switch, BrowserRouter as Router } from "react-router-dom";
 
-describe("need to take out snapshot", () => {
-  test("delete later", () => {});
+// Set local chrome mock as global var
+import chrome from "sinon-chrome";
+global.chrome = chrome;
+
+// Create the test component
+const testComponent = (
+  <Router>
+    <SideNav />
+  </Router>
+);
+
+// Testing the rendering of side nav bar
+test("Testing Side Navigation Renders Correctly", () => {
+  // Render the test component
+  render(testComponent);
+
+  // Query all text in side nav bar
+  const queryHomeText = "home";
+  const queryTimeline = "access_time";
+  const queryChart = "insert_chart";
+  const queryGroup = "group_add";
+
+  // Try to get the elements by text
+  const homeNav = screen.getByText(queryHomeText);
+  expect(homeNav).toBeInTheDocument();
+
+  const timelineNav = screen.getByText(queryTimeline);
+  expect(timelineNav).toBeInTheDocument();
+
+  const chartNav = screen.getByText(queryChart);
+  expect(chartNav).toBeInTheDocument();
+
+  const groupNav = screen.getByText(queryGroup);
+  expect(groupNav).toBeInTheDocument();
 });
-/*eslint-disable*/
-// Function to find DOM components recursively
-function findDOMComponent(component, searchName) {
-  const child = Array.isArray(component) ? component[0] : component;
 
-  console.log(child);
+// Testing click_through of side nav bar
+test("Testing Side Navigation With Clicking", () => {
+  // Render the test component
+  render(testComponent);
 
-  if (!component.children || !component.children.length) {
-    return null;
-  }
-  if (child.props.className && child.props.id) {
-    return (
-      child.props.className === searchName || child.props.id === searchName
-    );
-  } else if (child.props.className) {
-    return child.props.className === searchName;
-  } else {
-    return child.props.id === searchName;
-  }
+  // Query all text in side nav bar
+  const queryHomeText = "home";
+  const queryTimeline = "access_time";
+  const queryChart = "insert_chart";
+  const queryGroup = "group_add";
 
-  const findComponent = child.children.find((child) => {
-    return !!findDOMComponent(child, searchName);
-  });
+  // Try to get the elements by text, and click them
+  const homeNav = screen.getByText(queryHomeText);
+  fireEvent.click(homeNav);
 
-  return findComponent;
-}
+  
+
+  const timelineNav = screen.getByText(queryTimeline);
+  expect(timelineNav).toBeInTheDocument();
+
+  const chartNav = screen.getByText(queryChart);
+  expect(chartNav).toBeInTheDocument();
+
+  const groupNav = screen.getByText(queryGroup);
+  expect(groupNav).toBeInTheDocument();
+});
