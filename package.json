@@ -37,7 +37,7 @@
     "flow": "flow",
     "lint:fix": "eslint . --fix",
     "prettier": "prettier --write .",
-	"jscpd": "npx jscpd public src __test__ __end2endTest__"
+    "jscpd": "npx jscpd public src __test__ __end2endTest__"
   },
   "eslintConfig": {
     "extends": "react-app"
