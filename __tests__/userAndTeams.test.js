@@ -151,7 +151,6 @@ describe("getTeamName", () => {
     expect(res).toEqual(undefined);
   });
 });
-describe("getUserAnimal", () => {});
 
 describe("getTeamNames", () => {
   test("get valid team names", async () => {
@@ -329,7 +328,39 @@ describe("createTeamOnFirebase", () => {
   });
 });
 
-describe("getUserAnimal", () => {
+describe("get user animal", () => {
+  test("get valid user animal", async () => {
+    get.mockResolvedValueOnce({
+      data: () => {
+        return {
+          distributedAnimal: { "user@ucsd.edu": "Predator" },
+        };
+      },
+    });
+
+    const res = await _.getUserAnimal("user@ucsd.edu", "12345");
+    expect(res).toEqual("Predator");
+  });
+  //   test("get invalid team name", async () => {
+  //     get.mockResolvedValueOnce({
+  //       exists: false,
+  //       data: () => {
+  //         return {
+  //           teamName: "jest mock",
+  //         };
+  //       },
+  //     });
+  //     let userProfile = {
+  //       joined_teams: {
+  //         12345: "now",
+  //       },
+  //     };
+  //     const res = await _.getTeamName("12345", userProfile);
+  //     expect(res).toEqual(undefined);
+  //   });
+});
+
+describe("getUserAnimals", () => {
   test("gets the user's animal", async () => {
     let userEmail = "user@ucsd.edu";
     let userEmail2 = "user2@ucsd.edu";
@@ -364,8 +395,6 @@ describe("getUserAnimal", () => {
 
     const result = await _.getUserAnimals(userEmail, teams);
     const result2 = await _.getUserAnimals(userEmail2, teams);
-    console.log(result);
-    console.log(result2);
 
     expect(_.getUserAnimal).toHaveBeenCalledTimes(4);
     expect(_.getUserAnimal).toHaveBeenCalledWith("user@ucsd.edu", "11111");
