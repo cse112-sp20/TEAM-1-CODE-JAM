@@ -1,4 +1,4 @@
-/* global firebase chrome sendToDB*/
+/* global firebase chrome */
 import { animals, addAnimal, getAnimal } from "./animalGenerator.js";
 import { getCurrentUrl } from "./tabs.js";
 import { sendToDB } from "./githubTracker.js";

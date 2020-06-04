@@ -1,7 +1,7 @@
 /* global firebase */
 import { db } from "./firebaseInit.js";
 import { getUserGithubToken } from "./github-oauth.js";
-import { userEmail, currentTeamInfo, userProfile } from "./userAndTeams.js";
+import { userEmail } from "./userAndTeams.js";
 /**
  *  Fetches data from github using the Github REST API. Header
  * includes the token which was saved after user sign-in with Github.
@@ -191,8 +191,7 @@ export function sendToDB(teamCode, animal) {
           });
           console.log(itemExists);
 
-          if (itemExists) {
-          } else {
+          if (!itemExists) {
             console.log("Item is not in Local Storage...");
             oldElements.push(item);
             localStorage.setItem("oldElements", JSON.stringify(oldElements));

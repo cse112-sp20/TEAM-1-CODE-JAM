@@ -1,4 +1,3 @@
-/* global firebase chrome sendToDB*/
 const chrome = require("sinon-chrome");
 window.chrome = chrome;
 
@@ -118,7 +117,9 @@ let tokenFetcher = (function () {
           // can be easily parsed to an object.
           if (this.status === 200) {
             let response = JSON.parse(this.responseText);
-            if (response.hasOwnProperty("access_token")) {
+            if (
+              Object.prototype.hasOwnProperty.call(response, "access_token")
+            ) {
               setAccessToken(response.access_token);
             } else {
               callback(new Error("Cannot obtain access_token from code."));
@@ -205,15 +206,6 @@ function onUserGithubTokenFetched(error) {
 function showButton(button) {
   button.style.display = "inline";
   button.disabled = false;
-}
-
-/**
- * Functions updating the User Interface:
- * Hides button that was passed in as parameter
- * @param {HTMLElement object} button
- */
-function hideButton(button) {
-  button.style.display = "none";
 }
 
 /**
