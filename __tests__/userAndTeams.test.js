@@ -327,37 +327,40 @@ describe("createTeamOnFirebase", () => {
   });
 });
 
-// describe("joinTeamOnFirebase", () => {
-//   let userProfile;
-//   beforeEach(() => {
-//     userProfile = {
-//       joined_teams: {
-//         12345: "yesterday",
-//       },
-//     };
-//   });
-//   test("already existed team code", async () => {
-//     const result = await joinTeamOnFirebase("12345", userProfile, userEmail);
-//     expect(result).toBe("already joined the group");
-//   });
-//   test("team code does not exist", async () => {
-//     const result = await joinTeamOnFirebase("123456", userProfile, userEmail);
-//     expect(result).toBe("team code not found");
-//   });
-//   test("join team success", async () => {
-//     let teamCode = await createTeamOnFirebase("jest testing", dummyEmail);
-//     const result = await joinTeamOnFirebase(teamCode, userProfile, userEmail);
-//     expect(result).toBe("success");
-//     let data = await Promise.all([
-//       getTeamInformation(teamCode),
-//       getUserInformation(userEmail),
-//     ]);
-//     let teamInformation = data[0].data();
-//     let userInformation = data[1].data();
-//     expect(teamCode in userInformation.joined_teams).toBe(true);
-//     expect(teamInformation.members.includes(userEmail)).toBe(true);
-//   });
-// });
+describe("joinTeamOnFirebase", () => {
+  test("already existed team code", async () => {
+    let userProfile = {
+      joined_teams: {
+        12345: "now",
+      },
+    };
+    const result = await _.joinTeamOnFirebase("12345", userProfile, userEmail);
+    expect(result).toBe("already joined the group");
+  });
+  test("team code does not exist", async () => {
+    let userProfile = {
+      joined_teams: {
+        12345: "now",
+      },
+    };
+    _.isTeamCodeUnique = jest.fn().mockResolvedValueOnce(true);
+    const result = await _.joinTeamOnFirebase("123456", userProfile, userEmail);
+    expect(result).toBe("team code not found");
+    _.joinTeamOnFirebase.mockRestore();
+  });
+  // test("join team success", async () => {
+  //   let userProfile = {
+  //     joined_teams: {
+  //       12345: "now",
+  //     },
+  //   };
+  //   const teamCode = "11111";
+  //   const result = await _.joinTeamOnFirebase("11111", userProfile, userEmail);
+  //   expect(result).toBe("success");
+  //   expect(teamCode in userInformation.joined_teams).toBe(true);
+  //   expect(teamInformation.members.includes(userEmail)).toBe(true);
+  // });
+});
 // describe("getTeamName", () => {
 //   test("get valid team name", async () => {
 //     let userProfile = {

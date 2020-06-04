@@ -77,13 +77,7 @@ export function setupListener() {
         getUserDailyPoints().then((res) => {
           sendResponse(res);
         });
-      }
-      // else if (request.message === "get timeline") {
-      //   reverseTimelineArray().then((tabs) => {
-      //     sendResponse(tabs);
-      //   });
-      // }
-      else if (request.message === "set timeout to delete team") {
+      } else if (request.message === "set timeout to delete team") {
         timeoutVars[request.teamCode] = setTimeout(async () => {
           let teamInfo = await getTeamInformation(request.teamCode);
           teamInfo = teamInfo.data();
@@ -246,7 +240,7 @@ export async function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
   if (teamCode in userProfile.joined_teams) {
     return "already joined the group";
   }
-  let unique = await isTeamCodeUnique(teamCode);
+  let unique = await _.isTeamCodeUnique(teamCode);
   const currentTime = Date.now();
   // unique means team code doesn't exist
   if (unique) {
@@ -874,6 +868,7 @@ const _ = {
   createUser,
   getUserProfile,
   createTeamOnFirebase,
+  joinTeamOnFirebase,
 };
 
 export default _;
