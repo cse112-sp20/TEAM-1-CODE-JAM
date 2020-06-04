@@ -99,3 +99,9 @@ jobs:
         max_long_functions_rate: '0.30'
         project_name: ''
         max_timeout_sec: '600'
+
+    - name: Check for code duplicate
+      run: npm run jscpd
+
+    - name: Static Type Checker
+      run: npm run flow

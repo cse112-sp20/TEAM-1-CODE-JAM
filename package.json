@@ -34,9 +34,10 @@
     "stylelint": "stylelint 'src/**/*.css', 'public/css/**/*.css'",
     "stylelint:fix": "stylelint 'src/**/*.css'  'public/css/**/*.css' --fix",
     "lint": "eslint .",
-	"flow": "flow",
+    "flow": "flow",
     "lint:fix": "eslint . --fix",
-    "prettier": "prettier --write ."
+    "prettier": "prettier --write .",
+	"jscpd": "npx jscpd public src __test__ __end2endTest__"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -71,6 +72,7 @@
     "flow-bin": "^0.126.1",
     "htmlhint": "^0.14.0",
     "jest-puppeteer": "^4.4.0",
+    "jscpd": "^3.3.0-rc.8",
     "prettier": "2.0.5",
     "puppeteer": "^3.1.0",
     "react-test-renderer": "^16.13.1",
