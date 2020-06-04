@@ -34,6 +34,7 @@
     "stylelint": "stylelint 'src/**/*.css', 'public/css/**/*.css'",
     "stylelint:fix": "stylelint 'src/**/*.css'  'public/css/**/*.css' --fix",
     "lint": "eslint .",
+	"flow": "flow",
     "lint:fix": "eslint . --fix",
     "prettier": "prettier --write ."
   },
