@@ -3,23 +3,34 @@ import "babel-polyfill";
 import SideNav from "../src/components/SideNav";
 import { render, fireEvent, waitFor, screen } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
-import { Route, Switch, BrowserRouter as Router } from "react-router-dom";
+import { Router } from "react-router-dom";
+import { createMemoryHistory } from "history";
 
-// Set local chrome mock as global var
+// Get chrome env variable
 import chrome from "sinon-chrome";
 global.chrome = chrome;
 
+// Function to render with router
+const renderWithRouter = (
+  component,
+  {
+    route = "/",
+    history = createMemoryHistory({ initialEntries: [route] }),
+  } = {}
+) => {
+  return {
+    ...render(<Router history={history}>{component}</Router>),
+    history,
+  };
+};
+
 // Create the test component
-const testComponent = (
-  <Router>
-    <SideNav />
-  </Router>
-);
+const testComponent = <SideNav />;
 
 // Testing the rendering of side nav bar
-test("Testing Side Navigation Renders Correctly", () => {
+test("Testing Side Nav Bar Renders Correctly", () => {
   // Render the test component
-  render(testComponent);
+  renderWithRouter(testComponent);
 
   // Query all text in side nav bar
   const queryHomeText = "home";
@@ -42,9 +53,9 @@ test("Testing Side Navigation Renders Correctly", () => {
 });
 
 // Testing click_through of side nav bar
-test("Testing Side Navigation With Clicking", () => {
+test("Testing click-through of Side Nav Bar", () => {
   // Render the test component
-  render(testComponent);
+  const { history } = renderWithRouter(testComponent);
 
   // Query all text in side nav bar
   const queryHomeText = "home";
@@ -52,18 +63,42 @@ test("Testing Side Navigation With Clicking", () => {
   const queryChart = "insert_chart";
   const queryGroup = "group_add";
 
+  // Get paths
+  let currPath = "";
+  const homePath = "/";
+  const timePath = "/timeline";
+  const chartPath = "/charts";
+  const teamsPath = "/teams";
+
   // Try to get the elements by text, and click them
   const homeNav = screen.getByText(queryHomeText);
   fireEvent.click(homeNav);
 
-  
+  // Get the current path and expect to be a route
+  currPath = history.location.pathname;
+  expect(currPath).toBe(homePath);
 
-  const timelineNav = screen.getByText(queryTimeline);
-  expect(timelineNav).toBeInTheDocument();
+  // Try to get the elements by text, and click them
+  const timeNav = screen.getByText(queryTimeline);
+  fireEvent.click(timeNav);
 
+  // Get the current path and expect to be a route
+  currPath = history.location.pathname;
+  expect(currPath).toBe(timePath);
+
+  // Try to get the elements by text, and click them
   const chartNav = screen.getByText(queryChart);
-  expect(chartNav).toBeInTheDocument();
+  fireEvent.click(chartNav);
 
-  const groupNav = screen.getByText(queryGroup);
-  expect(groupNav).toBeInTheDocument();
+  // Get the current path and expect to be a route
+  currPath = history.location.pathname;
+  expect(currPath).toBe(chartPath);
+
+  // Try to get the elements by text, and click them
+  const teamNav = screen.getByText(queryGroup);
+  fireEvent.click(teamNav);
+
+  // Get the current path and expect to be a route
+  currPath = history.location.pathname;
+  expect(currPath).toBe(teamsPath);
 });
