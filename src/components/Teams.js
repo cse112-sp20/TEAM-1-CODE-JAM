@@ -110,7 +110,7 @@ class Teams extends Component {
   render() {
     return (
       <div className="row">
-        {this.state.teams.map((team) => {
+        {this.state.teams.map((team, index) => {
           if (!team.visable) return;
 
           return (
@@ -118,11 +118,16 @@ class Teams extends Component {
               {/* This is the button of each team */}
               <button
                 onClick={this.onClickTeam.bind(this, team.teamCode)}
-                teamCode={team.teamCode}
+                // teamCode={team.teamCode}
                 className="rounded-btn waves-effect waves-light btn"
               >
                 <div className="inside-btn">
-                  <text className="flexbox-centering">{team.teamName}</text>
+                  <span
+                    className="flexbox-centering"
+                    data-testid={"team name " + (index + 1)}
+                  >
+                    {team.teamName}
+                  </span>
                 </div>
               </button>
               {/* delete button */}
@@ -146,12 +151,12 @@ class Teams extends Component {
             data-testid="Teams-createjoin"
           >
             <div className="inside-btn">
-              <text className="flexbox-centering">
+              <span className="flexbox-centering">
                 {/* using icon add */}
                 <i id="add-btn" className="material-icons">
                   add
                 </i>
-              </text>
+              </span>
             </div>
           </a>
         </div>
