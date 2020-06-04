@@ -1,6 +1,7 @@
 import "babel-polyfill";
 const chrome = require("sinon-chrome");
 window.chrome = chrome;
+
 describe("need to take out snapshot", () => {
   test("delete later", () => {});
 });
