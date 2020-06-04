@@ -26,8 +26,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "jest",
-    "test:coverage": "jest --coverage",
+    "test": "jest --colors",
+    "test:coverage": "jest --coverage --colors",
     "test1": "react-scripts test",
     "eject": "react-scripts eject",
     "eslint:github-action": "node ./node_modules/eslint/bin/eslint . --ignore-path .gitignore",
