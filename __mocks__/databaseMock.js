@@ -1,19 +1,14 @@
-let exists = true;
-export let get = jest.fn(() => {
-  return Promise.resolve({
-    exists: exists,
-    id: "test@gmail.com",
-    data: jest.fn(() => {
-      return "correct";
-    }),
-  });
-});
-export let doc = jest.fn((document) => {
+export let set = jest.fn();
+export let get = jest.fn();
+// input should be document
+export let doc = jest.fn(() => {
   return {
     get: get,
+    set: set,
   };
 });
-export let collection = jest.fn((collect) => {
+// input should be collection string
+export let collection = jest.fn(() => {
   return {
     doc: doc,
   };
@@ -21,7 +16,3 @@ export let collection = jest.fn((collect) => {
 export let db = {
   collection: collection,
 };
-
-export function setExists(bool) {
-  exists = bool;
-}

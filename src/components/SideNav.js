@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import "./SideNav.css";
 
 export default class SideNav extends Component {
@@ -30,7 +30,7 @@ export default class SideNav extends Component {
           className="btn tooltipped waves-effect waves-light card-panel center-align"
           id="sidenav-background"
           data-position="right"
-          data-tooltip="Charts"
+          data-tooltip="Your Performance"
           to="/charts"
         >
           {/* <span>Charts</span> */}

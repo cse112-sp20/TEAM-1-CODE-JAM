@@ -1,0 +1,12 @@
+.github/
+build/
+coverage/
+public/manifest.json
+src/serviceWorker.js
+src/setupTests.js
+src/components/materialize.min.css
+.eslintrc.json
+.prettierrc.json
+.stylelintrc.json
+firebase.json
+README.md

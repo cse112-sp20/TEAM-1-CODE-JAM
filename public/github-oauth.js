@@ -1,4 +1,4 @@
-/* global chrome */
+/* global chrome*/
 
 import { sendToDB } from "./githubTracker.js";
 
@@ -83,11 +83,13 @@ let tokenFetcher = (function () {
       }
 
       function handleProviderResponse(values) {
-        if (values.hasOwnProperty("access_token"))
+        // if (values.hasOwnProperty("access_token"))
+        if (Object.prototype.hasOwnProperty.call(values, "access_token"))
           setAccessToken(values.access_token);
         // If response does not have an access_token, it might have the code,
         // which can be used in exchange for token.
-        else if (values.hasOwnProperty("code"))
+        // else if (values.hasOwnProperty("code"))
+        else if (Object.prototype.hasOwnProperty.call(values, "code"))
           exchangeCodeForToken(values.code);
         else callback(new Error("Neither access_token nor code avialable."));
       }
@@ -230,7 +232,7 @@ function disableButton(button) {
  * their GitHub.
  */
 function interactiveSignIn() {
-  tokenFetcher.getToken(true, function (error, access_token) {
+  tokenFetcher.getToken(true, function (error) {
     if (error) {
       showButton(signin_button);
     } else {
@@ -267,6 +269,5 @@ revoke_button = document.querySelector("#revoke");
  */
 if (signin_button || revoke_button) {
   signin_button.onclick = interactiveSignIn;
-  // revoke_button.onclick = revokeToken;
   revoke_button.onclick = revokeToken;
 }

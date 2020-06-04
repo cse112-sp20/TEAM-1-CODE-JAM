@@ -77,6 +77,7 @@ export default class Home extends Component {
             teamMembers: teamInfo.members,
             teamPoints: teamPoints,
             timelineArr: timelineArr,
+            profilePic: teamInfo.userAnimal,
           });
         }
       });
@@ -85,7 +86,7 @@ export default class Home extends Component {
   importAll = (r) => {
     return r.keys().map(r);
   };
-  onClickBlacklistButton = (e) => {
+  onClickBlacklistButton = () => {
     if (!this.state.isInBlacklist) {
       this.setState({
         isInBlacklist: true,
@@ -131,7 +132,7 @@ export default class Home extends Component {
       </Button>
     );
   };
-  handleCheckIn = (e) => {
+  handleCheckIn = () => {
     this.setState({
       isCheckIn: !this.state.isCheckIn,
     });
@@ -202,7 +203,10 @@ export default class Home extends Component {
     return Math.round((num + Number.EPSILON) * 100) / 100;
   };
   getProfilePic = (profilePic) => {
-    return require("../SVG/" + profilePic + ".svg");
+    if (profilePic == undefined) {
+      profilePic = "Predator";
+    }
+    return require("../images/emojis/" + profilePic + ".svg");
   };
 
   render() {
@@ -247,7 +251,11 @@ export default class Home extends Component {
             {/* <!-- Dropdown Structure --> */}
             <ul id="people" className="dropdown-content collection">
               {this.state.teamMembers.map((teamMember) => {
-                return <li className="collection-item">{teamMember}</li>;
+                return (
+                  <li key={teamMember} className="collection-item">
+                    {teamMember}
+                  </li>
+                );
               })}
             </ul>
           </div>

@@ -1,7 +1,7 @@
 /* global firebase */
 import { db } from "./firebaseInit.js";
 import { getUserGithubToken } from "./github-oauth.js";
-import { userEmail } from "./userAndTeams.js";
+import { userEmail, currentTeamInfo, userProfile } from "./userAndTeams.js";
 /**
  *  Fetches data from github using the Github REST API. Header
  * includes the token which was saved after user sign-in with Github.
@@ -216,91 +216,3 @@ export function sendToDB(teamCode, animal) {
     })
     .catch((err) => console.log(err));
 }
-
-/*
-export function sendToDB(teamCode, animal) {
-  // if (teamCode === undefined || animal === undefined) {
-  //   return;
-  // }
-  console.log("update");
-  getMostRecentCommit()
-    .then((arr) => {
-      let max = "00:00:00";
-      arr.forEach((e) => {
-        if (e > max) {
-          max = e;
-        }
-      });
-
-      console.log("test");
-      if (max != "00:00:00") {
-        if (localStorage.getItem("oldElements") == null) {
-          let item = [{ url: "github.com", time: max }];
-          localStorage.setItem("oldElements", JSON.stringify(item));
-
-          // chrome.runtime.sendMessage(msg, function (response) {
-          //     resolve(response);
-          // });
-          // let seconds = JSON.parse(currData)[tabUrl] / 1000;
-          let seconds = new Date().toLocaleTimeString();
-          //let seconds =
-          // parseInt(JSON.parse(localStorage.getItem(teamCode)).time) / 1000;
-          //time = `${tabUrl}: ${seconds} seconds`;
-          console.log("in update local storage");
-          // let userAnimal = await getUserAnimal(userEmail, teamCode);
-          let userAnimal = animal;
-          db.collection("teams")
-            .doc(teamCode)
-            .update({
-              timeWasted: firebase.firestore.FieldValue.arrayUnion({
-                point: "+1",
-                user: userEmail,
-                url: "www.GitHub.com",
-                time: seconds,
-                animal: userAnimal,
-              }),
-            });
-        } else {
-          let item = { url: "github.com", time: max };
-          let oldElements = JSON.parse(localStorage.getItem("oldElements"));
-
-          // Checks if an item exists in the local storage
-          let itemExists = false;
-          oldElements.forEach((e) => {
-            if (e.time == max) {
-              itemExists = true;
-            }
-          });
-          console.log(itemExists);
-
-          if (itemExists) {
-          } else {
-            console.log("Item is not in Local Storage...");
-            oldElements.push(item);
-            localStorage.setItem("oldElements", JSON.stringify(oldElements));
-            console.log("here");
-            // let seconds = JSON.parse(currData)[tabUrl] / 1000;
-            let seconds = new Date().toLocaleTimeString();
-            //let seconds =
-            // parseInt(JSON.parse(localStorage.getItem(teamCode)).time) / 1000;
-            //time = `${tabUrl}: ${seconds} seconds`;
-            console.log("in update local storage");
-            // let userAnimal = await getUserAnimal(userEmail, teamCode);
-            let userAnimal = animal;
-            db.collection("teams")
-              .doc(teamCode)
-              .update({
-                timeWasted: firebase.firestore.FieldValue.arrayUnion({
-                  user: userEmail,
-                  url: "Git Push",
-                  time: seconds,
-                  animal: userAnimal,
-                }),
-              });
-          }
-        }
-      }
-    })
-    .catch((err) => console.log(err));
-}
-*/
