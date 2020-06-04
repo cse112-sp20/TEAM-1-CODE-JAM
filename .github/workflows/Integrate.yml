@@ -99,7 +99,15 @@ jobs:
         #    max_long_functions_rate: '0.30'
         #    project_name: ''
         #    max_timeout_sec: '600'
-
+    - name: Check out Git repository
+      uses: actions/checkout@v2
+    - name: Set up Node.js
+      uses: actions/setup-node@master
+      with:
+        node-version: 12
+    - name: Install Node.js dependencies
+      run: npm install
+    
     - name: Check for code duplicate
       run: npm run jscpd
 
