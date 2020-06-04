@@ -10,3 +10,5 @@ src/components/materialize.min.css
 .stylelintrc.json
 firebase.json
 README.md
+out/
+public/LandingPage

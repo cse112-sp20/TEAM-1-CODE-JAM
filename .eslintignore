@@ -2,3 +2,4 @@ public/js
 build/
 coverage/
 node_modules/
+out/
