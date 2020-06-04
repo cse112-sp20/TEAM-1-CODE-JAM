@@ -84,10 +84,10 @@ export default class Timeline extends Component {
 
   render() {
     return (
-      <div className="row" id="myTimeline">
+      <div data-testid="my-timeline" className="row" id="myTimeline">
         <div className="card blue-grey lighten-5" id="myCard">
           <div className="card-content black-text" id="myContent">
-            <table className="highlight" id="myTable">
+            <table data-testid="my-table" className="highlight" id="myTable">
               <thead>
                 <tr>
                   <th id="myHead">Time</th>
