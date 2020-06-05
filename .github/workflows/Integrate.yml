@@ -25,6 +25,7 @@ jobs:
       - name: Install Node.js dependencies
         run: npm install
 
+        run: node node_modules/jest/bin/jest --clearCache
       - name: Run unit-test
         run: npm test __tests__
 
