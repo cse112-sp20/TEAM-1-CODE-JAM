@@ -1,13 +1,10 @@
 /*global firebase*/
+export let db;
 /**
  * Init Firebase configuration
  * @author Karl Wang
  */
-function initializeFirebase() {
-  try {
-    global.firebase = require("firebase");
-  } catch {}
-
+export function initializeFirebase() {
   const firebaseConfig = {
     apiKey: "AIzaSyCJYc-PMIXdQxE2--bQI6Z1FGMKwMulEyc",
     authDomain: "chrome-extension-cse-112.firebaseapp.com",
@@ -19,10 +16,9 @@ function initializeFirebase() {
   };
   // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
+  setDB(firebase.firestore());
 }
-initializeFirebase();
-try {
-  module.exports = {
-    initializeFirebase,
-  };
-} catch {}
+
+export function setDB(database) {
+  db = database;
+}

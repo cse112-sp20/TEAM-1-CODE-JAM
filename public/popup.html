@@ -1,111 +1,153 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta name="viewport" content="width=device-width", initial-scale="1.0">
+  <head>
+    <meta name="viewport" content="width=device-width" , initial-scale="1.0" />
     <!--Import Google Icon Font-->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
 
-     <!-- Compiled and minified CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <!-- Compiled and minified CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+    />
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
 
     <title>Settings</title>
-</head>
+  </head>
 
-
-<body>
-
+  <body>
     <div class="sidebar">
-        <h2><img id="main-logo" alt="main logo" src="images/donut-logo.png"></h2>
-        <ul>
-            <!-- <li id="tabs" class="active" onclick="openTab(event, 'Authentications')"> -->
-            <li id="authenticationsTab" class="defaultOpen">
-                <a href="#"><img id="side-bar-icons" alt="auth" src="images/authentication.png">Authentications</a>
-            </li>
-
-            <!-- <li id="tabs" onclick="openTab(event, 'About')"> -->
-            <li id="aboutTab">
-                <a href="#"><img id="side-bar-icons" alt="about" src="images/about.png">About</a>
-            </li>
-        </ul> 
+      <h2>
+        <img id="main-logo" alt="main logo" src="images/donut-logo.png" />
+      </h2>
+      <ul>
+        <li id="authenticationsTab" class="defaultOpen">
+          <a href="#"
+            ><img
+              id="side-bar-icons"
+              alt="auth"
+              src="images/authentication.png"
+            />Authentications</a
+          >
+        </li>
+        <li id="aboutTab">
+          <a href="#"
+            ><img
+              id="side-bar-icons"
+              alt="about"
+              src="images/about.png"
+            />About</a
+          >
+        </li>
+      </ul>
     </div>
 
-    <div style="margin-left: 12%">
+    <div style="margin-left: 12%;">
+      <div id="authentications" class="main-content">
+        <div id="top-header">Authentications</div>
+        <div class="container">
+          <div class="row">
+            <div id="left-text">
+              <img id="auth-icons" alt="github" src="images/github_icon.png" />
+            </div>
+            <div id="left-text">
+              <header id="app-name">Github</header>
+              <p id="auth-desc">
+                Sign into your Github account to give us access to track your
+                commits. <br />
+                Each commit made will earn you some points.
+              </p>
+            </div>
+            <div id="right-text">
+              <button
+                id="signin"
+                class="btn waves-effect waves-light"
+                type="submit"
+                name="action"
+              >
+                SIGN IN
+              </button>
+              <button
+                id="revoke"
+                class="btn waves-effect waves-light"
+                type="submit"
+                name="action"
+              >
+                REVOKE
+              </button>
+            </div>
+          </div>
 
-        <div id="Authentications" class="main_content">
-            <div id="top-header">Authentications</div>
-            <div class="container">
-                    <div class="row">
-                        <div id="left-text">
-                            <img id="auth-icons" alt="github" src="images/github_icon.png">
-                        </div>
-                        <div id="left-text">
-                            <header id="appName">Github</header>
-                            <p id="auth-desc">Sign into your Github account to give us access to track your commits.
-                                <br> Each commit made will earn you some points.
-                            </p>
-                        </div>
-                        <div id="right-text">
-                            <button id="signin" class="btn waves-effect waves-light" type="submit" name="action">SIGN IN
-                            </button>
-                            <!-- <button id="signedin" class="btn waves-effect waves-light" type="submit">
-                                <i class = "material-icons">check</i>
-                            </button> -->
-                            <button id="revoke" class="btn waves-effect waves-light" type="submit" name="action">REVOKE
-                            </button>
-                            
-                        </div>
-                    </div>
-    
-                        <div class="row">
-                            <div id="left-text">
-                                <img id="auth-icons" alt="basecamp" src="images/basecamp_icon.png">
-                            </div>
-                            <div id="left-text">
-                                <header id="appName">Basecamp</header>
-                                <p id="auth-desc">Sign into your Basecamp account to allow us authorization to track
-                                    <br>the completion of your to-do lists.
-                                </p>
-                            </div>
-                            <div id="right-text">
-                                <button id="coming-soon" class="btn waves-effect waves-light" type="submit" name="action">COMING SOON
-                                </button>
-                            </div>
-                        </div>
-    
-                        <div class="row">
-                            <div id="left-text">
-                                <img id="auth-icons" alt="trello" src="images/trello_icon.png">
-                            </div>
-                            <div id="left-text">
-                                <header id="appName">Trello</header>
-                                <p id="auth-desc">Sign into your Trello account to allow us to track the progress of all
-                                    <br>your tasks. Completed tasks will earn you some points!
-                                </p>
-                            </div>
-                            <div id="right-text">
-                                <button id="coming-soon" class="btn waves-effect waves-light" type="submit" name="action">COMING SOON
-                                </button>
-                            </div>
-                        </div>
-                </div>
+          <div class="row">
+            <div id="left-text">
+              <img
+                id="auth-icons"
+                alt="basecamp"
+                src="images/basecamp_icon.png"
+              />
             </div>
-    
-        <div id="About" class="main_content">
-            <div id="top-header">About</div>
-            <div id="desc" class="row center">
-                <p>Team Activity Tracker v1.0</p>
-                <!-- <p>&#10004</p> -->
+            <div id="left-text">
+              <header id="app-name">Basecamp</header>
+              <p id="auth-desc">
+                Sign into your Basecamp account to allow us authorization to
+                track <br />the completion of your to-do lists.
+              </p>
             </div>
+            <div id="right-text">
+              <button
+                id="coming-soon"
+                class="btn waves-effect waves-light"
+                type="submit"
+                name="action"
+              >
+                COMING SOON
+              </button>
+            </div>
+          </div>
+
+          <div class="row">
+            <div id="left-text">
+              <img id="auth-icons" alt="trello" src="images/trello_icon.png" />
+            </div>
+            <div id="left-text">
+              <header id="app-name">Trello</header>
+              <p id="auth-desc">
+                Sign into your Trello account to allow us to track the progress
+                of all <br />your tasks. Completed tasks will earn you some
+                points!
+              </p>
+            </div>
+            <div id="right-text">
+              <button
+                id="coming-soon"
+                class="btn waves-effect waves-light"
+                type="submit"
+                name="action"
+              >
+                COMING SOON
+              </button>
+            </div>
+          </div>
         </div>
+      </div>
 
+      <div id="about" class="main-content">
+        <div id="top-header">About</div>
+        <div id="desc" class="row center">
+          <p>
+            <br /><br /><br />Team Activity Tracker v1.0<br />Created by Team
+            Code Jam
+          </p>
+        </div>
+      </div>
     </div>
-</body>
-    <script src="js/popup.js"></script>
+  </body>
+  <script src="js/popup.js"></script>
   <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-auth.js"></script>
 
   <script src="./github-oauth.js"></script>
 </html>
-
-

@@ -4,6 +4,7 @@ import "./Teams.css";
 import M from "materialize-css";
 import CreateJoinTeam from "./CreateJoinTeam";
 import { withRouter } from "react-router-dom";
+import PropTypes from "prop-types";
 
 class Teams extends Component {
   constructor(props) {
@@ -51,7 +52,6 @@ class Teams extends Component {
           });
         }
         let toastElement = document.querySelector(".toast" + teamCode);
-        console.log(toastElement);
         let toastInstance = M.Toast.getInstance(toastElement);
         toastInstance.dismiss();
       }
@@ -110,19 +110,24 @@ class Teams extends Component {
   render() {
     return (
       <div className="row">
-        {this.state.teams.map((team) => {
+        {this.state.teams.map((team, index) => {
           if (!team.visable) return;
 
           return (
-            <div className="col s3" id="team-and-delete">
+            <div key={team.teamCode} className="col s3" id="team-and-delete">
               {/* This is the button of each team */}
               <button
                 onClick={this.onClickTeam.bind(this, team.teamCode)}
-                teamCode={team.teamCode}
+                // teamCode={team.teamCode}
                 className="rounded-btn waves-effect waves-light btn"
               >
                 <div className="inside-btn">
-                  <text className="flexbox-centering">{team.teamName}</text>
+                  <span
+                    className="flexbox-centering"
+                    data-testid={"team name " + (index + 1)}
+                  >
+                    {team.teamName}
+                  </span>
                 </div>
               </button>
               {/* delete button */}
@@ -146,12 +151,12 @@ class Teams extends Component {
             data-testid="Teams-createjoin"
           >
             <div className="inside-btn">
-              <text className="flexbox-centering">
+              <span className="flexbox-centering">
                 {/* using icon add */}
                 <i id="add-btn" className="material-icons">
                   add
                 </i>
-              </text>
+              </span>
             </div>
           </a>
         </div>
@@ -173,5 +178,8 @@ class Teams extends Component {
     );
   }
 }
+Teams.propTypes = {
+  history: PropTypes.object,
+};
 
 export default withRouter(Teams);

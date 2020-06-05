@@ -1,3 +1,7 @@
+/* global firebase */
+import { db } from "./firebaseInit.js";
+import { getUserInfo } from "./github-oauth.js";
+import { userEmail, currentTeamInfo, userProfile } from "./userAndTeams.js";
 /**
  *  Fetches data from github using the Github REST API. Header
  * includes the token which was saved after user sign-in with Github.
@@ -43,7 +47,9 @@ async function getCommits(url, repo) {
     method: "GET",
     headers: headers,
   });
-  return (result = await response.json());
+
+  // return (result = await response.json());
+  return await response.json();
 }
 
 /**
@@ -133,8 +139,7 @@ async function getMostRecentCommit() {
  * @param {string} teamCode
  * @param {string} animal
  */
-function sendToDB(teamCode, animal) {
-  // console.log(teamCode)
+export function sendToDB(teamCode, animal) {
   if (teamCode === undefined || animal === undefined) {
     return;
   }
@@ -146,33 +151,28 @@ function sendToDB(teamCode, animal) {
     getMostRecentCommit()
       .then((arr) => {
         let max = "00:00:00";
-        // console.log(arr);
         arr.forEach((e) => {
           if (e > max) {
             max = e;
           }
         });
 
-        // console.log(max);
-
         if (max != "00:00:00") {
-          let msg = {
-            for: "popup",
-            message: "timeline demo",
-            url: "GitHub",
-            time: max,
-            animal: "water-bottle",
-          };
+          // let msg = {
+          //   for: "popup",
+          //   message: "team info",
+          //   url: "GitHub",
+          //   time: max,
+          //   animal: "water-bottle",
+          // };
 
           if (localStorage.getItem("oldElements") == null) {
             let item = [{ url: "github.com", time: max }];
             localStorage.setItem("oldElements", JSON.stringify(item));
 
             // chrome.runtime.sendMessage(msg, function (response) {
-            //     console.log(response);
             //     resolve(response);
             // });
-            console.log("here");
             // let seconds = JSON.parse(currData)[tabUrl] / 1000;
             let seconds = new Date().toLocaleTimeString();
             //let seconds =
@@ -180,21 +180,37 @@ function sendToDB(teamCode, animal) {
             //time = `${tabUrl}: ${seconds} seconds`;
             console.log("in update local storage");
             // let userAnimal = await getUserAnimal(userEmail, teamCode);
+            let teamPoints = currentTeamInfo.teamPoints;
+            // we will be using teamCode and userEmail to retrieve userPoints and update these
+            teamPoints = teamPoints + 3;
+            let userPoints = userProfile.user_points[teamCode];
+            userPoints = userPoints + 3;
             let userAnimal = animal;
             db.collection("teams")
               .doc(teamCode)
               .update({
                 timeWasted: firebase.firestore.FieldValue.arrayUnion({
-                  point: "+1",
+                  points: +3,
                   user: userEmail,
-                  url: "www.GitHub.com",
-                  time: seconds,
+                  url: "Git Push",
+                  currTime: seconds,
                   animal: userAnimal,
                 }),
+                teamPoints: teamPoints,
               });
+
+            db.collection("users")
+              .doc(userEmail)
+              .set(
+                {
+                  user_points: {
+                    [teamCode]: userPoints,
+                  },
+                },
+                { merge: true }
+              );
           } else {
             let item = { url: "github.com", time: max };
-            // console.log("Local Storage is not empty...")
             let oldElements = JSON.parse(localStorage.getItem("oldElements"));
 
             // Checks if an item exists in the local storage
@@ -204,38 +220,47 @@ function sendToDB(teamCode, animal) {
                 itemExists = true;
               }
             });
-            console.log(itemExists);
 
-            if (itemExists) {
-              // console.log("Item is in Local Storage...")
-            } else {
+            if (!itemExists) {
               console.log("Item is not in Local Storage...");
               oldElements.push(item);
               localStorage.setItem("oldElements", JSON.stringify(oldElements));
-              // chrome.runtime.sendMessage(msg, function (response) {
-              //     console.log("send message");
-              //     console.log(response);
-              //     resolve(response);
-              // });
-              console.log("here");
               // let seconds = JSON.parse(currData)[tabUrl] / 1000;
               let seconds = new Date().toLocaleTimeString();
               //let seconds =
               // parseInt(JSON.parse(localStorage.getItem(teamCode)).time) / 1000;
               //time = `${tabUrl}: ${seconds} seconds`;
               console.log("in update local storage");
+              let teamPoints = currentTeamInfo.teamPoints;
+              // we will be using teamCode and userEmail to retrieve userPoints and update these
+              teamPoints = teamPoints + 3;
+              let userPoints = userProfile.user_points[teamCode];
+              userPoints = userPoints + 3;
               // let userAnimal = await getUserAnimal(userEmail, teamCode);
               let userAnimal = animal;
               db.collection("teams")
                 .doc(teamCode)
                 .update({
                   timeWasted: firebase.firestore.FieldValue.arrayUnion({
+                    points: +3,
                     user: userEmail,
                     url: "Git Push",
-                    time: seconds,
+                    currTime: seconds,
                     animal: userAnimal,
                   }),
+                  teamPoints: teamPoints,
                 });
+
+              db.collection("users")
+                .doc(userEmail)
+                .set(
+                  {
+                    user_points: {
+                      [teamCode]: userPoints,
+                    },
+                  },
+                  { merge: true }
+                );
             }
           }
         }

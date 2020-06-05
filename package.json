@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "babel-polyfill": "^6.26.0",
@@ -27,11 +26,18 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "testw": "jest --watchAll",
-    "test": "jest",
+    "test": "jest --colors",
+    "test:coverage": "jest --coverage --colors",
     "test1": "react-scripts test",
     "eject": "react-scripts eject",
-    "eslint:github-action": "node ./node_modules/eslint/bin/eslint . --ignore-path .gitignore"
+    "eslint:github-action": "node ./node_modules/eslint/bin/eslint . --ignore-path .gitignore",
+    "stylelint": "stylelint 'src/**/*.css', 'public/css/**/*.css'",
+    "stylelint:fix": "stylelint 'src/**/*.css'  'public/css/**/*.css' --fix",
+    "lint": "eslint .",
+    "flow": "flow",
+    "lint:fix": "eslint . --fix",
+    "prettier": "prettier --write .",
+    "jscpd": "npx jscpd public src __test__ __end2endTest__"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -49,18 +55,34 @@
     ]
   },
   "devDependencies": {
+    "@babel/cli": "^7.10.1",
+    "@babel/core": "^7.10.2",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/plugin-transform-runtime": "^7.9.6",
     "@babel/preset-env": "^7.9.6",
+    "@babel/preset-flow": "^7.10.1",
     "@babel/preset-react": "^7.9.4",
-    "eslint": "^6.6.0",
+    "@testing-library/jest-dom": "^4.2.4",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.1.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.3",
+    "eslint-plugin-react": "^7.20.0",
+    "eslint-plugin-standard": "^4.0.1",
+    "flow-bin": "^0.126.1",
+    "htmlhint": "^0.14.0",
     "jest-puppeteer": "^4.4.0",
+    "jscpd": "^3.3.0-rc.8",
+    "jsdoc": "^3.6.4",
+    "prettier": "2.0.5",
     "puppeteer": "^3.1.0",
-    "react-test-renderer": "^16.13.1"
+    "react-test-renderer": "^16.13.1",
+    "stylelint": "^13.5.0",
+    "stylelint-config-standard": "^20.0.0"
   },
   "jest": {
     "moduleNameMapper": {
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/fileMock.js",
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/chromeMock.js",
       "\\.(css|less|scss|sass)$": "identity-obj-proxy"
     }
   }
