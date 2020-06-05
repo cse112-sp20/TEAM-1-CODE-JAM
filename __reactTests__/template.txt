@@ -1,0 +1,40 @@
+import React from 'react';
+import "babel-polyfill";
+import YOUR TEST COMPONENT from WHEREVER';
+import { render, fireEvent, waitFor, screen } from '@testing-library/react';
+import '@testing-library/jest-dom/extend-expect';
+
+// Add local chrome variable
+import { chrome } from "../__mocks__/chromeMock.js";
+global.chrome = chrome;
+
+// Create the test component
+const testComponent = <SideNav />;
+
+// Testing the rendering of side nav bar
+test("Testing Side Navigation Renders Correctly", () => {
+  // Render the test component
+  render(testComponent);
+
+  // Query all text in side nav bar
+  const queryHomeText = "home";
+  const queryTimeline = "access_time";
+  const queryChart = "insert_chart";
+  const queryGroup = "group_add";
+
+  // Try to get the elements by text
+  const homeNav = screen.getByText(queryHomeText);
+  expect(homeNav).toBeInTheDocument();
+
+  const timelineNav = screen.getByText(queryTimeline);
+  expect(timelineNav).toBeInTheDocument();
+
+  const chartNav = screen.getByText(queryChart);
+  expect(chartNav).toBeInTheDocument();
+
+  const groupNav = screen.getByText(queryGroup);
+  expect(groupNav).toBeInTheDocument();
+
+  // Can add more tests, like fireEvent. More Info at the link below:
+  https://github.com/testing-library/react-testing-library#basic-example
+});
