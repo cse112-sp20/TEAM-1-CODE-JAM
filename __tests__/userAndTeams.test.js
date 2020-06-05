@@ -328,11 +328,14 @@ describe("createTeamOnFirebase", () => {
 });
 
 describe("get user animal", () => {
-  test("get valid user animal", async () => {
+  test("get a valid user animal", async () => {
     get.mockResolvedValueOnce({
       data: () => {
         return {
-          distributedAnimal: { "user@ucsd.edu": "Predator" },
+          distributedAnimal: {
+            "user@ucsd.edu": "Predator",
+            "user2@ucsd.edu": "android",
+          },
         };
       },
     });
@@ -340,23 +343,36 @@ describe("get user animal", () => {
     const res = await _.getUserAnimal("user@ucsd.edu", "12345");
     expect(res).toEqual("Predator");
   });
-  //   test("get invalid team name", async () => {
-  //     get.mockResolvedValueOnce({
-  //       exists: false,
-  //       data: () => {
-  //         return {
-  //           teamName: "jest mock",
-  //         };
-  //       },
-  //     });
-  //     let userProfile = {
-  //       joined_teams: {
-  //         12345: "now",
-  //       },
-  //     };
-  //     const res = await _.getTeamName("12345", userProfile);
-  //     expect(res).toEqual(undefined);
-  //   });
+
+  test("get another member's valid user animal", async () => {
+    get.mockResolvedValueOnce({
+      data: () => {
+        return {
+          distributedAnimal: {
+            "user@ucsd.edu": "Predator",
+            "user2@ucsd.edu": "android",
+          },
+        };
+      },
+    });
+    const res = await _.getUserAnimal("user2@ucsd.edu", "12345");
+    expect(res).toEqual("android");
+  });
+
+  test("return undefined if user not on team", async () => {
+    get.mockResolvedValueOnce({
+      data: () => {
+        return {
+          distributedAnimal: {
+            "user@ucsd.edu": "Predator",
+            "user2@ucsd.edu": "android",
+          },
+        };
+      },
+    });
+    const res = await _.getUserAnimal("nonMember@ucsd.edu", "12345");
+    expect(res).toEqual(undefined);
+  });
 });
 
 describe("getUserAnimals", () => {
@@ -404,7 +420,50 @@ describe("getUserAnimals", () => {
     expect(result2).toEqual(["banana", "apple"]);
   });
 });
+describe("Reset Team info on a new day", () => {
+  test("reset team info", async () => {
+    // _.currTeamCode = undefined;
+    // animals = ["apple", "banana", "pear"];
 
+    let teams = {
+      11111: {
+        members: ["user@ucsd.edu", "user2@ucsd.edu"],
+        distributedAnimal: {
+          "user@ucsd.edu": "apple",
+          "user2@ucsd.edu": "banana",
+        },
+        curDate: "yesterday",
+        teamPoints: 112,
+        timeWasted: ["facebook", "twitter", "youtube"],
+        animalsLeft: ["pear"],
+      },
+    };
+    update.mockImplementationOnce((dictionary) => {
+      return new Promise((resolve) => {
+        teams["11111"].timeWasted = [];
+        teams["11111"].teamPoints = 100;
+        teams["11111"].animalsLeft = ["apple"];
+        teams["11111"].distributedAnimal = {
+          "user@ucsd.edu": "pear",
+          "user2@ucsd.edu": "apple",
+        };
+
+        // teams["11111"].members = [
+        //   ...teams["11111"].members,
+        //   ...dictionary.members,
+        // ];
+        // teams["11111"].animalsLeft = dictionary.animalsLeft;
+        resolve();
+      });
+    });
+    const res = await _.resetTeamInfo();
+    console.log(teams["11111"]);
+    update.mockRestore();
+
+    console.log(res);
+    // console.log(_.animals);
+  });
+});
 // describe("joinTeamOnFirebase", () => {
 //   let userProfile;
 //   beforeEach(() => {

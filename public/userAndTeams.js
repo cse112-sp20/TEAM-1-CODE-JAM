@@ -275,7 +275,7 @@ export async function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
         },
         { merge: true }
       ),
-    db //me
+    db
       .collection("teams")
       .doc(teamCode)
       .set(
@@ -835,6 +835,8 @@ export function isCheckIn() {
 function resetTeamInfo() {
   if (currTeamCode === undefined) return;
   let animalsLeft = Array.from(animals);
+
+  // console.log(animalsLeft);
   let members = currentTeamInfo.members;
   let numMem = currentTeamInfo.members.length;
   let distributedAnimal = {};
@@ -895,6 +897,9 @@ const _ = {
   joinTeamOnFirebase,
   getAnimalsLeft,
   getAnimal,
+  resetTeamInfo,
+  // animals,
+  currTeamCode,
 };
 
 export default _;

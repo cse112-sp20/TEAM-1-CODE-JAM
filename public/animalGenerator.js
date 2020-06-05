@@ -73,3 +73,9 @@ export function addAnimal(animalsLeft, animal) {
     animalsLeft.push(animal);
   }
 }
+
+const _animals = {
+  animals,
+};
+
+export default _animals;
