@@ -9,7 +9,7 @@ on:
 
   push:
     branches: 
-      - test/pipeline
+      - bugFix/dupLinters
 
 jobs:
   Unit-Test:
@@ -59,12 +59,11 @@ jobs:
         run: npm install
 
       - name: Run linters
-        uses: samuelmeuli/lint-action@v1
-        with:
-          github_token: ${{ secrets.github_token }}
-          stylelint: true
-          eslint: true
-          prettier: true
+        run: npm run lint &&
+          npm run stylelint
+
+      - name: Run style checker
+        run: npm run prettier
 
   Code-Coverage:
     runs-on: ubuntu-latest
