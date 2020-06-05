@@ -1,26 +1,124 @@
+// Import testing library
+import "@testing-library/jest-dom";
 import React from "react";
-import "babel-polyfill";
-import Charts from "../src/components/Charts";
-import { render, fireEvent, waitFor, screen } from "@testing-library/react";
-import "@testing-library/jest-dom/extend-expect";
+import { render, fireEvent, screen } from "@testing-library/react";
+import { Router } from "react-router-dom";
+import { createMemoryHistory } from "history";
+import Charts from "../src/components/Charts.js";
+import ReactRenderer from "react-test-renderer";
 
-// Set local chrome mock as global var
-import { chrome } from "../__mocks__/chromeMock.js";
+// Set chrome mock
+import { chrome, sendMessage } from "../__mocks__/chromeMock.js";
 global.chrome = chrome;
 
-// Create the test component
+// Change window.name to valid
+window.name = "not_nodejs";
+
+// Function to render with router
+const renderWithRouter = (
+  component,
+  {
+    route = "/",
+    history = createMemoryHistory({ initialEntries: [route] }),
+  } = {}
+) => {
+  return {
+    ...render(<Router history={history}>{component}</Router>),
+    history,
+  };
+};
+
+// define testComponent
 const testComponent = <Charts />;
 
-// Testing the rendering of the charts component
-test("Testing Charts Render Correctly", () => {
-  // Render the test component
-  render(testComponent);
+// Test data (change at will)
+const testTeams = [
+  {
+    teamCode: 11111,
+    teamName: "test 1",
+    joinedTime: "yesterday",
+  },
+];
+const testTeamPoints = {
+  "11111": {
+    userPoints: 300,
+    teamPoints: 1200,
+  },
+};
 
-  // Query the team title
-  const teamTitle = screen.getByText("Team Activity Tracker");
-  expect(teamTitle).toBeInTheDocument();
+// Testing charts
+describe("<Charts />", () => {
+  // Mock an implementation for send message
+  beforeEach(() => {
+    sendMessage.mockImplementation((msg, callback) => {
+      let response;
 
-  // Check that the settings button is there
-  const settingsBtn = screen.getByText("settings");
-  expect(settingsBtn).toBeInTheDocument();
+      // Get team points
+      if (msg.message == "get team points") {
+        response = testTeamPoints;
+      }
+      // Get teams
+      else if (msg.message === "get teams") {
+        response = testTeams;
+      }
+      // Switch teams
+      else if (msg.message == "switch team") {
+        response = "success";
+      }
+      // Not recognized
+      else {
+        response = undefined;
+      }
+
+      // Return response
+      callback(response);
+    });
+  });
+
+  // Clear send message after test
+  afterEach(() => {
+    sendMessage.mockClear();
+  });
+
+  // test render
+  test("Charts.js react unit tests: test send message, and chart data", () => {
+    // Render charts
+    const { getByTestId } = renderWithRouter(testComponent);
+
+    // Expect send message to be called twice
+    expect(sendMessage).toHaveBeenCalledTimes(2);
+
+    // Expect get teams to be called
+    expect(sendMessage).toHaveBeenCalledWith(
+      {
+        for: "background",
+        message: "get teams",
+      },
+      expect.anything()
+    );
+
+    // Expect get team points to be called
+    expect(sendMessage).toHaveBeenCalledWith(
+      {
+        for: "background",
+        message: "get team points",
+      },
+      expect.anything()
+    );
+
+    // Get the chart data from the screen
+    const chartTestId = "chart-container";
+    const testArray = getByTestId(chartTestId);
+
+    // Check that chart data is an attribute
+    expect(testArray.hasAttribute("chartdata")).toBe(true);
+
+    // Check that chart data is not null if test data exists
+    if (testTeams.length) {
+      expect(testArray.getAttribute("chartdata")).toBeDefined();
+    }
+
+    // Check if at least one chart is rendered
+    expect(testArray.childElementCount).toBe(testTeams.length);
+  });
 });
