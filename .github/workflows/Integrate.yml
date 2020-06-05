@@ -85,7 +85,22 @@ jobs:
   Code-Quality:
     runs-on: ubuntu-latest
     steps:
-    - name: Check code meets quality standards
+    - name: Check out Git repository
+      uses: actions/checkout@v2
+    - name: Set up Node.js
+      uses: actions/setup-node@master
+      with:
+        node-version: 12
+    - name: Install Node.js dependencies
+      run: npm install
+    
+    - name: Check for code duplicate
+      run: npm run jscpd
+
+    - name: Static Type Checker
+      run: npm run flow
+
+    - name: Running Code Inspector
       id: code-inspector
       uses: codeinspectorio/github-action@master
       with:
