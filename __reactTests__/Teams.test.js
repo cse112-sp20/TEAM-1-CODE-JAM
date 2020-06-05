@@ -2,7 +2,6 @@ import { chrome, sendMessage, set } from "../__mocks__/chromeMock.js";
 global.chrome = chrome;
 import "@testing-library/jest-dom";
 import React from "react";
-// import { render, fireEvent, screen } from "@testing-library/react";
 import { render, fireEvent } from "@testing-library/react";
 import { Route, Router } from "react-router-dom";
 import { createMemoryHistory } from "history";
