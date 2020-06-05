@@ -39,7 +39,7 @@ export default class Charts extends Component {
       if (response == undefined) {
         return;
       }
-      console.log(response);
+
       // parse through response that grabs the day's team and user points
       response.forEach((element) => {
         let newElement = Object.values(element);
@@ -49,10 +49,12 @@ export default class Charts extends Component {
         teams: teamInfo,
       });
     });
+
     let msg2 = {
       for: "background",
       message: "get team points",
     };
+
     // ask the background for team information
     chrome.runtime.sendMessage(msg2, (response) => {
       if (response == undefined) {
@@ -61,6 +63,7 @@ export default class Charts extends Component {
       for (let [key, value] of Object.entries(response)) {
         teamData[key] = value;
       }
+
       this.setState({
         points: teamData,
       });
@@ -88,62 +91,83 @@ export default class Charts extends Component {
   }
   render() {
     let data = [];
-    if (window.name !== "nodejs") {
-      let index;
-      // iterate through each team
-      for (index = 0; index < this.state.teams.length; index++) {
-        // grab team code
-        let curTeamCode = this.state.teams[index][0];
-        // grab points associated to person and team
-        let pointsPair = this.state.points[curTeamCode];
-        // get out of something is undefined ( a deleted team )
-        if (pointsPair == undefined) {
-          break;
-        }
-        // create array for graphing
-        let tempArray = [];
-        pointsPair = Object.entries(pointsPair);
-        tempArray.push(pointsPair[0][1]);
-        tempArray.push(pointsPair[1][1]);
+    let testArray = {
+      labels: ["Team Points", "My Contributions"],
+      data: [],
+    };
 
-        // create doughnuts based on number of teams
-        data.push(
-          <Doughnut
-            key="2"
-            data={{
-              labels: ["Team Points", "My Contributions"],
-              datasets: [
-                {
-                  type: "doughnut",
-                  label: "My Contributions",
-                  data: tempArray,
-                  backgroundColor: [
-                    "rgba(11, 113, 126, 0.7)",
-                    "rgba(255,206,86,0.6)",
-                  ],
-                },
-              ],
-            }}
-            options={{
-              title: {
-                display: true,
-                text: this.state.teams[index][1],
-                fontSize: 20,
-              },
-              legend: {
-                display: true,
-                position: "bottom",
-              },
-              maintainAspectRatio: true,
-            }}
-          />
-        );
+    let index;
+
+    // iterate through each team
+    for (index = 0; index < this.state.teams.length; index++) {
+      // grab team code
+      let curTeamCode = this.state.teams[index][0];
+
+      // grab points associated to person and team
+      let pointsPair = this.state.points[curTeamCode];
+      // get out of something is undefined ( a deleted team )
+      if (pointsPair == undefined) {
+        break;
       }
-      return (
-        <div id="chart" chartData={this.state.chartData} className="chart">
-          {data}
-        </div>
+      // create array for graphing
+      let tempArray = [];
+
+      pointsPair = Object.entries(pointsPair);
+      tempArray.push(pointsPair[0][1]);
+      tempArray.push(pointsPair[1][1]);
+
+      // New data
+      const newChartData = {
+        labels: ["Team Points", "My Contributions"],
+        datasets: [
+          {
+            type: "doughnut",
+            label: "My Contributions",
+            data: tempArray,
+            backgroundColor: [
+              "rgba(11, 113, 126, 0.7)",
+              "rgba(255,206,86,0.6)",
+            ],
+          },
+        ],
+      };
+
+      // Append data to test array
+      testArray.data.push({
+        teamCode: curTeamCode,
+        points: tempArray,
+      });
+
+      // create doughnuts based on number of teams
+      data.push(
+        <Doughnut
+          key="2"
+          data={newChartData}
+          options={{
+            title: {
+              display: true,
+              text: this.state.teams[index][1],
+              fontSize: 20,
+            },
+            legend: {
+              display: true,
+              position: "bottom",
+            },
+            maintainAspectRatio: true,
+          }}
+        />
       );
     }
+
+    return (
+      <div
+        id="chart"
+        data-testid="chart-container"
+        chartdata={testArray}
+        className="chart"
+      >
+        {data}
+      </div>
+    );
   }
 }
