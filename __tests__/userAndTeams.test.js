@@ -327,6 +327,191 @@ describe("createTeamOnFirebase", () => {
   });
 });
 
+describe("get user animal", () => {
+  test("get valid user animal", async () => {
+    get.mockResolvedValueOnce({
+      data: () => {
+        return {
+          distributedAnimal: { "user@ucsd.edu": "Predator" },
+        };
+      },
+    });
+
+    const res = await _.getUserAnimal("user@ucsd.edu", "12345");
+    expect(res).toEqual("Predator");
+  });
+  //   test("get invalid team name", async () => {
+  //     get.mockResolvedValueOnce({
+  //       exists: false,
+  //       data: () => {
+  //         return {
+  //           teamName: "jest mock",
+  //         };
+  //       },
+  //     });
+  //     let userProfile = {
+  //       joined_teams: {
+  //         12345: "now",
+  //       },
+  //     };
+  //     const res = await _.getTeamName("12345", userProfile);
+  //     expect(res).toEqual(undefined);
+  //   });
+});
+
+describe("getUserAnimals", () => {
+  test("gets the user's animal", async () => {
+    let userEmail = "user@ucsd.edu";
+    let userEmail2 = "user2@ucsd.edu";
+    let teams = {
+      11111: {
+        distributedAnimal: {
+          "user@ucsd.edu": "Predator",
+          "user2@ucsd.edu": "banana",
+        },
+      },
+      22222: {
+        distributedAnimal: {
+          "user@ucsd.edu": "android",
+          "user2@ucsd.edu": "apple",
+        },
+      },
+    };
+
+    _.getUserAnimal = jest.fn();
+    let userTeamCodes = Object.keys(teams);
+    for (let key in userTeamCodes) {
+      let teamCode = userTeamCodes[key];
+      let userAnimal = teams[teamCode].distributedAnimal[userEmail];
+      _.getUserAnimal.mockReturnValueOnce(Promise.resolve(userAnimal));
+    }
+
+    for (let key in userTeamCodes) {
+      let teamCode = userTeamCodes[key];
+      let userAnimal2 = teams[teamCode].distributedAnimal[userEmail2];
+      _.getUserAnimal.mockReturnValueOnce(Promise.resolve(userAnimal2));
+    }
+
+    const result = await _.getUserAnimals(userEmail, teams);
+    const result2 = await _.getUserAnimals(userEmail2, teams);
+
+    expect(_.getUserAnimal).toHaveBeenCalledTimes(4);
+    expect(_.getUserAnimal).toHaveBeenCalledWith("user@ucsd.edu", "11111");
+    expect(_.getUserAnimal).toHaveBeenCalledWith("user@ucsd.edu", "22222");
+    expect(_.getUserAnimal).toHaveBeenCalledWith("user2@ucsd.edu", "11111");
+    expect(_.getUserAnimal).toHaveBeenCalledWith("user2@ucsd.edu", "22222");
+    expect(result).toEqual(["Predator", "android"]);
+    expect(result2).toEqual(["banana", "apple"]);
+  });
+});
+
+// describe("joinTeamOnFirebase", () => {
+//   let userProfile;
+//   beforeEach(() => {
+//     userProfile = {
+//       joined_teams: {
+//         12345: "yesterday",
+//       },
+//     };
+//   });
+//   test("already existed team code", async () => {
+//     const result = await joinTeamOnFirebase("12345", userProfile, userEmail);
+//     expect(result).toBe("already joined the group");
+//   });
+//   test("team code does not exist", async () => {
+//     const result = await joinTeamOnFirebase("123456", userProfile, userEmail);
+//     expect(result).toBe("team code not found");
+//   });
+//   test("join team success", async () => {
+//     let teamCode = await createTeamOnFirebase("jest testing", dummyEmail);
+//     const result = await joinTeamOnFirebase(teamCode, userProfile, userEmail);
+//     expect(result).toBe("success");
+//     let data = await Promise.all([
+//       getTeamInformation(teamCode),
+//       getUserInformation(userEmail),
+//     ]);
+//     let teamInformation = data[0].data();
+//     let userInformation = data[1].data();
+//     expect(teamCode in userInformation.joined_teams).toBe(true);
+//     expect(teamInformation.members.includes(userEmail)).toBe(true);
+//   });
+// });
+// describe("getTeamName", () => {
+//   test("get valid team name", async () => {
+//     let userProfile = {
+//       joined_teams: {
+//         12345: "yesterday",
+//       },
+//     };
+//     const result = await getTeamName("12345", userProfile);
+//     expect(result).toEqual({
+//       teamCode: "12345",
+//       teamName: "testing",
+//       joinedTime: "yesterday",
+//     });
+//   });
+// });
+
+// describe("validUserEmail", () => {
+//   const createUserMock = jest.fn(() => Promise.resolve());
+//   afterEach(() => {
+//     jest.clearAllMocks();
+//   });
+//   test("user does not exist", async () => {
+//     let fakeEmail = "doesn't exist";
+//     await validUserEmail(fakeEmail, createUserMock);
+//     expect(createUserMock).toHaveBeenCalled();
+//     expect(createUserMock).toHaveBeenCalledWith(fakeEmail);
+//   });
+//   test("user does exist", async () => {
+//     await validUserEmail(userEmail, createUserMock);
+//     expect(createUserMock).not.toHaveBeenCalled();
+//     expect(createUserMock).not.toHaveBeenCalledWith(userEmail);
+//   });
+// });
+
+// describe("createTeamOnFirebase", () => {
+//   test("create a new team on firebase", async () => {
+//     let teamCode = await createTeamOnFirebase("jest testing", userEmail);
+//     let result = await Promise.all([
+//       getTeamInformation(teamCode),
+//       getUserInformation(userEmail),
+//     ]);
+//     let teamInformation = result[0].data();
+//     let userInformation = result[1].data();
+//     expect(teamInformation.teamName).toBe("jest testing");
+//     expect(teamInformation.members.includes(userEmail)).toBe(true);
+//     expect(teamInformation.creator).toBe(userEmail);
+//     expect(teamCode in userInformation.joined_teams).toBe(true);
+//   });
+// });
+
+// describe("deleteTeamFromUser", () => {
+//   test("create a team then delete from user", async () => {
+//     let userProfile = {
+//       joined_teams: {
+//         12345: "yesterday",
+//       },
+//     };
+//     let teamCode = await createTeamOnFirebase("jest testing", dummyEmail);
+//     await joinTeamOnFirebase(teamCode, userProfile, userEmail);
+//     await deleteTeamFromUser(userEmail, teamCode);
+//     let result = await Promise.all([
+//       getTeamInformation(teamCode),
+//       getUserInformation(userEmail),
+//     ]);
+//     let teamInformation = result[0].data();
+//     let userInformation = result[1].data();
+//     expect(teamInformation.members.includes(userEmail)).toBe(false);
+//     expect(teamCode in userInformation.joined_teams).toBe(false);
+//   });
+// });
+
+// afterAll(async () => {
+//   await deleteEverythingAboutAUser(dummyEmail);
+//   await deleteEverythingAboutAUser(userEmail);
+//   global.firebase.app().delete();
+// });
 describe("joinTeamOnFirebase", () => {
   test("already existed team code", async () => {
     let userProfile = {
