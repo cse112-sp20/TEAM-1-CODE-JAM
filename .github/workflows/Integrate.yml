@@ -40,7 +40,6 @@ jobs:
       - name: Run unit-test
         run: npm test __end2endTest__
     
-
   Stylelint-Eslint-Prettier:
     runs-on: ubuntu-latest
     
@@ -58,7 +57,7 @@ jobs:
         run: npm run lint &&
           npm run stylelint
 
-      - name: Run style checker
+      - name: Run prettier
         run: npm run prettier
 
   Code-Coverage:
