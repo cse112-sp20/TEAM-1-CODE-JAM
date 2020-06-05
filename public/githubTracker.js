@@ -9,7 +9,7 @@ import { userEmail } from "./userAndTeams.js";
  * @author Gen Barcenas
  * @param {string} url
  */
-async function getRepos(url, token) {
+export async function getRepos(url, token) {
   // Url of the user
   let headers = {
     Authorization: `Token ${token}`,
@@ -31,7 +31,7 @@ async function getRepos(url, token) {
  * @param {string} url
  * @param {string} repo
  */
-async function getCommits(url, repo, token) {
+export async function getCommits(url, repo, token) {
   let headers = {
     Accept: "application/vnd.github.cloak-preview",
     Authorization: `Token ${token}`,
@@ -54,7 +54,7 @@ async function getCommits(url, repo, token) {
  * of commits, the function only wants commits from the current day.
  * @author Gen Barcenas
  */
-async function getMostRecentCommit() {
+export async function getMostRecentCommit() {
   let arr = [];
 
   getUserGithubToken(false);
