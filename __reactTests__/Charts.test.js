@@ -1,11 +1,10 @@
 // Import testing library
 import "@testing-library/jest-dom";
 import React from "react";
-import { render, fireEvent, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import { Router } from "react-router-dom";
 import { createMemoryHistory } from "history";
 import Charts from "../src/components/Charts.js";
-import ReactRenderer from "react-test-renderer";
 
 // Set chrome mock
 import { chrome, sendMessage } from "../__mocks__/chromeMock.js";

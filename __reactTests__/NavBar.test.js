@@ -1,7 +1,7 @@
 import React from "react";
 import "babel-polyfill";
 import NavBar from "../src/components/NavBar";
-import { render, fireEvent, waitFor, screen } from "@testing-library/react";
+import { render, fireEvent, screen } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 
 // Set local chrome mock as global var
