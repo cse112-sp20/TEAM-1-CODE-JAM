@@ -1,3 +1,12 @@
+// Define a tabs array
+var openTabs = [];
+
+// Push a new tab
+const pushTabs = (data) => {
+  openTabs.push(data);
+};
+
+// Define identity
 export let sendMessage = jest.fn();
 
 let identity = {
@@ -5,6 +14,12 @@ let identity = {
     callback({ email: "test@gmail.com" });
   }),
   getRedirectURL: jest.fn(),
+};
+
+// Define a tab
+let tabs = {
+  create: pushTabs,
+  pages: openTabs,
 };
 
 let runtime = {
@@ -23,7 +38,8 @@ let storage = {
 };
 
 export const chrome = {
-  identity: identity,
-  runtime: runtime,
-  storage: storage,
+  identity,
+  runtime,
+  storage,
+  tabs,
 };
