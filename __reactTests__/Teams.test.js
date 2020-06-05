@@ -6,6 +6,7 @@ import { render, fireEvent } from "@testing-library/react";
 import { Route, Router } from "react-router-dom";
 import { createMemoryHistory } from "history";
 import Teams from "../src/components/Teams.js";
+
 describe("<Teams />", () => {
   beforeEach(() => {
     sendMessage.mockImplementationOnce((msg, callback) => {
@@ -32,7 +33,7 @@ describe("<Teams />", () => {
   afterEach(() => {
     sendMessage.mockClear();
   });
-  test("should render all teams", () => {
+  test("Testing rendering all teams", () => {
     const history = createMemoryHistory();
     const { getByTestId } = render(
       <Router history={history}>
@@ -54,7 +55,7 @@ describe("<Teams />", () => {
       expect.anything()
     );
   });
-  test("should click on a team", async () => {
+  test("Test clicking on a team", async () => {
     const history = createMemoryHistory();
     const { getByText } = render(
       <Router history={history}>
