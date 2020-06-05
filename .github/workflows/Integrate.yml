@@ -7,10 +7,6 @@ on:
       - develop
       - staging
 
-  push:
-    branches: 
-      - bugFix/dupLinters
-
 jobs:
   Unit-Test:
     runs-on: ubuntu-latest
