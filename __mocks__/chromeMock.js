@@ -16,6 +16,9 @@ let identity = {
   getRedirectURL: jest.fn(),
 };
 
+let onMessage = {
+  addListener: jest.fn(),
+};
 // Define a tab
 let tabs = {
   create: pushTabs,
@@ -24,6 +27,7 @@ let tabs = {
 
 let runtime = {
   sendMessage,
+  onMessage,
 };
 
 export let set = jest.fn();

@@ -84,7 +84,8 @@
   },
   "jest": {
     "moduleNameMapper": {
-      "\\.(css|less|scss|sass)$": "identity-obj-proxy"
+      "\\.(css|less|scss|sass)$": "identity-obj-proxy",
+      "\\.(png|svg|pdf|jpg|jpeg)$": "<rootDir>/__mocks__/chromeMock.js"
     }
   }
 }
