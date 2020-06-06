@@ -1,7 +1,7 @@
-/* global firebase chrome sendToDB*/
-import { animals, addAnimal, getAnimal } from "./animalGenerator.js";
+/* global firebase chrome */
+import { animals, addAnimal, getAnimal, setAnimal } from "./animalGenerator.js";
 import { getCurrentUrl } from "./tabs.js";
-// import { sendToDB } from "./githubTracker.js";
+import { sendToDB } from "./githubTracker.js";
 import { db } from "./firebaseInit.js";
 export let currentTeamSnapshot = () => {};
 export let teamNames = [];
@@ -33,6 +33,24 @@ export let updateDBParams = {
   githubTimeout: 15000,
 };
 
+/**
+ * set the current team info to a custom team information
+ * use for testing purpose only
+ * @param {Object} dictionary the custom team infomation
+ */
+export function setCurrentTeamInfo(dictionary) {
+  currentTeamInfo = {
+    currDate: dictionary.curDate,
+    animalsLeft: dictionary.animalsLeft,
+    createdTime: dictionary.createdTime,
+    creator: dictionary.creator,
+    distributedAnimal: dictionary.distributedAnimal,
+    members: dictionary.members,
+    teamName: dictionary.teamName,
+    teamPoints: dictionary.teamPoints,
+    timeWasted: dictionary.timeWasted,
+  };
+}
 /**
  * setupListener listens for request coming from popup,
  * it then sends the response that the popup need
@@ -77,13 +95,7 @@ export function setupListener() {
         getUserDailyPoints().then((res) => {
           sendResponse(res);
         });
-      }
-      // else if (request.message === "get timeline") {
-      //   reverseTimelineArray().then((tabs) => {
-      //     sendResponse(tabs);
-      //   });
-      // }
-      else if (request.message === "set timeout to delete team") {
+      } else if (request.message === "set timeout to delete team") {
         timeoutVars[request.teamCode] = setTimeout(async () => {
           let teamInfo = await getTeamInformation(request.teamCode);
           teamInfo = teamInfo.data();
@@ -246,15 +258,15 @@ export async function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
   if (teamCode in userProfile.joined_teams) {
     return "already joined the group";
   }
-  let unique = await isTeamCodeUnique(teamCode);
+  let unique = await _.isTeamCodeUnique(teamCode);
   const currentTime = Date.now();
   // unique means team code doesn't exist
   if (unique) {
     return "team code not found";
   }
   let initPoint = 100;
-  let animalsLeft = await getAnimalsLeft(teamCode);
-  let newAnimal = getAnimal(animalsLeft);
+  let animalsLeft = await _.getAnimalsLeft(teamCode);
+  let newAnimal = _.getAnimal(animalsLeft);
 
   // do both of these two things parallelly
   await Promise.all([
@@ -281,7 +293,7 @@ export async function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
         },
         { merge: true }
       ),
-    db //me
+    db
       .collection("teams")
       .doc(teamCode)
       .set(
@@ -579,6 +591,27 @@ export function getUserProfile(userEmail) {
   });
 }
 
+export async function getUserAnimals(userEmail, teams) {
+  let promises = [];
+  let userTeamCodes = Object.keys(teams);
+  for (let key in userTeamCodes) {
+    let teamCode = userTeamCodes[key];
+    promises.push(_.getUserAnimal(userEmail, teamCode));
+  }
+  return await Promise.all(promises);
+}
+// export async function getUserAnimals(userProfile, teams) {
+//   let promises = [];
+//   for (let key in userProfile.teams) {
+//     let members = userProfile.teams[key].members;
+//     for (let member in members) {
+//       let email = member;
+//       promises.push(_.getUserAnimal(email, key));
+//     }
+//   }
+//   return await Promise.all(promises);
+// }
+
 /**
  * return the user icon base on his email and the
  * team he is in
@@ -817,9 +850,10 @@ export function isCheckIn() {
  * new animal for each teammember
  * @author Brian Aguirre & William Lui
  */
-function resetTeamInfo() {
+async function resetTeamInfo() {
   if (currTeamCode === undefined) return;
   let animalsLeft = Array.from(animals);
+
   let members = currentTeamInfo.members;
   let numMem = currentTeamInfo.members.length;
   let distributedAnimal = {};
@@ -827,7 +861,8 @@ function resetTeamInfo() {
     distributedAnimal[members[i]] = getAnimal(animalsLeft);
   }
 
-  db.collection("teams")
+  await db
+    .collection("teams")
     .doc(currTeamCode)
     .update({
       currDate: getDate(),
@@ -841,6 +876,7 @@ function resetTeamInfo() {
     });
 }
 /**
+ * return the current date
  * @author: Youliang Liu & Xiang Liu
  * @return: the current date
  */
@@ -869,11 +905,23 @@ const _ = {
   getUserEmail,
   getTeamNames,
   getTeamName,
+  getUserAnimals,
+  getUserAnimal,
   setTeamCode,
+  setCurrentTeamCode: setTeamCode,
+  setCurrentTeamInfo,
   validUserEmail,
   createUser,
   getUserProfile,
   createTeamOnFirebase,
+  joinTeamOnFirebase,
+  getAnimalsLeft,
+  getAnimal,
+  resetTeamInfo,
+  // animals,
+  currTeamCode,
+  setAnimal,
+  animals,
   checkDate,
   getDate,
   updateLocalStorage,

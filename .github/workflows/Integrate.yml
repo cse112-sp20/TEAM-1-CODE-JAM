@@ -7,10 +7,6 @@ on:
       - develop
       - staging
 
-  push:
-    branches: 
-      - test/pipeline
-
 jobs:
   Unit-Test:
     runs-on: ubuntu-latest
@@ -24,7 +20,7 @@ jobs:
           node-version: 12
       - name: Install Node.js dependencies
         run: npm install
-
+        
       - name: Run unit-test
         run: npm test __tests__
 
@@ -44,7 +40,6 @@ jobs:
       - name: Run unit-test
         run: npm test __end2endTest__
     
-
   Stylelint-Eslint-Prettier:
     runs-on: ubuntu-latest
     
@@ -59,12 +54,11 @@ jobs:
         run: npm install
 
       - name: Run linters
-        uses: samuelmeuli/lint-action@v1
-        with:
-          github_token: ${{ secrets.github_token }}
-          stylelint: true
-          eslint: true
-          prettier: true
+        run: npm run lint &&
+          npm run stylelint
+
+      - name: Run prettier
+        run: npm run prettier
 
   Code-Coverage:
     runs-on: ubuntu-latest
@@ -85,7 +79,22 @@ jobs:
   Code-Quality:
     runs-on: ubuntu-latest
     steps:
-    - name: Check code meets quality standards
+    - name: Check out Git repository
+      uses: actions/checkout@v2
+    - name: Set up Node.js
+      uses: actions/setup-node@master
+      with:
+        node-version: 12
+    - name: Install Node.js dependencies
+      run: npm install
+    
+    - name: Check for code duplicate
+      run: npm run jscpd
+
+    - name: Static Type Checker
+      run: npm run flow
+
+    - name: Running Code Inspector
       id: code-inspector
       uses: codeinspectorio/github-action@master
       with:
