@@ -95,8 +95,4 @@ describe("getMostRecentCommit", () => {
 
     const json = await getMostRecentCommit;
 
-    expect(global.fetch).toHaveBeenLastCalledWith();
-    expect(Array.isArray(json)).toEqual(true);
-    expect(json.length).toEqual(0);
-
 })
