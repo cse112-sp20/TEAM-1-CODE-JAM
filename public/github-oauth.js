@@ -1,9 +1,26 @@
-/* global chrome*/
+const chrome = require("sinon-chrome");
+window.chrome = chrome;
+
+/**
+ * For the original code please visit:
+ * www.github.com/GoogleChrome/chrome-app-samples/tree/master/samples/github-auth
+ *
+ * Modified by: Gen Barcenas
+ *
+ * GitHub Authentication for Chrome extension using GitHub OAuth.
+ * Provided with several functions thats fetches User's Github token.
+ *
+ * Information that the coder has to provide in order to be able to use GitHub OAuth
+ * are clientId and clientSecret. In addition, coder has to make an addition after line
+ * 46, in order to specify the scope of the GitHub OAuth. For example, the scope for this
+ * project is access to user repo, therefore, &scope=repo is added on line 47. The coder
+ * can begin using GitHub authentication by assigning a button with an id name stated at
+ * the bottom of the file.
+ *
+ */
 
 let signin_button;
 let revoke_button;
-let user_info_div;
-let access_token = null;
 
 let tokenFetcher = (function () {
   // Replace clientId and clientSecret with values obtained by you for your
@@ -15,7 +32,7 @@ let tokenFetcher = (function () {
   let redirectUri = chrome.identity.getRedirectURL("provider_cb");
   let redirectRe = new RegExp(redirectUri + "[#?](.*)");
 
-  localStorage.removeItem("token");
+  let access_token = null;
 
   return {
     getToken: function (interactive, callback) {
@@ -35,7 +52,6 @@ let tokenFetcher = (function () {
           "&redirect_uri=" +
           encodeURIComponent(redirectUri),
       };
-
       chrome.identity.launchWebAuthFlow(options, function (redirectUri) {
         if (chrome.runtime.lastError) {
           callback(new Error(chrome.runtime.lastError));
@@ -101,16 +117,10 @@ let tokenFetcher = (function () {
           // can be easily parsed to an object.
           if (this.status === 200) {
             let response = JSON.parse(this.responseText);
-
-            // if (response.hasOwnProperty("access_token")) {
             if (
               Object.prototype.hasOwnProperty.call(response, "access_token")
             ) {
               setAccessToken(response.access_token);
-              // let item = { "token" : response.access_token };
-              localStorage.setItem("token", response.access_token);
-
-              // signin_button.disabled = true;
             } else {
               callback(new Error("Cannot obtain access_token from code."));
             }
@@ -127,16 +137,22 @@ let tokenFetcher = (function () {
         callback(null, access_token);
       }
     },
+
     removeCachedToken: function (token_to_remove) {
       if (access_token == token_to_remove) access_token = null;
     },
   };
 })();
 
+/**
+ * Makes the GitHub api call to the server to gain access
+ * to the user's token.
+ * @param {string} method
+ * @param {string} url
+ * @param {boolean} interactive
+ * @param {function pointer} callback
+ */
 function xhrWithAuth(method, url, interactive, callback) {
-  // let retry = true;
-  // let access_token;
-
   getToken();
   function getToken() {
     tokenFetcher.getToken(interactive, function (error, token) {
@@ -144,132 +160,106 @@ function xhrWithAuth(method, url, interactive, callback) {
         callback(error);
         return;
       }
-
-      access_token = token;
+      // access_token = token;
+      localStorage.setItem("token", token);
+      callback(error);
     });
   }
 }
 
-function getUserInfo(interactive) {
+/**
+ * Fetches User's GitHub Token.
+ * If interactive then show pop up for user permission
+ * to access their GitHub data.
+ * If not interactive then directly fetches token.
+ * @param {boolean} interactive
+ */
+export function getUserGithubToken(interactive) {
+  console.log("Fetching User GitHub Token...");
   xhrWithAuth(
     "GET",
     "https://api.github.com/user",
     interactive,
-    onUserInfoFetched
+    onUserGithubTokenFetched
   );
 }
 
-// Functions updating the User Interface:
+/**
+ * Used as a callback function and notifies user if the
+ * fetching of the token was successful or a failure
+ * @author Gen Barcenas
+ * @param {object} error
+ */
+function onUserGithubTokenFetched(error) {
+  if (error) {
+    console.log("Fetch GitHub Token failed", error, status);
+  } else {
+    console.log("Success!");
+  }
+}
+
+/**
+ * Functions updating the User Interface:
+ * Shows button that was passed in as parameter
+ * @param {HTMLElement object} button
+ */
 function showButton(button) {
-  if (button != null) {
-    button.style.display = "inline";
-    button.disabled = false;
-  }
+  button.style.display = "inline";
+  button.disabled = false;
 }
 
-function hideButton(button) {
-  if (button != null) {
-    button.style.display = "none";
-  }
-}
-
+/**
+ * Functions updating the User Interface:
+ * Disables button that was passed in as parameter
+ * @param {HTMLElement object} button
+ */
 function disableButton(button) {
-  if (button != null) {
-    button.disabled = true;
-  }
+  button.disabled = true;
 }
 
-function onUserInfoFetched(error, status, response) {
-  if (!error && status == 200) {
-    console.log("Got the following user info: " + response);
-    let user_info = JSON.parse(response);
-    populateUserInfo(user_info);
-    showButton(revoke_button);
-    fetchUserRepos(user_info["repos_url"]);
-  } else {
-    console.log("infoFetch failed", error, status);
-    showButton(signin_button);
-  }
-}
-
-function populateUserInfo(user_info) {
-  let elem = user_info_div;
-  let nameElem = document.createElement("div");
-  nameElem.innerHTML =
-    "<b>Hello " +
-    user_info.name +
-    "</b><br>" +
-    "Your github page is: " +
-    user_info.html_url;
-  elem.appendChild(nameElem);
-}
-
-function fetchUserRepos(repoUrl) {
-  xhrWithAuth("GET", repoUrl, false, onUserReposFetched);
-}
-
-function onUserReposFetched(error, status, response) {
-  let elem = document.querySelector("#user_repos");
-  elem.value = "";
-  if (!error && status == 200) {
-    console.log("Got the following user repos:", response);
-    let user_repos = JSON.parse(response);
-    user_repos.forEach(function (repo) {
-      if (repo.private) {
-        elem.value += "[private repo]";
-      } else {
-        elem.value += repo.name;
-      }
-      elem.value += "\n";
-    });
-  } else {
-    console.log("infoFetch failed", error, status);
-  }
-}
-
-// Handlers for the buttons's onclick events.
+/**
+ * Handlers for the buttons's onclick events. Fetches GitHub token from
+ * user's account. If access has not been permitted by user then  a pop
+ * will appear and ask the user for permission to access their data in
+ * their GitHub.
+ */
 function interactiveSignIn() {
   tokenFetcher.getToken(true, function (error) {
     if (error) {
-      document.querySelector("#signin").innerHTML = "SIGN IN";
       showButton(signin_button);
     } else {
-      document.querySelector("#signin").innerHTML = "&#10004";
+      console.log("User is already authenticated by GitHub...");
       disableButton(signin_button);
-      //   getUserInfo(true);
     }
   });
 }
 
+/**
+ * Redirects the user to the https://github.com/settings/applications
+ * which will allow the user to manually revoke their token for their
+ * GitHub. As a result, it will deny access to the user's repositories.
+ */
 function revokeToken() {
   // We are opening the web page that allows user to revoke their token.
-  window.open("https://github.com/settings/applications");
+  // window.open("https://github.com/settings/applications");
+  window.location.href = "https://github.com/settings/applications";
+
   // And then clear the user interface, showing the Sign in button only.
   // If the user revokes the app authorization, they will be prompted to log
   // in again. If the user dismissed the page they were presented with,
   // Sign in button will simply sign them in.
-  // user_info_div.textContent = '';
-  hideButton(revoke_button);
-  document.querySelector("#signin").innerHTML = "SIGN IN";
+  disableButton(revoke_button);
   showButton(signin_button);
-  if (signin_button != null) {
-    signin_button.onclick = interactiveSignIn;
-  }
 }
 
 signin_button = document.querySelector("#signin");
-if (signin_button != null) {
-  signin_button.onclick = interactiveSignIn;
-}
 revoke_button = document.querySelector("#revoke");
-if (revoke_button != null) {
+
+/**
+ * JS files is called in other places so buttons might equal null.
+ * Checks if the buttons exists.
+ */
+if (signin_button || revoke_button) {
+  signin_button.onclick = interactiveSignIn;
   revoke_button.onclick = revokeToken;
 }
-
-// user_info_div = document.querySelector('#user_info');
-
-if (signin_button != null) {
-  showButton(signin_button);
-}
-
-getUserInfo(false);
