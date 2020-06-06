@@ -437,7 +437,6 @@ describe("getUserAnimals", () => {
 describe("Reset Team info on a new day", () => {
   test("check when teamcode is undefined", async () => {
     _.currTeamCode = undefined;
-
     let teams = {
       11111: {
         members: ["user@ucsd.edu", "user2@ucsd.edu"],
@@ -502,6 +501,17 @@ describe("Reset Team info on a new day", () => {
     allAnimal.sort();
     expect(allAnimal).toEqual(["apple", "banana", "pear"].sort());
     _.setAnimal(allAnimals);
+    _.setCurrentTeamInfo({
+      currDate: undefined,
+      animalsLeft: [],
+      createdTime: undefined,
+      creator: undefined,
+      distributedAnimal: [],
+      members: [],
+      teamName: "",
+      teamPoints: 100,
+      timeWasted: [],
+    });
   });
 
   update.mockRestore();
