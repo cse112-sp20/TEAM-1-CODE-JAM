@@ -1,8 +1,12 @@
 import { chrome } from "../__mocks__/chromeMock.js";
 global.chrome = chrome;
 import _, { getDate } from "../public/userAndTeams.js";
+import { localStorageMock } from "../__mocks__/testMock.js";
 import { setDB } from "../public/firebaseInit.js";
 import { db, get, set, update } from "../__mocks__/databaseMock.js";
+
+//localStorageMock.setItem("test", 2);
+//console.log(store);
 
 let userEmail = "test@gmail.com";
 // let dummyEmail = "test2@gmail.com";
@@ -515,6 +519,34 @@ describe("Reset Team info on a new day", () => {
   });
 
   update.mockRestore();
+});
+
+describe("testing checkDate()", () => {
+  test("checkDate for empty localStorage", () => {
+    _.checkDate();
+    let date = _.getDate();
+    expect(localStorageMock.setItem).toHaveBeenCalled();
+    expect(localStorageMock.setItem).toHaveBeenCalledTimes(1);
+    expect(localStorageMock.setItem).toHaveBeenCalledWith("date", date);
+  });
+  test("checkDate for different date", () => {
+    localStorageMock.setItem("date", "test");
+    expect(localStorageMock.getItem("date")).toBe("test");
+    _.checkDate();
+    //_.updateLocalStorage();
+    let date = _.getDate();
+    expect(localStorageMock.setItem).toHaveBeenCalledTimes(3);
+    expect(localStorageMock.setItem).toHaveBeenLastCalledWith("date", date);
+    expect(localStorageMock.getItem("date")).toBe(date);
+  });
+  test("checkDate for clearing localStorage", () => {
+    localStorageMock.setItem("date", "test");
+    expect(localStorageMock.getItem("date")).toBe("test");
+    localStorageMock.setItem("toBeCleared", "value");
+    expect(localStorageMock.getItem("toBeCleared")).toBe("value");
+    _.checkDate();
+    expect(localStorageMock.getItem("toBeCleared")).toBe(null);
+  });
 });
 
 describe("joinTeamOnFirebase", () => {
