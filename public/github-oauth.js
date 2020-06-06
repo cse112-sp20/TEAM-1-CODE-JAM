@@ -190,9 +190,9 @@ export function getUserGithubToken(interactive) {
  * @author Gen Barcenas
  * @param {object} error
  */
-function onUserGithubTokenFetched(error) {
+export function onUserGithubTokenFetched(error) {
   if (error) {
-    console.log("Fetch GitHub Token failed", error, status);
+    console.log("Fetch GitHub Token failed", error);
   } else {
     console.log("Success!");
   }
@@ -203,9 +203,13 @@ function onUserGithubTokenFetched(error) {
  * Shows button that was passed in as parameter
  * @param {HTMLElement object} button
  */
-function showButton(button) {
-  button.style.display = "inline";
+export function showButton(button) {
+  // button.style.display = "inline";
+  if (button === null) {
+    return;
+  }
   button.disabled = false;
+  return button;
 }
 
 /**
@@ -213,8 +217,12 @@ function showButton(button) {
  * Disables button that was passed in as parameter
  * @param {HTMLElement object} button
  */
-function disableButton(button) {
+export function disableButton(button) {
+  if (button === null) {
+    return;
+  }
   button.disabled = true;
+  return button;
 }
 
 /**

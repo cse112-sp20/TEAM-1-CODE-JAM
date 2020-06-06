@@ -77,22 +77,3 @@ describe("getCommits", () => {
     ]);
   });
 });
-
-describe("getMostRecentCommit", () => {
-  test("get most recent commit", async () => {
-    let response = {
-      headers: {
-        Accept: "application/vnd.github.cloak-preview",
-        Authorization: "Token 123456789",
-      },
-      method: "GET",
-    };
-
-    global.fetch = jest.fn().mockImplementation(() =>
-      Promise.resolve({
-        json: () => [],
-    ));
-
-    const json = await getMostRecentCommit;
-
-})
