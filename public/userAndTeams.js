@@ -1,5 +1,5 @@
 /* global firebase chrome */
-import { animals, addAnimal, getAnimal } from "./animalGenerator.js";
+import { animals, addAnimal, getAnimal, setAnimal } from "./animalGenerator.js";
 import { getCurrentUrl } from "./tabs.js";
 import { sendToDB } from "./githubTracker.js";
 import { db } from "./firebaseInit.js";
@@ -33,6 +33,24 @@ export let updateDBParams = {
   githubTimeout: 15000,
 };
 
+/**
+ * set the current team info to a custom team information
+ * use for testing purpose only
+ * @param {Object} dictionary the custom team infomation
+ */
+export function setCurrentTeamInfo(dictionary) {
+  currentTeamInfo = {
+    currDate: dictionary.curDate,
+    animalsLeft: dictionary.animalsLeft,
+    createdTime: dictionary.createdTime,
+    creator: dictionary.creator,
+    distributedAnimal: dictionary.distributedAnimal,
+    members: dictionary.members,
+    teamName: dictionary.teamName,
+    teamPoints: dictionary.teamPoints,
+    timeWasted: dictionary.timeWasted,
+  };
+}
 /**
  * setupListener listens for request coming from popup,
  * it then sends the response that the popup need
@@ -832,11 +850,10 @@ export function isCheckIn() {
  * new animal for each teammember
  * @author Brian Aguirre & William Lui
  */
-function resetTeamInfo() {
+async function resetTeamInfo() {
   if (currTeamCode === undefined) return;
   let animalsLeft = Array.from(animals);
 
-  // console.log(animalsLeft);
   let members = currentTeamInfo.members;
   let numMem = currentTeamInfo.members.length;
   let distributedAnimal = {};
@@ -844,7 +861,8 @@ function resetTeamInfo() {
     distributedAnimal[members[i]] = getAnimal(animalsLeft);
   }
 
-  db.collection("teams")
+  await db
+    .collection("teams")
     .doc(currTeamCode)
     .update({
       currDate: getDate(),
@@ -858,6 +876,7 @@ function resetTeamInfo() {
     });
 }
 /**
+ * return the current date
  * @author: Youliang Liu & Xiang Liu
  * @return: the current date
  */
@@ -890,6 +909,7 @@ const _ = {
   getUserAnimal,
   setTeamCode,
   setCurrentTeamCode: setTeamCode,
+  setCurrentTeamInfo,
   validUserEmail,
   createUser,
   getUserProfile,
@@ -900,6 +920,7 @@ const _ = {
   resetTeamInfo,
   // animals,
   currTeamCode,
+  setAnimal,
 };
 
 export default _;
