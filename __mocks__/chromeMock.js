@@ -43,3 +43,4 @@ export const chrome = {
   storage,
   tabs,
 };
+

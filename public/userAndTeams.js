@@ -922,6 +922,9 @@ const _ = {
   currTeamCode,
   setAnimal,
   animals,
+  checkDate,
+  getDate,
+  updateLocalStorage,
 };
 
 export default _;
