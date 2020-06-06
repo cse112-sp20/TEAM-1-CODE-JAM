@@ -326,6 +326,20 @@ describe("createTeamOnFirebase", () => {
     _.generateRandomTeamCode.mockRestore();
   });
 });
+describe("get animals left", () => {
+  test("gets all animals remaining", async () => {
+    get.mockResolvedValueOnce({
+      data: () => {
+        return {
+          animalsLeft: ["Predator", "android"],
+        };
+      },
+    });
+
+    const res = await _.getAnimalsLeft("12345");
+    expect(res).toEqual(["Predator", "android"]);
+  });
+});
 
 describe("get user animal", () => {
   test("get a valid user animal", async () => {
@@ -444,6 +458,7 @@ describe("Reset Team info on a new day", () => {
   });
   test("check when resetTeamInfo runs correctly", async () => {
     _.setCurrentTeamCode("11111");
+    let allAnimals = _.animals;
     _.setAnimal(["apple", "banana", "pear"]);
 
     let teams = {
@@ -486,7 +501,10 @@ describe("Reset Team info on a new day", () => {
 
     allAnimal.sort();
     expect(allAnimal).toEqual(["apple", "banana", "pear"].sort());
+    _.setAnimal(allAnimals);
   });
+
+  update.mockRestore();
 });
 
 describe("joinTeamOnFirebase", () => {

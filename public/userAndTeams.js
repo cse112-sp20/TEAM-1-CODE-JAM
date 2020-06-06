@@ -921,6 +921,7 @@ const _ = {
   // animals,
   currTeamCode,
   setAnimal,
+  animals,
 };
 
 export default _;
