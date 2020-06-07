@@ -1,7 +1,35 @@
-/* global firebase chrome */
-import { animals, addAnimal, getAnimal, setAnimal } from "./animalGenerator.js";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: userAndTeams.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: userAndTeams.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* global firebase chrome sendToDB*/
+import { animals, addAnimal, getAnimal } from "./animalGenerator.js";
 import { getCurrentUrl } from "./tabs.js";
-import { sendToDB } from "./githubTracker.js";
+// import { sendToDB } from "./githubTracker.js";
 import { db } from "./firebaseInit.js";
 export let currentTeamSnapshot = () => {};
 export let teamNames = [];
@@ -33,24 +61,6 @@ export let updateDBParams = {
   githubTimeout: 15000,
 };
 
-/**
- * set the current team info to a custom team information
- * use for testing purpose only
- * @param {Object} dictionary the custom team infomation
- */
-export function setCurrentTeamInfo(dictionary) {
-  currentTeamInfo = {
-    currDate: dictionary.curDate,
-    animalsLeft: dictionary.animalsLeft,
-    createdTime: dictionary.createdTime,
-    creator: dictionary.creator,
-    distributedAnimal: dictionary.distributedAnimal,
-    members: dictionary.members,
-    teamName: dictionary.teamName,
-    teamPoints: dictionary.teamPoints,
-    timeWasted: dictionary.timeWasted,
-  };
-}
 /**
  * setupListener listens for request coming from popup,
  * it then sends the response that the popup need
@@ -95,7 +105,13 @@ export function setupListener() {
         getUserDailyPoints().then((res) => {
           sendResponse(res);
         });
-      } else if (request.message === "set timeout to delete team") {
+      }
+      // else if (request.message === "get timeline") {
+      //   reverseTimelineArray().then((tabs) => {
+      //     sendResponse(tabs);
+      //   });
+      // }
+      else if (request.message === "set timeout to delete team") {
         timeoutVars[request.teamCode] = setTimeout(async () => {
           let teamInfo = await getTeamInformation(request.teamCode);
           teamInfo = teamInfo.data();
@@ -190,9 +206,7 @@ export async function getTeamNames(userProfile) {
   for (let key in userProfile.joined_teams) {
     promises.push(_.getTeamName(key, userProfile));
   }
-  let res = await Promise.all(promises);
-  res = res.filter(Boolean);
-  return res;
+  return await Promise.all(promises);
 }
 /**
  * Get the team name with such team code
@@ -206,10 +220,6 @@ export function getTeamName(teamCode, userProfile) {
       .doc(teamCode)
       .get()
       .then(function (doc) {
-        if (!doc.exists) {
-          resolve(undefined);
-          return;
-        }
         let data = doc.data();
         resolve({
           teamCode: teamCode,
@@ -234,13 +244,13 @@ export function checkDate() {
     localStorage.setItem("date", dateStr);
   }
   if (
-    currentTeamInfo.currDate !== undefined &&
+    currentTeamInfo.currDate !== undefined &amp;&amp;
     currentTeamInfo.currDate !== dateStr
   ) {
     console.log("reset");
     resetTeamInfo();
     // currentDate = getDate();
-    createTeamPerformance(currTeamCode, 100, userEmail);
+    createTeamPerformance(currTeamCode, 100);
   }
 }
 
@@ -258,15 +268,15 @@ export async function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
   if (teamCode in userProfile.joined_teams) {
     return "already joined the group";
   }
-  let unique = await _.isTeamCodeUnique(teamCode);
+  let unique = await isTeamCodeUnique(teamCode);
   const currentTime = Date.now();
   // unique means team code doesn't exist
   if (unique) {
     return "team code not found";
   }
   let initPoint = 100;
-  let animalsLeft = await _.getAnimalsLeft(teamCode);
-  let newAnimal = _.getAnimal(animalsLeft);
+  let animalsLeft = await getAnimalsLeft(teamCode);
+  let newAnimal = getAnimal(animalsLeft);
 
   // do both of these two things parallelly
   await Promise.all([
@@ -293,7 +303,7 @@ export async function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
         },
         { merge: true }
       ),
-    db
+    db //me
       .collection("teams")
       .doc(teamCode)
       .set(
@@ -328,7 +338,7 @@ export async function deleteIfNoMembers(teamCode) {
  */
 export async function createTeamOnFirebase(teamName, userEmail) {
   // first generate a random length 5 id
-  let teamCode = await _.generateRandomTeamCode(5);
+  let teamCode = await generateRandomTeamCode(5);
   // create a time stamp (used for sorting)
   let currentTime = Date.now();
   let initPoint = 100;
@@ -370,15 +380,14 @@ export async function createTeamOnFirebase(teamName, userEmail) {
         },
         { merge: true }
       ),
-    createTeamPerformance(teamCode, initPoint, userEmail),
   ]);
+  createTeamPerformance(teamCode, initPoint);
   return teamCode;
 }
-export async function createTeamPerformance(key, points, userEmail) {
+function createTeamPerformance(key, points) {
   let code = key;
   let currentDate = getDate();
-  return db
-    .collection("teamPerformance")
+  db.collection("teamPerformance")
     .doc(currentDate)
     .set(
       {
@@ -498,7 +507,7 @@ export function randomTeamCode(length) {
   let result = "";
   let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   let charactersLength = characters.length;
-  for (let i = 0; i < length; i++) {
+  for (let i = 0; i &lt; length; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
@@ -509,7 +518,7 @@ export function randomTeamCode(length) {
  * @param {string} id The team code to be checked
  * @returns {boolean} True if the team code is unique, else False
  */
-export function isTeamCodeUnique(id) {
+export async function isTeamCodeUnique(id) {
   let idRef = db.collection("teams").doc(id);
   return new Promise((resolve) => {
     idRef.get().then(function (doc) {
@@ -523,7 +532,7 @@ export function isTeamCodeUnique(id) {
     });
   });
 }
-export function validUserEmail(userEmail, createUser) {
+export async function validUserEmail(userEmail, createUser) {
   return new Promise((resolve) => {
     db.collection("users")
       .doc(userEmail)
@@ -590,27 +599,6 @@ export function getUserProfile(userEmail) {
       });
   });
 }
-
-export async function getUserAnimals(userEmail, teams) {
-  let promises = [];
-  let userTeamCodes = Object.keys(teams);
-  for (let key in userTeamCodes) {
-    let teamCode = userTeamCodes[key];
-    promises.push(_.getUserAnimal(userEmail, teamCode));
-  }
-  return await Promise.all(promises);
-}
-// export async function getUserAnimals(userProfile, teams) {
-//   let promises = [];
-//   for (let key in userProfile.teams) {
-//     let members = userProfile.teams[key].members;
-//     for (let member in members) {
-//       let email = member;
-//       promises.push(_.getUserAnimal(email, key));
-//     }
-//   }
-//   return await Promise.all(promises);
-// }
 
 /**
  * return the user icon base on his email and the
@@ -848,21 +836,19 @@ export function isCheckIn() {
 /**
  * Resets timeline elements and redistributes a
  * new animal for each teammember
- * @author Brian Aguirre & William Lui
+ * @author Brian Aguirre &amp; William Lui
  */
-async function resetTeamInfo() {
+function resetTeamInfo() {
   if (currTeamCode === undefined) return;
   let animalsLeft = Array.from(animals);
-
   let members = currentTeamInfo.members;
   let numMem = currentTeamInfo.members.length;
   let distributedAnimal = {};
-  for (let i = 0; i < numMem; i++) {
+  for (let i = 0; i &lt; numMem; i++) {
     distributedAnimal[members[i]] = getAnimal(animalsLeft);
   }
 
-  await db
-    .collection("teams")
+  db.collection("teams")
     .doc(currTeamCode)
     .update({
       currDate: getDate(),
@@ -876,8 +862,7 @@ async function resetTeamInfo() {
     });
 }
 /**
- * return the current date
- * @author: Youliang Liu & Xiang Liu
+ * @author: Youliang Liu &amp; Xiang Liu
  * @return: the current date
  */
 export function getDate() {
@@ -905,26 +890,30 @@ const _ = {
   getUserEmail,
   getTeamNames,
   getTeamName,
-  getUserAnimals,
-  getUserAnimal,
-  setTeamCode,
   setCurrentTeamCode: setTeamCode,
-  setCurrentTeamInfo,
-  validUserEmail,
-  createUser,
-  getUserProfile,
-  createTeamOnFirebase,
-  joinTeamOnFirebase,
-  getAnimalsLeft,
-  getAnimal,
-  resetTeamInfo,
-  // animals,
-  currTeamCode,
-  setAnimal,
-  animals,
-  checkDate,
-  getDate,
-  updateLocalStorage,
 };
 
 export default _;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#checkDate">checkDate</a></li><li><a href="global.html#checkIn">checkIn</a></li><li><a href="global.html#createTeamOnFirebase">createTeamOnFirebase</a></li><li><a href="global.html#createUser">createUser</a></li><li><a href="global.html#deleteEverythingAboutAUser">deleteEverythingAboutAUser</a></li><li><a href="global.html#deleteIfNoMembers">deleteIfNoMembers</a></li><li><a href="global.html#deleteTeamEntirely">deleteTeamEntirely</a></li><li><a href="global.html#deleteTeamFromUser">deleteTeamFromUser</a></li><li><a href="global.html#generateRandomTeamCode">generateRandomTeamCode</a></li><li><a href="global.html#getAnimalsLeft">getAnimalsLeft</a></li><li><a href="global.html#getDate">getDate</a></li><li><a href="global.html#getTeamCode">getTeamCode</a></li><li><a href="global.html#getTeamInformation">getTeamInformation</a></li><li><a href="global.html#getTeamName">getTeamName</a></li><li><a href="global.html#getTeamNames">getTeamNames</a></li><li><a href="global.html#getTeamOnSnapshot">getTeamOnSnapshot</a></li><li><a href="global.html#getUserAnimal">getUserAnimal</a></li><li><a href="global.html#getUserEmail">getUserEmail</a></li><li><a href="global.html#getUserInformation">getUserInformation</a></li><li><a href="global.html#getUserProfile">getUserProfile</a></li><li><a href="global.html#isCheckIn">isCheckIn</a></li><li><a href="global.html#isTeamCodeUnique">isTeamCodeUnique</a></li><li><a href="global.html#joinTeamOnFirebase">joinTeamOnFirebase</a></li><li><a href="global.html#myTimer">myTimer</a></li><li><a href="global.html#randomTeamCode">randomTeamCode</a></li><li><a href="global.html#resetTeamInfo">resetTeamInfo</a></li><li><a href="global.html#setupListener">setupListener</a></li><li><a href="global.html#toggleCheckIn">toggleCheckIn</a></li><li><a href="global.html#updateLocalStorage">updateLocalStorage</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Wed Jun 03 2020 19:54:17 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
