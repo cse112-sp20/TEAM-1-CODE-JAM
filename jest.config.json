@@ -3,7 +3,7 @@
     "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/tests/mocks/chromeMock.js",
     "\\.(css|less|scss|sass)$": "identity-obj-proxy"
   },
-  "setupFiles": ["jest-canvas-mock", "<rootDir>/jest/setup.js"],
+  "setupFiles": [],
   "collectCoverage": true,
   "collectCoverageFrom": ["**/*.{js, jsx}"],
   "coveragePathIgnorePatterns": [
