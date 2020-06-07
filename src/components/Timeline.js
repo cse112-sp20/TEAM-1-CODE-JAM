@@ -64,11 +64,11 @@ export default class Timeline extends Component {
    */
   handleMessage = (request) => {
     // new element for timeline
-    if (request.for === "team info")
+    if (request.for === "team info") {
       this.setState({
         timeline: request.message.timeWasted,
       });
-
+    }
     return true;
   };
   /**

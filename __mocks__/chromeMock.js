@@ -8,7 +8,7 @@ const pushTabs = (data) => {
 
 // Define identity
 export let sendMessage = jest.fn();
-
+export let addListener = jest.fn();
 let identity = {
   getProfileUserInfo: jest.fn((callback) => {
     callback({ email: "test@gmail.com" });
@@ -17,7 +17,8 @@ let identity = {
 };
 
 let onMessage = {
-  addListener: jest.fn(),
+  addListener,
+  // addListener: jest.fn(),
 };
 // Define a tab
 let tabs = {
