@@ -44,7 +44,7 @@ jobs:
       - name: Run headful puppeteer tests
         uses: djp3/puppeteer-headful@master
         with:
-          args: npm run-script test __end2endTest_
+          args: npm run-script test __end2endTest__
     
   Stylelint-Eslint-Prettier:
     runs-on: ubuntu-latest
