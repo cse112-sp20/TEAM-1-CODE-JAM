@@ -11,7 +11,8 @@ import { chrome, sendMessage } from "../mocks/chromeMock.js";
 global.chrome = chrome;
 
 // Change window.name to valid
-window.name = "not_nodejs";
+// window.name = "not_nodejs";
+window.name = "nodejs";
 
 // Function to render with router
 const renderWithRouter = (

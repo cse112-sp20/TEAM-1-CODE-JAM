@@ -137,25 +137,30 @@ export default class Charts extends Component {
         teamCode: curTeamCode,
         points: tempArray,
       });
+      // if (window.name == "nodejs") continue;
 
       // create doughnuts based on number of teams
       data.push(
-        <Doughnut
-          key="2"
-          data={newChartData}
-          options={{
-            title: {
-              display: true,
-              text: this.state.teams[index][1],
-              fontSize: 20,
-            },
-            legend: {
-              display: true,
-              position: "bottom",
-            },
-            maintainAspectRatio: true,
-          }}
-        />
+        window.name !== "nodejs" ? (
+          <Doughnut
+            key="2"
+            data={newChartData}
+            options={{
+              title: {
+                display: true,
+                text: this.state.teams[index][1],
+                fontSize: 20,
+              },
+              legend: {
+                display: true,
+                position: "bottom",
+              },
+              maintainAspectRatio: true,
+            }}
+          />
+        ) : (
+          <div key={"test" + index}></div>
+        )
       );
     }
 

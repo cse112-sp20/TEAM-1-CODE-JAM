@@ -12,3 +12,4 @@ firebase.json
 README.md
 out/
 public/LandingPage
+tests/
