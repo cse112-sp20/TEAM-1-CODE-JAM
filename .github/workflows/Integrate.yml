@@ -26,7 +26,8 @@ jobs:
 
   End-to-End-Test:
     runs-on: ubuntu-latest
-    
+    env:
+      CI: 'true'
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -36,9 +37,12 @@ jobs:
           node-version: 12
       - name: Install Node.js dependencies
         run: npm install
-
-      - name: Run unit-test
-        run: npm test __end2endTest__
+        env:
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: 'true'
+      - name: Run headful puppeteer tests
+        uses: djp3/puppeteer-headful@master
+        with:
+          args: npm test
     
   Stylelint-Eslint-Prettier:
     runs-on: ubuntu-latest
