@@ -1,10 +1,48 @@
-import chrome from "sinon-chrome";
-global.chrome = chrome;
-// const puppeteer = require("puppeteer");
+const timeout = 5000;
 
-describe("delete later and uncomment the following", () => {
-  test("delete later", () => {});
-});
+describe(
+  "/ (Home Page)",
+  () => {
+    let page;
+    beforeAll(async () => {
+      const extensionName = "Team Activity Tracker";
+      const extensionPopupHtml = "index.html";
+      const targets = await global.__BROWSER__.targets();
+      const extensionTarget = targets.find(({ _targetInfo }) => {
+        return (
+          _targetInfo.title === extensionName &&
+          _targetInfo.type === "background_page"
+        );
+      });
+      const extensionUrl = extensionTarget._targetInfo.url || "";
+      const [, , extensionID] = extensionUrl.split("/");
+      page = await global.__BROWSER__.newPage();
+      await page.goto(
+        `chrome-extension://${extensionID}/${extensionPopupHtml}`
+      );
+    }, timeout);
+
+    afterAll(async () => {
+      await page.close();
+    });
+
+    it("should load without error", async () => {
+      let text = await page.evaluate(() => {
+        return document.querySelector("#team-name").innerText;
+      });
+      expect(text).toContain("Team Activity Tracker");
+    });
+  },
+  timeout
+);
+
+// import chrome from "sinon-chrome";
+// global.chrome = chrome;
+// // const puppeteer = require("puppeteer");
+
+// describe("delete later and uncomment the following", () => {
+//   test("delete later", () => {});
+// });
 // const extensionPath = "./build";
 
 // const extensionUrl = "chrome-extension://imdkakgonmilneihbfjnlfbjgbidmldj";
