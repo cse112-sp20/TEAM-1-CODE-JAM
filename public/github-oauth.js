@@ -1,6 +1,5 @@
-const chrome = require("sinon-chrome");
-window.chrome = chrome;
-
+/*global chrome*/
+// import { chrome } from "../__mocks__/databaseMock.js";
 /**
  * For the original code please visit:
  * www.github.com/GoogleChrome/chrome-app-samples/tree/master/samples/github-auth

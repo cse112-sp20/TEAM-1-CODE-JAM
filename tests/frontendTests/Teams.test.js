@@ -1,11 +1,11 @@
-import { chrome, sendMessage, set } from "../__mocks__/chromeMock.js";
+import { chrome, sendMessage, set } from "../mocks/chromeMock.js";
 global.chrome = chrome;
 import "@testing-library/jest-dom";
 import React from "react";
 import { render, fireEvent } from "@testing-library/react";
 import { Route, Router } from "react-router-dom";
 import { createMemoryHistory } from "history";
-import Teams from "../src/components/Teams.js";
+import Teams from "../../src/components/Teams.js";
 
 describe("<Teams />", () => {
   beforeEach(() => {

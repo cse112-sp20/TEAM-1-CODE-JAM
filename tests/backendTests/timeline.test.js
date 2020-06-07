@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import { render, cleanup } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import "@testing-library/jest-dom/extend-expect";
-import Timeline from "../src/components/Timeline";
+import Timeline from "../../src/components/Timeline";
 
 import chrome from "sinon-chrome";
 global.chrome = chrome;

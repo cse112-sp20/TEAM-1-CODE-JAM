@@ -22,7 +22,7 @@ jobs:
         run: npm install
         
       - name: Run unit-test
-        run: npm test __tests__
+        run: npm test tests/backendTests tests/frontendTests
 
   End-to-End-Test:
     runs-on: ubuntu-latest
@@ -38,7 +38,7 @@ jobs:
         run: npm install
 
       - name: Run unit-test
-        run: npm test __end2endTest__
+        run: npm test tests/end2endTests
     
   Stylelint-Eslint-Prettier:
     runs-on: ubuntu-latest

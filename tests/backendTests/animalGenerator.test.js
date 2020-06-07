@@ -1,4 +1,4 @@
-import { animals, getAnimal, addAnimal } from "../public/animalGenerator.js";
+import { animals, getAnimal, addAnimal } from "../../public/animalGenerator.js";
 
 describe("testing getAnimal() from animalGenerator.js", () => {
   test("get animals", () => {
