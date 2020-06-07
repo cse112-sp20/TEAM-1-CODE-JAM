@@ -10,21 +10,19 @@ on:
 jobs:
   End-to-End-Test:
     runs-on: ubuntu-latest
-    env:
-      CI: 'true'
     steps:
     - name: Check out code
-      uses: actions/checkout@v2
-    - name: Install node 
-      uses: actions/setup-node@v2-beta
-      with:
-        node-version: 12.x
-    - name: Install npm dependencies 
-      run: npm install 
+      uses: actions/checkout@master
+    - name: Install Dependencies 
+      uses: actions/npm@master
       env:
         PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: 'true'
+      with:
+        args: install
     - name: Run headful puppeteer tests
-      uses: djp3/puppeteer-headful@master
+      uses: mujo-code/puppeteer-headful@master
+      env:
+        CI: 'true'
       with:
         args: npm test
     
