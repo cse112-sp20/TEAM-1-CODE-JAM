@@ -20,7 +20,7 @@
     "<rootDir>/public/LandingPage/js/materialize.js",
     "<rootDir>/public/LandingPage/js/materialize.min.js"
   ],
-  "coverageReporters": ["json", "text", "text-summary", "html"],
+  "coverageReporters": ["json", "text", "text-summary", "html", "lcov"],
   "coverageThreshold": {
     "global": {
       "lines": 20,
