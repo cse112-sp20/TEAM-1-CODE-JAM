@@ -1,12 +1,11 @@
 // Define a tabs array
-var openTabs = [];
+let openTabs = [];
 
 // Push a new tab
 const pushTabs = (data) => {
   openTabs.push(data);
 };
 
-// Define identity
 export let sendMessage = jest.fn();
 export let addListener = jest.fn();
 let identity = {
@@ -24,6 +23,13 @@ let onMessage = {
 let tabs = {
   create: pushTabs,
   pages: openTabs,
+};
+
+// setup addListener
+export let addListener = jest.fn();
+
+let onMessage = {
+  addListener,
 };
 
 let runtime = {
