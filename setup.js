@@ -11,6 +11,7 @@ module.exports = async function () {
   console.log(chalk.green("Setup Puppeteer"));
   const pathToExtension = require("path").join(__dirname, "build");
   const browser = await puppeteer.launch({
+    executablePath: process.env.PUPPETEER_EXEC_PATH,
     headless: false,
     args: [
       `--no-sandbox`,
