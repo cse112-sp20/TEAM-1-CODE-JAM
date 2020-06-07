@@ -17,6 +17,7 @@ module.exports = async function () {
     args: [
       `--no-sandbox`,
       `--disable-setuid-sandbox`,
+      `--disable-gpu`,
       `--disable-extensions-except=${pathToExtension}`,
       `--load-extension=${pathToExtension}`,
     ],
