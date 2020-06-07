@@ -1,6 +1,6 @@
 const chalk = require("chalk");
 const NodeEnvironment = require("jest-environment-node");
-const JsdomEnvironment = require('jest-environment-jsdom');
+const JsdomEnvironment = require("jest-environment-jsdom");
 const puppeteer = require("puppeteer");
 const fs = require("fs");
 const os = require("os");
