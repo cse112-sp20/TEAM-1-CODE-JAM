@@ -4,10 +4,10 @@ import React from "react";
 import { render } from "@testing-library/react";
 import { Router } from "react-router-dom";
 import { createMemoryHistory } from "history";
-import Charts from "../src/components/Charts.js";
+import Charts from "../../src/components/Charts.js";
 
 // Set chrome mock
-import { chrome, sendMessage } from "../__mocks__/chromeMock.js";
+import { chrome, sendMessage } from "../mocks/chromeMock.js";
 global.chrome = chrome;
 
 // Change window.name to valid
