@@ -26,23 +26,25 @@ jobs:
 
   End-to-End-Test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [12.x]
     env:
+      PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: 'true'
       CI: 'true'
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
-      - name: Set up Node.js
-        uses: actions/setup-node@master
-        with:
-          node-version: 12
+
       - name: Install Node.js dependencies
-        run: npm install
-        env:
-          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: 'true'
+        uses: actions/setup-node@v2-beta
+        with:
+          node-version: ${{ matrix.node-version }}
+
       - name: Run headful puppeteer tests
         uses: djp3/puppeteer-headful@master
         with:
-          args: npm test
+          args: npm run-script test __end2endTest_
     
   Stylelint-Eslint-Prettier:
     runs-on: ubuntu-latest
