@@ -106,7 +106,7 @@ class CreateJoinTeam extends Component {
             <ul id="body" className="tabs">
               <li className="tab col s6">
                 {/* <!-- First Tab --> */}
-                <a className="active" href="#createTeam">
+                <a className="active" href="#createTeam" id="create-team-btn">
                   Create Team
                 </a>
               </li>

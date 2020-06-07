@@ -38,7 +38,7 @@ export default class SideNav extends Component {
         </NavLink>
         <NavLink
           className="btn tooltipped waves-effect waves-light card-panel center-align"
-          id="sidenav-background"
+          id="sidenav-background-teams"
           data-position="right"
           data-tooltip="Teams"
           data-testid="SideNav-teams"

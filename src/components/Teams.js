@@ -149,6 +149,7 @@ class Teams extends Component {
             data-position="bottom"
             data-tooltip="Create or join a new team"
             data-testid="Teams-createjoin"
+            id="teams-create-join-btn"
           >
             <div className="inside-btn">
               <span className="flexbox-centering">
