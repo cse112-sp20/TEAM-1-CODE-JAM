@@ -26,6 +26,7 @@ jobs:
 
   End-to-End-Test:
     runs-on: ubuntu-latest
+    
     strategy:
       matrix:
         node-version: [12.x]
@@ -36,15 +37,18 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v2
 
-      - name: Install Node.js dependencies
+      - name: Install Node.js
         uses: actions/setup-node@v2-beta
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Install Node.js dependencies
+        run: npm install 
+
       - name: Run headful puppeteer tests
         uses: djp3/puppeteer-headful@master
         with:
-          args: npm run-script test __end2endTest__
+          args: npm run-script test
     
   Stylelint-Eslint-Prettier:
     runs-on: ubuntu-latest
