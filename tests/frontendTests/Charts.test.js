@@ -29,7 +29,7 @@ const renderWithRouter = (
 };
 
 // define testComponent
-const testComponent = <Charts />;
+const chartComponent = <Charts />;
 
 // Test data (change at will)
 const testTeams = [
@@ -83,7 +83,7 @@ describe("<Charts />", () => {
   // test render
   test("Charts.js react unit tests: test send message, and chart data", () => {
     // Render charts
-    const { getByTestId } = renderWithRouter(testComponent);
+    const { getByTestId } = renderWithRouter(chartComponent);
 
     // Expect send message to be called twice
     expect(sendMessage).toHaveBeenCalledTimes(2);
