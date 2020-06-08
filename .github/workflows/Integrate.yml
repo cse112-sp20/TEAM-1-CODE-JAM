@@ -75,8 +75,6 @@ jobs:
         uses: actions/setup-node@master
         with:
           node-version: 12
-      - name: Install Node.js dependencies
-        run: npm install
     
       - name: Running jest coverage
         run: npm run test:coverage
