@@ -1,4 +1,4 @@
-const timeout = 9000000;
+const timeout = 5000;
 
 describe(
   "/ (Home Page)",
