@@ -31,16 +31,6 @@ jobs:
       - name: Run prettier
         run: npm run prettier
 
-      - name: Create file 'LINT.TXT' and write 'true' into it
-        run: echo 'true' > LINT.TXT
-
-      - name: Upload file 'LINT.TXT' as an artifact
-        uses: actions/upload-artifact@v1
-        with:
-          name: pass_file
-          path: LINT.TXT
-
-
   Code-Quality:
     runs-on: ubuntu-latest
     steps:
@@ -76,6 +66,7 @@ jobs:
 
   Code-Coverage:
     runs-on: ubuntu-latest
+    needs: [Stylelint-Eslint-Prettier]
     
     steps:
       - name: Check out Git repository
@@ -88,7 +79,6 @@ jobs:
         run: npm install
     
       - name: Running jest coverage
-        if: steps.set_output.outputs.LINT == 'true'
         run: npm run test:coverage
 
   Unit-Test:
