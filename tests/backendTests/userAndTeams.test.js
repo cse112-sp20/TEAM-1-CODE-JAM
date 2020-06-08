@@ -778,8 +778,8 @@ describe("setupListener", () => {
     _.getUserDailyPoints = jest.fn().mockResolvedValue("success");
     _.setupListener();
     await new Promise((r) => setTimeout(r, 10));
-    expect(res).toBe("success");
     expect(_.getUserDailyPoints).toHaveBeenCalled();
+    expect(res).toEqual([teamNames, "success"]);
   });
   test("set timeout to delete team", async () => {
     request.message = "set timeout to delete team";
