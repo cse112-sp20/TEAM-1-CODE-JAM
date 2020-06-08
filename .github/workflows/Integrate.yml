@@ -8,7 +8,7 @@ on:
       - staging
   push:
     branches:
-      - test/pipeline_reorder
+      - tests/pupetteer-jest_trevor
 
 jobs:
   Stylelint-Eslint-Prettier:
