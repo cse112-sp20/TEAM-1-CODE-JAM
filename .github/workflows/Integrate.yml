@@ -89,7 +89,7 @@ jobs:
           max_complex_functions_rate: '0.30'
           max_long_functions_rate: '0.30'
           project_name: ''
-           max_timeout_sec: '600'
+          max_timeout_sec: '600'
 
   Code-Coverage:
     runs-on: ubuntu-latest
