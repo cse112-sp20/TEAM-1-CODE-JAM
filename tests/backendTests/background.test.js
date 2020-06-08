@@ -1,6 +1,3 @@
-import chrome from "sinon-chrome";
-global.chrome = chrome;
-
 // require("../public/firebaseInit");
 describe("delete later and uncomment the following", () => {
   test("delete later", () => {});

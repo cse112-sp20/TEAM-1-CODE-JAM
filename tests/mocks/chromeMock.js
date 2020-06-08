@@ -1,14 +1,14 @@
 // Define a tabs array
-var openTabs = [];
+let openTabs = [];
 
 // Push a new tab
 const pushTabs = (data) => {
   openTabs.push(data);
 };
 
-// Define identity
 export let sendMessage = jest.fn();
 
+// Define identity
 let identity = {
   getProfileUserInfo: jest.fn((callback) => {
     callback({ email: "test@gmail.com" });
@@ -22,8 +22,16 @@ let tabs = {
   pages: openTabs,
 };
 
+// setup addListener
+export let addListener = jest.fn();
+
+let onMessage = {
+  addListener,
+};
+
 let runtime = {
   sendMessage,
+  onMessage,
 };
 
 export let set = jest.fn();
