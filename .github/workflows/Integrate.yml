@@ -6,7 +6,9 @@ on:
       - master
       - develop
       - staging
-
+  push:
+    branches:
+      - tests/puppeteer-jest_trevor
 jobs:
   # Unit-Test:
   #   runs-on: ubuntu-latest
