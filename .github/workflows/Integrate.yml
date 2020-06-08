@@ -83,6 +83,7 @@ jobs:
 
   Unit-Test:
     runs-on: ubuntu-latest
+    needs: [Stylelint-Eslint-Prettier]
     
     steps:
       - name: Check out Git repository
@@ -99,6 +100,7 @@ jobs:
 
   End-to-End-Test:
     runs-on: ubuntu-latest
+    needs: [Stylelint-Eslint-Prettier]
     
     steps:
       - name: Check out Git repository
