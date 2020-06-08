@@ -26,21 +26,19 @@ jobs:
 
   End-to-End-Test:
     runs-on: ubuntu-latest
-    
     steps:
-      - name: GitHub Action for NPM/Chrome
-        uses: daleobrien/npm-with-chrome-browser-action@v1.0.1
       - name: Check out Git repository
-        uses: actions/checkout@v2
-      - name: Set up Node.js
-        uses: actions/setup-node@master
+        uses: actions/checkout@master
+        env:
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: 'true'
         with:
-          node-version: 12
-      - name: Install Node.js dependencies
-        run: npm install
-
-      - name: Run unit-test
-        run: npm test tests/end2endTests
+          args: install
+      - name: Test Code
+        uses: mujo-code/puppeteer-headful@master
+        env:
+          CI: 'true'
+        with:
+          args: npm test tests/end2endTests
     
   # Stylelint-Eslint-Prettier:
   #   runs-on: ubuntu-latest
