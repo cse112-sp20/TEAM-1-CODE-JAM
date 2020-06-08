@@ -8,7 +8,7 @@ on:
       - staging
   push:
     branches:
-      - tests/puppeteer-jest_trevor
+      - tests/pupetteer-jest_trevor
 jobs:
   # Unit-Test:
   #   runs-on: ubuntu-latest
