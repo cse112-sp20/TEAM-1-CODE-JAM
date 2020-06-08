@@ -14,7 +14,7 @@ jobs:
   Stylelint-Eslint-Prettier:
     runs-on: ubuntu-latest
     
-    steps:
+    step1:
       - name: Check out Git repository
         uses: actions/checkout@v2
       - name: Set up Node.js
@@ -33,7 +33,7 @@ jobs:
 
   Code-Quality:
     runs-on: ubuntu-latest
-    steps:
+    step2:
     - name: Check out Git repository
       uses: actions/checkout@v2
     - name: Set up Node.js
@@ -67,7 +67,7 @@ jobs:
   Code-Coverage:
     runs-on: ubuntu-latest
     
-    steps:
+    step3:
       - name: Check out Git repository
         uses: actions/checkout@v2
       - name: Set up Node.js
@@ -78,13 +78,13 @@ jobs:
         run: npm install
     
       - name: Running jest coverage
-        if: Stylelint-Eslint-Prettier.set_output.outputs.post_message == 'true'
+        if: step1.set_output.outputs.post_message == 'true'
         run: npm run test:coverage
 
   Unit-Test:
     runs-on: ubuntu-latest
     
-    steps:
+    step4:
       - name: Check out Git repository
         uses: actions/checkout@v2
       - name: Set up Node.js
@@ -95,13 +95,13 @@ jobs:
         run: npm install
         
       - name: Run unit-test
-        if: Stylelint-Eslint-Prettier.set_output.outputs.post_message == 'true'
+        if: step1.set_output.outputs.post_message == 'true'
         run: npm test tests/backendTests tests/frontendTests
 
   End-to-End-Test:
     runs-on: ubuntu-latest
     
-    steps:
+    step5:
       - name: Check out Git repository
         uses: actions/checkout@v2
       - name: Set up Node.js
@@ -112,5 +112,5 @@ jobs:
         run: npm install
 
       - name: Run end-to-end-test
-        if: Stylelint-Eslint-Prettier.set_output.outputs.post_message == 'true'
+        if: step1.set_output.outputs.post_message == 'true'
         run: npm test tests/end2endTests
