@@ -66,21 +66,21 @@ export default class Home extends Component {
         timelineArr: timelineArr,
         profilePic: response.profilePic,
       });
-      chrome.runtime.onMessage.addListener((msg) => {
-        if (msg.for === "team info") {
-          let teamInfo = msg.message;
-          let timelineArr = teamInfo.timeWasted.reverse();
-          if (timelineArr.length > 5) timelineArr = timelineArr.slice(0, 5);
-          let teamPoints = this.roundNumber(teamInfo.teamPoints);
-          this.setState({
-            teamName: teamInfo.teamName,
-            teamMembers: teamInfo.members,
-            teamPoints: teamPoints,
-            timelineArr: timelineArr,
-            profilePic: teamInfo.userAnimal,
-          });
-        }
-      });
+    });
+    chrome.runtime.onMessage.addListener((msg) => {
+      if (msg.for === "team info") {
+        let teamInfo = msg.message;
+        let timelineArr = teamInfo.timeWasted.reverse();
+        if (timelineArr.length > 5) timelineArr = timelineArr.slice(0, 5);
+        let teamPoints = this.roundNumber(teamInfo.teamPoints);
+        this.setState({
+          teamName: teamInfo.teamName,
+          teamMembers: teamInfo.members,
+          teamPoints: teamPoints,
+          timelineArr: timelineArr,
+          profilePic: teamInfo.userAnimal,
+        });
+      }
     });
   };
   importAll = (r) => {
