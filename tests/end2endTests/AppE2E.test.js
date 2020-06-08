@@ -2,7 +2,6 @@ import path from 'path'
 import puppeteer from 'puppeteer'
 
 const TEST_TIMEOUT = 20000 // extend test timeout sinces its E2E
-const extensionName = "Team Activity Tracker"
 
 let browser
 let page
@@ -11,6 +10,7 @@ const BUILD_PATH = path.resolve(__dirname, '../../build')
 let extensionId = null
 
 const getExtensionId = async () => {
+  const extensionName = "Team Activity Tracker";
   const dummyPage = await browser.newPage()
   await dummyPage.waitFor(2000) // arbitrary wait time.
 
