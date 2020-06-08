@@ -68,6 +68,8 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+      - name: job id
+        run: echo $"github.job"
       - name: Check out Git repository
         uses: actions/checkout@v2
       - name: Set up Node.js
@@ -78,7 +80,6 @@ jobs:
         run: npm install
     
       - name: Running jest coverage
-        needs: [Stylelint-Eslint-Prettier]
         run: npm run test:coverage
 
   Unit-Test:
