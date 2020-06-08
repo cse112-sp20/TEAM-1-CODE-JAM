@@ -7,8 +7,8 @@ on:
       - develop
       - staging
   push:
-      branches:
-      - test/pipeline_reorder 
+    branches:
+      - test/pipeline_reorder
 
 jobs:
   Stylelint-Eslint-Prettier:
@@ -31,7 +31,9 @@ jobs:
       - name: Run prettier
         run: npm run prettier
 
-    steps2:
+  Code-Quality:
+    runs-on: ubuntu-latest
+    steps:
     - name: Check out Git repository
       uses: actions/checkout@v2
     - name: Set up Node.js
@@ -76,6 +78,7 @@ jobs:
         run: npm install
     
       - name: Running jest coverage
+        if: Stylelint-Eslint-Prettier.set_output.outputs.post_message == 'true'
         run: npm run test:coverage
 
   Unit-Test:
@@ -92,6 +95,7 @@ jobs:
         run: npm install
         
       - name: Run unit-test
+        if: Stylelint-Eslint-Prettier.set_output.outputs.post_message == 'true'
         run: npm test tests/backendTests tests/frontendTests
 
   End-to-End-Test:
@@ -107,5 +111,6 @@ jobs:
       - name: Install Node.js dependencies
         run: npm install
 
-      - name: Run unit-test
+      - name: Run end-to-end-test
+        if: Stylelint-Eslint-Prettier.set_output.outputs.post_message == 'true'
         run: npm test tests/end2endTests
