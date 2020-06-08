@@ -32,13 +32,13 @@ jobs:
         env:
           PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: 'true'
         with:
-          args: install
+          args: npm run install
       - name: Test Code
         uses: mujo-code/puppeteer-headful@master
         env:
           CI: 'true'
         with:
-          args: npm test tests/end2endTests
+          args: npm run test tests/end2endTests
     
   # Stylelint-Eslint-Prettier:
   #   runs-on: ubuntu-latest
