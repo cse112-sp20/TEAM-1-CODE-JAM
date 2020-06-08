@@ -8,25 +8,37 @@ on:
       - staging
 
 jobs:
+  Unit-Test:
+    runs-on: macos-latest
+    
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@master
+        with:
+          node-version: 12
+      - name: Install Node.js dependencies
+        run: npm install
+        
+      - name: Run unit-test
+        run: npm test tests/backendTests tests/frontendTests
+
   End-to-End-Test:
     runs-on: macos-latest
-    env:
-      CI: 'true'
+    
     steps:
-    - name: Check out code
-      uses: actions/checkout@v2
-    - name: Install node 
-      uses: actions/setup-node@v2-beta
-      with:
-        node-version: 12.x
-    - name: Install npm dependencies 
-      run: npm install 
-      env:
-        PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: 'true'
-    - name: Run headful puppeteer tests
-      uses: djp3/puppeteer-headful@master
-      with:
-        args: npm test
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@master
+        with:
+          node-version: 12
+      - name: Install Node.js dependencies
+        run: npm install
+
+      - name: Run unit-test
+        run: npm test tests/end2endTests
     
   Stylelint-Eslint-Prettier:
     runs-on: ubuntu-latest
