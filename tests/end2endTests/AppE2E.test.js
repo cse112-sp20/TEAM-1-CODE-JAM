@@ -1,8 +1,8 @@
 import path from 'path'
 import puppeteer from 'puppeteer'
-import manifest from '../../build/manifest.json'
 
 const TEST_TIMEOUT = 20000 // extend test timeout sinces its E2E
+const extensionName = "Team Activity Tracker"
 
 let browser
 let page
@@ -17,7 +17,7 @@ const getExtensionId = async () => {
   const targets = await browser.targets()
   const extensionTarget = targets.find(
     ({ _targetInfo }) =>
-      _targetInfo.title === manifest.name &&
+      _targetInfo.title === extensionName &&
       _targetInfo.type === 'background_page'
   )
   // eslint-disable-next-line no-underscore-dangle

@@ -8,21 +8,21 @@ on:
       - staging
 
 jobs:
-  Unit-Test:
-    runs-on: ubuntu-latest
+  # Unit-Test:
+  #   runs-on: ubuntu-latest
     
-    steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v2
-      - name: Set up Node.js
-        uses: actions/setup-node@master
-        with:
-          node-version: 12
-      - name: Install Node.js dependencies
-        run: npm install
+  #   steps:
+  #     - name: Check out Git repository
+  #       uses: actions/checkout@v2
+  #     - name: Set up Node.js
+  #       uses: actions/setup-node@master
+  #       with:
+  #         node-version: 12
+  #     - name: Install Node.js dependencies
+  #       run: npm install
         
-      - name: Run unit-test
-        run: npm test tests/backendTests tests/frontendTests
+  #     - name: Run unit-test
+  #       run: npm test tests/backendTests tests/frontendTests
 
   End-to-End-Test:
     runs-on: ubuntu-latest
@@ -36,75 +36,79 @@ jobs:
           node-version: 12
       - name: Install Node.js dependencies
         run: npm install
-
-      - name: Run unit-test
-        run: npm test tests/end2endTests
-    
-  Stylelint-Eslint-Prettier:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v2
-      - name: Set up Node.js
-        uses: actions/setup-node@master
+      - run: npm run build
+      - name: Test Code
+        uses: mujo-code/puppeteer-headful@master
+        env:
+          CI: 'true'
         with:
-          node-version: 12
-      - name: Install Node.js dependencies
-        run: npm install
-
-      - name: Run linters
-        run: npm run lint &&
-          npm run stylelint
-
-      - name: Run prettier
-        run: npm run prettier
-
-  Code-Coverage:
-    runs-on: ubuntu-latest
+          args: npm test
     
-    steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v2
-      - name: Set up Node.js
-        uses: actions/setup-node@master
-        with:
-          node-version: 12
-      - name: Install Node.js dependencies
-        run: npm install
+  # Stylelint-Eslint-Prettier:
+  #   runs-on: ubuntu-latest
     
-      - name: Running jest coverage
-        run: npm run test:coverage
+  #   steps:
+  #     - name: Check out Git repository
+  #       uses: actions/checkout@v2
+  #     - name: Set up Node.js
+  #       uses: actions/setup-node@master
+  #       with:
+  #         node-version: 12
+  #     - name: Install Node.js dependencies
+  #       run: npm install
 
-  Code-Quality:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Check out Git repository
-      uses: actions/checkout@v2
-    - name: Set up Node.js
-      uses: actions/setup-node@master
-      with:
-        node-version: 12
-    - name: Install Node.js dependencies
-      run: npm install
+  #     - name: Run linters
+  #       run: npm run lint &&
+  #         npm run stylelint
+
+  #     - name: Run prettier
+  #       run: npm run prettier
+
+  # Code-Coverage:
+  #   runs-on: ubuntu-latest
     
-    - name: Check for code duplicate
-      run: npm run jscpd
+  #   steps:
+  #     - name: Check out Git repository
+  #       uses: actions/checkout@v2
+  #     - name: Set up Node.js
+  #       uses: actions/setup-node@master
+  #       with:
+  #         node-version: 12
+  #     - name: Install Node.js dependencies
+  #       run: npm install
+    
+  #     - name: Running jest coverage
+  #       run: npm run test:coverage
 
-    - name: Static Type Checker
-      run: npm run flow
+  # Code-Quality:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: Check out Git repository
+  #     uses: actions/checkout@v2
+  #   - name: Set up Node.js
+  #     uses: actions/setup-node@master
+  #     with:
+  #       node-version: 12
+  #   - name: Install Node.js dependencies
+  #     run: npm install
+    
+  #   - name: Check for code duplicate
+  #     run: npm run jscpd
 
-    - name: Running Code Inspector
-      id: code-inspector
-      uses: codeinspectorio/github-action@master
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        code_inspector_access_key: ${{ secrets.CODE_INSPECTOR_ACCESS_KEY }}
-        code_inspector_secret_key: ${{ secrets.CODE_INSPECTOR_SECRET_KEY }}
-        min_quality_grade: 'WARNING'
-        min_quality_score: '50'
-        max_defects_rate: '0.30'
-        max_complex_functions_rate: '0.30'
-        max_long_functions_rate: '0.30'
-        project_name: ''
-        max_timeout_sec: '600'
+  #   - name: Static Type Checker
+  #     run: npm run flow
+
+  #   - name: Running Code Inspector
+  #     id: code-inspector
+  #     uses: codeinspectorio/github-action@master
+  #     with:
+  #       repo_token: ${{ secrets.GITHUB_TOKEN }}
+  #       code_inspector_access_key: ${{ secrets.CODE_INSPECTOR_ACCESS_KEY }}
+  #       code_inspector_secret_key: ${{ secrets.CODE_INSPECTOR_SECRET_KEY }}
+  #       min_quality_grade: 'WARNING'
+  #       min_quality_score: '50'
+  #       max_defects_rate: '0.30'
+  #       max_complex_functions_rate: '0.30'
+  #       max_long_functions_rate: '0.30'
+  #       project_name: ''
+  #       max_timeout_sec: '600'
