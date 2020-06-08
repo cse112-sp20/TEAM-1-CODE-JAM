@@ -32,42 +32,45 @@ export default class Charts extends Component {
     // The api is async @ credits to Karl
     let msg = {
       for: "background",
-      message: "get teams",
+      message: "get team points",
     };
     // ask the background for team information
     chrome.runtime.sendMessage(msg, (response) => {
-      if (response == undefined) {
+      if (response[0] == undefined || response[1] == undefined) {
         return;
       }
-
       // parse through response that grabs the day's team and user points
-      response.forEach((element) => {
+      response[0].forEach((element) => {
         let newElement = Object.values(element);
         teamInfo.push(newElement);
       });
-      this.setState({
-        teams: teamInfo,
-      });
-    });
-
-    let msg2 = {
-      for: "background",
-      message: "get team points",
-    };
-
-    // ask the background for team information
-    chrome.runtime.sendMessage(msg2, (response) => {
-      if (response == undefined) {
-        return;
-      }
-      for (let [key, value] of Object.entries(response)) {
+      for (let [key, value] of Object.entries(response[1])) {
         teamData[key] = value;
       }
-
       this.setState({
+        teams: teamInfo,
         points: teamData,
       });
     });
+
+    // let msg2 = {
+    //   for: "background",
+    //   message: "get team points",
+    // };
+
+    // // ask the background for team information
+    // chrome.runtime.sendMessage(msg2, (response) => {
+    //   if (response == undefined) {
+    //     return;
+    //   }
+    //   for (let [key, value] of Object.entries(response)) {
+    //     teamData[key] = value;
+    //   }
+
+    //   this.setState({
+    //     points: teamData,
+    //   });
+    // });
   }
   // function to insert data into chart
   getChartData() {

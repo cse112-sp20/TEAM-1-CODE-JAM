@@ -55,11 +55,7 @@ describe("<Charts />", () => {
 
       // Get team points
       if (msg.message == "get team points") {
-        response = testTeamPoints;
-      }
-      // Get teams
-      else if (msg.message === "get teams") {
-        response = testTeams;
+        response = [testTeams, testTeamPoints];
       }
       // Switch teams
       else if (msg.message == "switch team") {
@@ -85,17 +81,17 @@ describe("<Charts />", () => {
     // Render charts
     const { getByTestId } = renderWithRouter(testComponent);
 
-    // Expect send message to be called twice
-    expect(sendMessage).toHaveBeenCalledTimes(2);
+    // Expect send message to be called once
+    expect(sendMessage).toHaveBeenCalledTimes(1);
 
-    // Expect get teams to be called
-    expect(sendMessage).toHaveBeenCalledWith(
-      {
-        for: "background",
-        message: "get teams",
-      },
-      expect.anything()
-    );
+    // // Expect get teams to be called
+    // expect(sendMessage).toHaveBeenCalledWith(
+    //   {
+    //     for: "background",
+    //     message: "get teams",
+    //   },
+    //   expect.anything()
+    // );
 
     // Expect get team points to be called
     expect(sendMessage).toHaveBeenCalledWith(

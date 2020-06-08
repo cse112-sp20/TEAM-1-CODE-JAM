@@ -1,8 +1,8 @@
-/* global firebase sendToDB chrome */
+/* global firebase chrome */
 import { animals, addAnimal, getAnimal, setAnimal } from "./animalGenerator.js";
 import { getCurrentUrl } from "./tabs.js";
-// import { sendToDB } from "./githubTracker.js";
 import { db } from "./firebaseInit.js";
+import { sendToDB } from "./githubTracker.js";
 export let currentTeamSnapshot = () => {};
 export let teamNames = [];
 export let currentTeamInfo = {
@@ -93,7 +93,7 @@ export function setupListener() {
       // VIVIAN
       else if (request.message === "get team points") {
         _.getUserDailyPoints().then((res) => {
-          sendResponse(res);
+          sendResponse([teamNames, res]);
         });
       } else if (request.message === "set timeout to delete team") {
         timeoutVars[request.teamCode] = setTimeout(async () => {
@@ -157,12 +157,16 @@ export function setupListener() {
 }
 //VIVIAN
 export async function getUserDailyPoints() {
+  let res = {};
   let curDate = getDate();
   let dbTeamPoints = await db.collection("teamPerformance").doc(curDate).get();
   dbTeamPoints = dbTeamPoints.data();
+  if (!(userEmail in dbTeamPoints) || !("totalTeamPoint" in dbTeamPoints))
+    return res;
   let userTeamsPoints = dbTeamPoints[userEmail];
   let allTeamsPoints = dbTeamPoints.totalTeamPoint;
-  let res = {};
+  console.log(userTeamsPoints);
+  console.log(allTeamsPoints);
   for (let team of Object.keys(userTeamsPoints)) {
     res[team] = {
       userPoints: userTeamsPoints[team],
@@ -239,8 +243,10 @@ export function checkDate() {
   ) {
     console.log("reset");
     resetTeamInfo();
-    // currentDate = getDate();
-    createTeamPerformance(currTeamCode, 100, userEmail);
+    // create new for each team
+    for (let teamCode in userProfile.joined_teams) {
+      createTeamPerformance(teamCode, 100, userEmail);
+    }
   }
 }
 
@@ -733,7 +739,7 @@ export async function updateLocalStorage(tabUrl, timeSpend, threshold) {
         .doc(currentDate)
         .set(
           {
-            [userEmail]: userProfile.user_points,
+            [userEmail]: { [currTeamCode]: userPoints },
             totalTeamPoint: { [currTeamCode]: teamPoints },
           },
           { merge: true }
