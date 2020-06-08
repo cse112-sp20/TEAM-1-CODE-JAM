@@ -17,19 +17,11 @@ let identity = {
 
 let onMessage = {
   addListener,
-  // addListener: jest.fn(),
 };
 // Define a tab
 let tabs = {
   create: pushTabs,
   pages: openTabs,
-};
-
-// setup addListener
-export let addListener = jest.fn();
-
-let onMessage = {
-  addListener,
 };
 
 let runtime = {

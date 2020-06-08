@@ -3,10 +3,8 @@ import ReactDOM from "react-dom";
 import { render, cleanup } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import "@testing-library/jest-dom/extend-expect";
-import Timeline from "../src/components/Timeline";
-
-// expect.extend({ toHaveClass });
-import { chrome, sendMessage, addListener } from "../__mocks__/chromeMock.js";
+import Timeline from "../../src/components/Timeline";
+import { chrome, sendMessage, addListener } from "../mocks/chromeMock.js";
 global.chrome = chrome;
 window.name = "not_nodejs";
 /* timeline objects to be tested */
