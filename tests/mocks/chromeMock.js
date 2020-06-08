@@ -7,8 +7,7 @@ const pushTabs = (data) => {
 };
 
 export let sendMessage = jest.fn();
-
-// Define identity
+export let addListener = jest.fn();
 let identity = {
   getProfileUserInfo: jest.fn((callback) => {
     callback({ email: "test@gmail.com" });
@@ -16,17 +15,13 @@ let identity = {
   getRedirectURL: jest.fn(),
 };
 
+let onMessage = {
+  addListener,
+};
 // Define a tab
 let tabs = {
   create: pushTabs,
   pages: openTabs,
-};
-
-// setup addListener
-export let addListener = jest.fn();
-
-let onMessage = {
-  addListener,
 };
 
 let runtime = {

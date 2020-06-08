@@ -18,8 +18,9 @@ export default class Timeline extends Component {
   /**
    * Creates a element for the timeline
    * @author Brian Aguirre
+   * @param timelineElement object containing url, animal and point relating to timeline
    */
-  createTimelineElement = (timelineElement) => {
+  createTimelineElement = (timelineElement, index) => {
     let animal = timelineElement.animal;
     if (animal == undefined) {
       animal = "Predator";
@@ -31,13 +32,16 @@ export default class Timeline extends Component {
     let points =
       Math.round((timelineElement.points + Number.EPSILON) * 100) / 100;
 
+    let temp = require(`../SVG/${animal}.svg`);
+
     let newElement = (
-      <tr>
+      <tr key={`tr-${index}`}>
         <td id="time">
           <p style={{ fontWeight: 600 }}>{timelineElement.currTime}</p>
         </td>
         <td>
-          <img src={require(`../SVG/${animal}.svg`)}></img>
+          {/* <img src={require(`../SVG/${animal}.svg`)}></img> */}
+          <img src={temp}></img>
         </td>
         <td id="thirdElem" style={{ color: `${color}` }}>
           <p
@@ -56,14 +60,15 @@ export default class Timeline extends Component {
   /**
    * Updates timeline if a new element is created for the timeline.
    * @author Brian Aguirre
+   * @param request object containing all timeline elements created
    */
   handleMessage = (request) => {
     // new element for timeline
-    if (request.for === "team info")
+    if (request.for === "team info") {
       this.setState({
         timeline: request.message.timeWasted,
       });
-
+    }
     return true;
   };
   /**
@@ -84,20 +89,36 @@ export default class Timeline extends Component {
 
   render() {
     return (
-      <div data-testid="my-timeline" className="row" id="myTimeline">
-        <div className="card blue-grey lighten-5" id="myCard">
-          <div className="card-content black-text" id="myContent">
-            <table data-testid="my-table" className="highlight" id="myTable">
-              <thead>
-                <tr>
-                  <th id="myHead">Time</th>
-                  <th id="myHead">Person</th>
-                  <th id="myHead">Earned</th>
+      <div
+        key="my-timelineKey"
+        data-testid="my-timeline"
+        className="row"
+        id="myTimeline"
+      >
+        <div key="my-card" className="card blue-grey lighten-5" id="myCard">
+          <div key="card-2" className="card-content black-text" id="myContent">
+            <table
+              key="table"
+              data-testid="my-table"
+              className="highlight"
+              id="myTable"
+            >
+              <thead key="my-thead">
+                <tr key="my-tr">
+                  <th key="my-th1" id="myHead">
+                    Time
+                  </th>
+                  <th key="my-th2" id="myHead">
+                    Person
+                  </th>
+                  <th key="my-th3" id="myHead">
+                    Earned
+                  </th>
                 </tr>
               </thead>
-              <tbody>
-                {this.state.timeline.map((eachTimeline) => {
-                  return this.createTimelineElement(eachTimeline);
+              <tbody data-testid="arrayTimeline" key="my-tbody">
+                {this.state.timeline.map((eachTimeline, index) => {
+                  return this.createTimelineElement(eachTimeline, index);
                 })}
               </tbody>
             </table>
