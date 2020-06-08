@@ -78,7 +78,7 @@ jobs:
         run: npm install
     
       - name: Running jest coverage
-        if: Stylelint-Eslint-Prettier.status == "success"
+        needs: [Stylelint-Eslint-Prettier]
         run: npm run test:coverage
 
   Unit-Test:
