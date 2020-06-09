@@ -1,8 +1,7 @@
 import path from 'path'
 import puppeteer from 'puppeteer'
 import manifest from '../../build/manifest.json'
-//import firebase from '../../public/firebaseInit';
-
+import db from '../../public/firebaseInit.js';
 const TEST_TIMEOUT = 50000 // extend test timeout sinces its E2E
 
 let browser
@@ -12,7 +11,6 @@ const BUILD_PATH = path.resolve(__dirname, '../../build')
 let extensionId = null
 
 const getExtensionId = async () => {
-  const extensionName = "Team Activity Tracker";
   const dummyPage = await browser.newPage()
   await dummyPage.waitFor(2000) // arbitrary wait time.
 
@@ -51,14 +49,11 @@ beforeAll(async () => {
 afterAll(async () => {
   if (browser) {
     await browser.close()
-    //   await deleteEverythingAboutAUser(userEmail);
-    //console.log(firebase.app())
-    //global.firebase.app().delete();
   }
 })
 
 beforeEach(async () => {
-  jest.setTimeout(20000);
+  jest.setTimeout(100000);
   page = await browser.newPage()
 })
 
@@ -112,6 +107,35 @@ test(
     await page.waitForSelector("[data-testid='team-title']", {visible: true, timeout: 0});
     const teamTitle = await page.$eval("[data-testid='team-title']", e => e.innerHTML);
     expect(teamTitle).toBe(`puppeteer testing`);
+  },
+  TEST_TIMEOUT
+)
+test(
+  'Check In button',
+  async () => {
+    const url = `chrome-extension://${extensionId}`;
+    await page.goto(`${url}/index.html`)
+    await page.waitForSelector(".app");
+    await page.click('[data-testid="checkin-btn"]');
+    expect(`puppeteer testing`).toBe(`puppeteer testing`);
+    await page.goto(`https://twitter.com/explore`, {
+      waitUntil: "networkidle2"
+    })
+    expect(page.url()).toBe("https://twitter.com/explore");
+    await page.waitFor(2000);
+  },
+  TEST_TIMEOUT
+)
+test(
+  'Test Timeline',
+  async () => {
+    const url = `chrome-extension://${extensionId}`;
+    await page.goto(`${url}/index.html`, {
+      waitUntil: "networkidle2"
+    })
+    await page.waitForSelector("[data-testid='home-timeline-item 0']");
+    const timelineItem = await page.$eval("[data-testid='home-timeline-item 0']", e => e.innerHTML);
+    expect(timelineItem).toBe(`twitter`);
   },
   TEST_TIMEOUT
 )
