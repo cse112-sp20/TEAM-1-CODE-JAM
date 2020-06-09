@@ -219,6 +219,7 @@ export default class Home extends Component {
     let rightSide = (
       <div className="col s8">
         <span
+          data-testid="team-title"
           id="title"
           className="truncate card-title black-text center-align"
         >
