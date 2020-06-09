@@ -242,6 +242,9 @@ export function checkDate() {
     console.log("reset");
     resetTeamInfo();
     // create new for each team
+    db.collection("users").doc(userEmail).update({
+      user_points: {},
+    });
     for (let teamCode in userProfile.joined_teams) {
       createTeamPerformance(teamCode, 100, userEmail);
     }
@@ -589,7 +592,7 @@ export function getUserProfile(userEmail) {
       .doc(userEmail)
       .onSnapshot(async function (doc) {
         userProfile = doc.data();
-        teamNames = await getTeamNames(userProfile);
+        teamNames = await _.getTeamNames(userProfile);
         resolve();
       });
   });
@@ -920,7 +923,6 @@ const _ = {
   getAnimalsLeft,
   getAnimal,
   resetTeamInfo,
-  // animals,
   currTeamCode,
   setAnimal,
   animals,

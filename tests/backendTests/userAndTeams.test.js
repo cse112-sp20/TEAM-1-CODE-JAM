@@ -6,8 +6,6 @@ import _, {
   updateDBParams,
   userProfile,
   teamNames,
-
-
   getUserInformation,
   getTeamInformation,
   randomTeamCode,
@@ -996,5 +994,36 @@ describe("getTeamOnSnapshot", () => {
       message: teamData,
     });
     expect(_.checkDate).toHaveBeenCalled();
+  });
+});
+describe("getUserProfile", () => {
+  afterAll(() => {
+    cleanup();
+  });
+  test("get user profile", async () => {
+    _.getTeamNames = jest.fn().mockResolvedValueOnce("success");
+    const userData = {
+      joined_teams: {
+        11111: "now",
+      },
+      user_points: {
+        11111: 100,
+      },
+    };
+    onSnapshot.mockImplementationOnce((callback) => {
+      let doc = {
+        data: () => {
+          return userData;
+        },
+      };
+      callback(doc);
+    });
+    await _.getUserProfile();
+    expect(db.collection).toHaveBeenCalledWith("users");
+    expect(db.collection("users").doc).toHaveBeenCalledWith(userEmail);
+    expect(userProfile).toEqual(userData);
+    expect(_.getTeamNames).toHaveBeenCalled();
+    expect(_.getTeamNames).toHaveBeenCalledWith(userProfile);
+    expect(teamNames).toEqual("success");
   });
 });
