@@ -144,6 +144,7 @@ export default class Home extends Component {
   };
   createTimelineItem = (profilePicName, website, points) => {
     let isProductive = Number(points) < 0 ? false : true;
+    let timelineCount = 0;
     let profilePic = this.getProfilePic(profilePicName);
     let dotColor;
     let textColor;
@@ -175,6 +176,7 @@ export default class Home extends Component {
           <div id="col" className="col s1"></div>
           <div id="col" className="col s5">
             <p
+              data-testid={`home-timeline-item ${timelineCount++}`}
               style={{
                 textTransform: "capitalize",
                 fontWeight: 600,
@@ -283,7 +285,10 @@ export default class Home extends Component {
     let checkIn = (
       <div id="col" className="col s6">
         {/* <span className="left black-text">Check In</span> */}
-        <div id="checkin" className="switch right">
+        <div 
+          data-testid="checkin-btn"
+          id="checkin" 
+          className="switch right">
           <label>
             Check off
             <input
