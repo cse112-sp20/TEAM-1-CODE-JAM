@@ -1,7 +1,9 @@
 import path from 'path'
 import puppeteer from 'puppeteer'
+import manifest from '../../build/manifest.json'
+//import firebase from '../../public/firebaseInit';
 
-const TEST_TIMEOUT = 20000 // extend test timeout sinces its E2E
+const TEST_TIMEOUT = 50000 // extend test timeout sinces its E2E
 
 let browser
 let page
@@ -17,7 +19,7 @@ const getExtensionId = async () => {
   const targets = await browser.targets()
   const extensionTarget = targets.find(
     ({ _targetInfo }) =>
-      _targetInfo.title === extensionName &&
+      _targetInfo.title === manifest.name &&
       _targetInfo.type === 'background_page'
   )
   // eslint-disable-next-line no-underscore-dangle
@@ -49,10 +51,14 @@ beforeAll(async () => {
 afterAll(async () => {
   if (browser) {
     await browser.close()
+    //   await deleteEverythingAboutAUser(userEmail);
+    //console.log(firebase.app())
+    //global.firebase.app().delete();
   }
 })
 
 beforeEach(async () => {
+  jest.setTimeout(20000);
   page = await browser.newPage()
 })
 
@@ -62,18 +68,64 @@ afterEach(async () => {
   }
 })
 
-
 test(
-  'newtab page should have a player',
+  'Launch Extension with no errors',
   async () => {
-    await page.goto(`chrome-extension://${extensionId}/index.html`)
-    //await waitDOMLoaded()
-    const el = 'test'
-    await page.waitFor(500);
-    expect(el).not.toBe(null)
+    const url = `chrome-extension://${extensionId}`;
+    await page.goto(`${url}/index.html`)
+    await page.waitForSelector(".app");
+    const header = await page.$eval("div>#team-name", e => e.innerHTML);
+    expect(header).toBe(`Team Activity Tracker`);
   },
   TEST_TIMEOUT
 )
+test(
+  'Create Team',
+  async () => {
+    const url = `chrome-extension://${extensionId}`;
+    await page.goto(`${url}/index.html`)
+    await page.waitForSelector(".app");
+    await page.click('[data-testid="SideNav-teams"]');
+    expect(page.url()).toBe(url + "/teams");
+    await page.click('[data-testid="Teams-createjoin"]');
+    await page.type(
+      '[data-testid="CreateJoinTeam-createinput"]',
+      "puppeteer testing"
+    );
+    await page.click('[data-testid="CreateJoinTeam-createbutton"]');
+    await page.waitForSelector("[data-testid='team-title']", {visible: true, timeout: 0});
+    const header = await page.$eval("[data-testid='team-title']", e => e.innerHTML);
+    expect(header).toBe(`puppeteer testing`);
+  },
+  TEST_TIMEOUT
+)
+test(
+  'Join Team',
+  async () => {
+    const url = `chrome-extension://${extensionId}`;
+    await page.goto(`${url}/index.html`)
+    await page.waitForSelector(".app");
+    await page.click('[data-testid="SideNav-teams"]');
+    const teamName = await page.$eval("[data-testid='team name 1']", e => e.innerHTML);
+    expect(teamName).toBe(`puppeteer testing`);
+    await page.click('[data-testid="team name 1"]');
+    await page.waitForSelector("[data-testid='team-title']", {visible: true, timeout: 0});
+    const teamTitle = await page.$eval("[data-testid='team-title']", e => e.innerHTML);
+    expect(teamTitle).toBe(`puppeteer testing`);
+  },
+  TEST_TIMEOUT
+)
+
+//     await page.goto(extensionUrl + "/index.html");
+//     await page.waitForSelector(".app");
+//     await page.click('[data-testid="SideNav-teams"]');
+//     // should be in teams page
+//     expect(page.url()).toBe(extensionUrl + "/teams");
+//     await page.click('[data-testid="Teams-createjoin"]');
+//     await page.type(
+//       '[data-testid="CreateJoinTeam-createinput"]',
+//       "puppeteer testing"
+//     );
 
 // // TODO need a good indicator that deeplinking is working
 // test(
