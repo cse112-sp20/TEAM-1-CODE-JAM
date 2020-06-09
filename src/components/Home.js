@@ -171,7 +171,10 @@ export default class Home extends Component {
         <div id="example" className="row">
           <div id="col" className="col s1"></div>
           <div id="col" className="col s2">
-            <img src={profilePic} className="circle" />
+            <img 
+              data-testid={`home-timeline-pic`}
+              src={profilePic} 
+              className="circle" />
           </div>
           <div id="col" className="col s1"></div>
           <div id="col" className="col s5">
@@ -188,6 +191,7 @@ export default class Home extends Component {
           </div>
           <div id="col" className="col s3">
             <p
+            data-testid={`home-timeline-points`}
               style={{
                 fontWeight: 600,
                 color: textColor,
@@ -230,7 +234,10 @@ export default class Home extends Component {
         <div className="divider"></div>
         <div className="row">
           <div id="col" className="col s4">
-            <p id="top" className="center-align">
+            <p 
+              data-testid={`home-teamCode`}
+              id="top" 
+              className="center-align">
               {this.state.teamCode}
             </p>
             <p
@@ -241,7 +248,10 @@ export default class Home extends Component {
             </p>
           </div>
           <div id="col" className="col s4">
-            <p id="top" className="center-align">
+            <p 
+              data-testid={`home-numberOfMembers`}
+              id="top" 
+              className="center-align">
               {this.state.teamMembers.length}
             </p>
             <p
@@ -264,7 +274,10 @@ export default class Home extends Component {
           </div>
 
           <div id="col" className="col s4">
-            <p id="top" className="center-align">
+            <p 
+              data-testid={`home-teamPoints`}
+              id="top" 
+              className="center-align">
               {this.state.teamPoints}
             </p>
             <p
@@ -278,7 +291,10 @@ export default class Home extends Component {
       </div>
     );
     let addToBlackList = (
-      <div id="col" className="col s6">
+      <div 
+        data-testid={`home-blacklist`}
+        id="col" 
+        className="col s6">
         {this.createBlacklistButton()}
       </div>
     );
