@@ -6,10 +6,6 @@ on:
       - master
       - develop
       - staging
-  push:
-    branches:
-      - tests/pupetteer-jest_trevor
-
 jobs:
   Stylelint-Eslint-Prettier:
     runs-on: ubuntu-latest
