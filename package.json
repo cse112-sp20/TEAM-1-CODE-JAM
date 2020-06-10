@@ -28,7 +28,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "jest --colors",
+    "test": "jest --colors --runInBand",
     "test:coverage": "jest --coverage --colors --config=jest.config.json --testPathIgnorePatterns tests/end2endTests",
     "test1": "react-scripts test",
     "eject": "react-scripts eject",

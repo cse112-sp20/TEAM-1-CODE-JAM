@@ -18,7 +18,7 @@ app.get("/", (req, res) => {
 // CRUD interface
 app.get("/:id", (req, res) => {
   const teamsRef = db.collection("teams").doc(req.params.id);
-  let getDoc = teamsRef
+  teamsRef
     .get()
     .then((doc) => {
       if (!doc.exists) {
