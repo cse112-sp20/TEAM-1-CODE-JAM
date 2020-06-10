@@ -1,13 +1,13 @@
 import path from "path";
 import puppeteer from "puppeteer";
-import manifest from "../../build/manifest.json";
+import manifest from "../build/manifest.json";
 const TEST_TIMEOUT = 80000; // extend test timeout sinces its E2E
 
 let browser;
 let teamCode;
 let page;
 let page2;
-const BUILD_PATH = path.resolve(__dirname, "../../build");
+const BUILD_PATH = path.resolve(__dirname, "../build");
 
 let extensionId = null;
 

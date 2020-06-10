@@ -1,6 +1,6 @@
 export let store = {};
 export let getItem = jest.fn((key) => {
-  return store[key] || null;
+  return store[key] || undefined;
 });
 export let setItem = jest.fn((key, value) => {
   store[key] = value.toString();

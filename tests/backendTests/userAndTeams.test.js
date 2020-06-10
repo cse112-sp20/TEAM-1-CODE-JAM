@@ -44,7 +44,7 @@ import _, {
   currentTeamInfo,
   updateDBParams,
 } from "../../public/userAndTeams.js";
-import { localStorageMock } from "../mocks/testMock.js";
+import { localStorageMock, store } from "../mocks/testMock.js";
 import { setDB } from "../../public/firebaseInit.js";
 import { db, get, set, update } from "../mocks/databaseMock.js";
 
@@ -564,6 +564,9 @@ describe("Reset Team info on a new day", () => {
 });
 
 describe("testing checkDate()", () => {
+  afterAll(()=>{
+    localStorageMock.clear();
+  });
   test("checkDate for empty localStorage", () => {
     _.checkDate();
     let date = _.getDate();
@@ -587,7 +590,7 @@ describe("testing checkDate()", () => {
     localStorageMock.setItem("toBeCleared", "value");
     expect(localStorageMock.getItem("toBeCleared")).toBe("value");
     _.checkDate();
-    expect(localStorageMock.getItem("toBeCleared")).toBe(null);
+    expect(localStorageMock.getItem("toBeCleared")).toBe(undefined);
   });
 });
 
@@ -843,5 +846,17 @@ describe("setupListener", () => {
     expect(currTeamCode).toBe("11111");
     expect(_.getTeamOnSnapshot).toHaveBeenCalled();
     // expect(_.)
+  });
+});
+
+describe("test updateLocalStorage()", ()=>{
+  test("If localStorage doesn't have the teamCode", async ()=>{
+    //expect(localStorageMock.setItem).toBeCalledTimes(0);
+    console.log(store);
+    _.getTeamCode = jest.fn().mockResolvedValue("11111");
+    expect(localStorageMock.getItem("11111")).toBe(undefined);
+    await updateLocalStorage("test.com", "10", "5");
+    console.log(store);
+    expect(localStorageMock.getItem("11111")).toBe({["test.com"]: Number(0)});
   });
 });
