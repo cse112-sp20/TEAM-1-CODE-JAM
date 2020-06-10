@@ -1,7 +1,7 @@
 import path from "path";
 import puppeteer from "puppeteer";
 import manifest from "../../build/manifest.json";
-const TEST_TIMEOUT = 60000; // extend test timeout sinces its E2E
+const TEST_TIMEOUT = 80000; // extend test timeout sinces its E2E
 
 let browser;
 let teamCode;
@@ -28,7 +28,7 @@ const getExtensionId = async () => {
 };
 
 beforeAll(async () => {
-  jest.setTimeout(60000);
+  jest.setTimeout(80000);
   browser = await puppeteer.launch({
     timeout: 0,
     executablePath: process.env.PUPPETEER_EXEC_PATH,
