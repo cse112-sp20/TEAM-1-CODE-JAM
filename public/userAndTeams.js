@@ -237,17 +237,17 @@ export function checkDate() {
   }
   if (
     currentTeamInfo.currDate !== undefined &&
-    currentTeamInfo.currDate !== dateStr
+    currentTeamInfo.currDate !== dateStr &&
+    currTeamCode !== undefined
   ) {
     console.log("reset");
     resetTeamInfo();
-    // create new for each team
-    db.collection("users").doc(userEmail).update({
-      user_points: {},
-    });
-    for (let teamCode in userProfile.joined_teams) {
-      createTeamPerformance(teamCode, 100, userEmail);
-    }
+    db.collection("users")
+      .doc(userEmail)
+      .update({
+        user_points: { [currTeamCode]: 100 },
+      });
+    createTeamPerformance(currTeamCode, 100, userEmail);
   }
 }
 
