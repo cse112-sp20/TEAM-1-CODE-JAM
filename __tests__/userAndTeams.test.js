@@ -5,6 +5,58 @@ import _, { getDate } from "../public/userAndTeams.js";
 import { localStorageMock } from "../__mocks__/testMock.js";
 import { setDB } from "../public/firebaseInit.js";
 import { db, get, set, update } from "../__mocks__/databaseMock.js";
+=======
+import _, {
+  getUserInformation,
+  getTeamInformation,
+  randomTeamCode,
+  isTeamCodeUnique,
+  generateRandomTeamCode,
+  getUserEmail,
+  getTeamNames,
+  getTeamName,
+  getUserAnimals,
+  getUserAnimal,
+  setTeamCode,
+  setCurrentTeamInfo,
+  validUserEmail,
+  createUser,
+  getUserProfile,
+  createTeamOnFirebase,
+  joinTeamOnFirebase,
+  getAnimalsLeft,
+  getAnimal,
+  resetTeamInfo,
+  // animals,
+  currTeamCode,
+  setAnimal,
+  animals,
+  checkDate,
+  getDate,
+  updateLocalStorage,
+  deleteIfNoMembers,
+  deleteTeamEntirely,
+  setupListener,
+  getUserDailyPoints,
+  checkOff,
+  getTeamCode,
+  toggleCheckIn,
+  getCurrentUrl,
+  isCheckIn,
+  setUserEmail,
+  deleteTeamFromUser,
+  teamNames,
+  userProfile,
+  currentTeamInfo,
+  updateDBParams,
+  tabUrl,
+  timeSpend,
+  threshold,
+} from "../../public/userAndTeams.js";
+import { localStorageMock } from "../mocks/testMock.js";
+import { setDB } from "../../public/firebaseInit.js";
+import { db, get, set, update } from "../mocks/databaseMock.js";
+>>>>>>> Stashed changes:tests/backendTests/userAndTeams.test.js
 
 //localStorageMock.setItem("test", 2);
 //console.log(store);
