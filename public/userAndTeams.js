@@ -1,7 +1,7 @@
-/* global firebase chrome */
-import { animals, addAnimal, getAnimal, setAnimal } from "./animalGenerator.js";
+/* global firebase chrome sendToDB*/
+import { animals, addAnimal, getAnimal } from "./animalGenerator.js";
 import { getCurrentUrl } from "./tabs.js";
-import { sendToDB } from "./githubTracker.js";
+// import { sendToDB } from "./githubTracker.js";
 import { db } from "./firebaseInit.js";
 export let currentTeamSnapshot = () => {};
 export let teamNames = [];
