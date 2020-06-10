@@ -1,10 +1,10 @@
 import path from 'path'
 import puppeteer from 'puppeteer'
 import manifest from '../../build/manifest.json'
-import db from '../../public/firebaseInit.js';
 const TEST_TIMEOUT = 100000000 // extend test timeout sinces its E2E
 
 let browser
+let teamCode
 let page
 let page2
 const BUILD_PATH = path.resolve(__dirname, '../../build')
@@ -21,7 +21,6 @@ const getExtensionId = async () => {
       _targetInfo.title === manifest.name &&
       _targetInfo.type === 'background_page'
   )
-  // eslint-disable-next-line no-underscore-dangle
   const extensionUrl = extensionTarget._targetInfo.url || ''
   const [, , extensionID] = extensionUrl.split('/')
   dummyPage.close()
@@ -50,7 +49,22 @@ beforeAll(async () => {
 
 afterAll(async () => {
   if (browser) {
+    jest.setTimeout(300000000);
+    const page = await browser.newPage();
+    await page.setRequestInterception(true);
+    page.once('request', request => {
+        var data = {
+            'method': 'DELETE',
+        };
+        request.continue(data);
+
+        // Immediately disable setRequestInterception, or all other requests will hang
+        page.setRequestInterception(false);
+    });
+    const response = await page.goto(`https://us-central1-chrome-extension-cse-112.cloudfunctions.net/teams/${teamCode}`, {timeout: 0});
+    await page.close()
     await browser.close()
+    
   }
 })
 
@@ -64,7 +78,6 @@ beforeEach(async () => {
 afterEach(async () => {
   if (page) {
     await page.close()
-  //  await page2.close()
   }
 })
 
@@ -81,26 +94,26 @@ test(
   },
   TEST_TIMEOUT
 )
-// test(
-//   'Create Team',
-//   async () => {
-//     const url = `chrome-extension://${extensionId}`;
-//     await page.goto(`${url}/index.html`)
-//     await page.waitForSelector(".app");
-//     await page.click('[data-testid="SideNav-teams"]');
-//     expect(page.url()).toBe(url + "/teams");
-//     await page.click('[data-testid="Teams-createjoin"]');
-//     await page.type(
-//       '[data-testid="CreateJoinTeam-createinput"]',
-//       "puppeteer testing"
-//     );
-//     await page.click('[data-testid="CreateJoinTeam-createbutton"]');
-//     await page.waitForSelector("[data-testid='team-title']", {visible: true, timeout: 0});
-//     const header = await page.$eval("[data-testid='team-title']", e => e.innerHTML);
-//     expect(header).toBe(`puppeteer testing`);
-//   },
-//   TEST_TIMEOUT
-// )
+test(
+  'Create Team',
+  async () => {
+    const url = `chrome-extension://${extensionId}`;
+    await page.goto(`${url}/index.html`)
+    await page.waitForSelector(".app");
+    await page.click('[data-testid="SideNav-teams"]');
+    expect(page.url()).toBe(url + "/teams");
+    await page.click('[data-testid="Teams-createjoin"]');
+    await page.type(
+      '[data-testid="CreateJoinTeam-createinput"]',
+      "puppeteer testing"
+    );
+    await page.click('[data-testid="CreateJoinTeam-createbutton"]');
+    await page.waitForSelector("[data-testid='team-title']", {visible: true, timeout: 0});
+    const header = await page.$eval("[data-testid='team-title']", e => e.innerHTML);
+    expect(header).toBe(`puppeteer testing`);
+  },
+  TEST_TIMEOUT
+)
 test(
   'Join Team',
   async () => {
@@ -134,8 +147,8 @@ test(
     })
     await page2.bringToFront();  
     expect(page2.url()).toBe("https://twitter.com/explore");
+    await page2.waitFor(5000);
     await page.bringToFront();
-    await page.waitFor(2000);
     await page2.close()
   },
   TEST_TIMEOUT
@@ -179,6 +192,22 @@ test(
     await page.waitForSelector("[data-testid='home-numberOfMembers']", {timeout: 0});
     const teamMembers = await page.$eval("[data-testid='home-numberOfMembers']", e => e.innerHTML);
     expect(parseInt(teamMembers)).toEqual(1);
+  },
+  TEST_TIMEOUT
+)
+test(
+  'Verify team code',
+  async () => {
+    const url = `chrome-extension://${extensionId}`;
+    await page.goto(`${url}/index.html`, {
+      waitUntil: "networkidle2",
+      timeout: 0
+    })
+    teamCode = await page.$eval(
+      '[data-testid="home-teamCode"]',
+      (el) => el.textContent
+    );
+    expect(teamCode.length).toBe(5);
   },
   TEST_TIMEOUT
 )

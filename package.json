@@ -7,6 +7,8 @@
     "@testing-library/user-event": "^7.1.2",
     "babel-polyfill": "^6.26.0",
     "chart.js": "^2.9.3",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
     "firebase": "^7.14.4",
     "firebase-admin": "^8.12.1",
     "identity-obj-proxy": "^3.0.0",
