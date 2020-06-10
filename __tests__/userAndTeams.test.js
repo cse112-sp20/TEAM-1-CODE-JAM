@@ -1,5 +1,6 @@
 import { chrome } from "../__mocks__/chromeMock.js";
 global.chrome = chrome;
+<<<<<<< Updated upstream:__tests__/userAndTeams.test.js
 import _, { getDate } from "../public/userAndTeams.js";
 import { localStorageMock } from "../__mocks__/testMock.js";
 import { setDB } from "../public/firebaseInit.js";
@@ -623,3 +624,188 @@ describe("joinTeamOnFirebase", () => {
     expect(teams["11111"].animalsLeft).toEqual(["1", "2", "3"]);
   });
 });
+<<<<<<< Updated upstream:__tests__/userAndTeams.test.js
+=======
+describe("deleteIfNoMembers", () => {
+  beforeEach(() => {
+    _.getTeamInformation = jest.fn();
+    _.deleteTeamEntirely = jest.fn();
+  });
+  afterEach(() => {
+    _.getTeamInformation = getTeamInformation;
+    _.deleteTeamEntirely = deleteTeamEntirely;
+  });
+  test("there are no members left", async () => {
+    _.getTeamInformation.mockResolvedValueOnce({
+      data: () => {
+        return {
+          members: [],
+        };
+      },
+    });
+    await _.deleteIfNoMembers("11111");
+    expect(_.getTeamInformation).toHaveBeenCalled();
+    expect(_.getTeamInformation).toHaveBeenCalledWith("11111");
+    expect(_.deleteTeamEntirely).toHaveBeenCalled();
+    expect(_.deleteTeamEntirely).toHaveBeenCalledWith("11111");
+  });
+  test("there are members left", async () => {
+    _.getTeamInformation.mockResolvedValueOnce({
+      data: () => {
+        return {
+          members: ["test1"],
+        };
+      },
+    });
+    await _.deleteIfNoMembers("11111");
+    expect(_.getTeamInformation).toHaveBeenCalled();
+    expect(_.getTeamInformation).toHaveBeenCalledWith("11111");
+    expect(_.deleteTeamEntirely).not.toHaveBeenCalled();
+  });
+});
+
+describe("setupListener", () => {
+  let request = {
+    for: "background",
+    message: "",
+  };
+  let res;
+  afterAll(() => {
+    _.createTeamOnFirebase = createTeamOnFirebase;
+    _.joinTeamOnFirebase = joinTeamOnFirebase;
+    _.getUserDailyPoints = getUserDailyPoints;
+    _.getTeamInformation = getTeamInformation;
+    _.deleteTeamFromUser = deleteTeamFromUser;
+    _.deleteIfNoMembers = deleteIfNoMembers;
+    _.checkOff = checkOff;
+  });
+  beforeEach(() => {
+    // set the userEmail on global field
+    _.setUserEmail(userEmail);
+    let sendResponse = (response) => {
+      res = response;
+    };
+    addListener.mockImplementation((callback) => {
+      let sender;
+      callback(request, sender, sendResponse);
+    });
+  });
+  test("get email", () => {
+    request.message = "get email";
+    _.setupListener();
+    expect(res).toEqual({ email: userEmail });
+  });
+  test("create team", async () => {
+    request.message = "create team";
+    request.teamName = "test team name";
+    _.createTeamOnFirebase = jest.fn().mockResolvedValue("11111");
+    _.setupListener();
+    expect(_.createTeamOnFirebase).toHaveBeenCalled();
+    expect(_.createTeamOnFirebase).toHaveBeenCalledWith(
+      request.teamName,
+      userEmail
+    );
+    // wait for fraction of a time
+    await new Promise((r) => setTimeout(r, 10));
+    expect(res).toBe("11111");
+  });
+  test("join team", async () => {
+    request.message = "join team";
+    request.teamCode = "22222";
+    _.joinTeamOnFirebase = jest.fn().mockResolvedValue("success");
+    _.setupListener();
+    expect(_.joinTeamOnFirebase).toHaveBeenCalled();
+    expect(_.joinTeamOnFirebase).toHaveBeenCalledWith(
+      request.teamCode,
+      userProfile,
+      userEmail
+    );
+    // wait for fraction of a time
+    await new Promise((r) => setTimeout(r, 10));
+    expect(res).toBe("success");
+  });
+  test("get teams", () => {
+    request.message = "get teams";
+    _.setupListener();
+    expect(res).toBe(teamNames);
+  });
+  test("get team info", () => {
+    request.message = "get team info";
+    _.setupListener();
+    expect(res).toBe(currentTeamInfo);
+  });
+  test("get team points", async () => {
+    request.message = "get team points";
+    _.getUserDailyPoints = jest.fn().mockResolvedValue("success");
+    _.setupListener();
+    await new Promise((r) => setTimeout(r, 10));
+    expect(_.getUserDailyPoints).toHaveBeenCalled();
+    expect(res).toEqual([teamNames, "success"]);
+  });
+  test("set timeout to delete team", async () => {
+    request.message = "set timeout to delete team";
+    request.teamCode = "12345";
+    _.getTeamInformation = jest.fn().mockResolvedValue({
+      data: () => {
+        return {
+          currDate: "now",
+          animalsLeft: ["cat"],
+          createdTime: "now",
+          creator: userEmail,
+          distributedAnimal: { [userEmail]: "dog" },
+          members: [],
+          teamName: "",
+          teamPoints: 100,
+          timeWasted: [],
+        };
+      },
+    });
+    _.deleteTeamFromUser = jest.fn().mockResolvedValue();
+    _.deleteIfNoMembers = jest.fn().mockResolvedValue();
+    _.setupListener();
+    await new Promise((r) => setTimeout(r, 4050));
+    expect(_.deleteTeamFromUser).toHaveBeenCalled();
+    expect(_.deleteTeamFromUser).toHaveBeenCalledWith(
+      userEmail,
+      request.teamCode,
+      "dog",
+      ["cat"],
+      { [userEmail]: "dog" }
+    );
+    expect(_.deleteIfNoMembers).toHaveBeenCalled();
+    expect(_.deleteIfNoMembers).toHaveBeenCalledWith(request.teamCode);
+    _.deleteTeamFromUser.mockClear();
+    _.deleteIfNoMembers.mockClear();
+  });
+  test("clear timeout", () => {
+    request.message = "clear timeout";
+    _.setupListener();
+    expect(_.deleteTeamFromUser).not.toHaveBeenCalled();
+    expect(_.deleteIfNoMembers).not.toHaveBeenCalled();
+  });
+  test("get timeline array", () => {
+    request.message = "get timeline array";
+    _.setupListener();
+    expect(res).toEqual(currentTeamInfo);
+  });
+  test("switch team", async () => {
+    request.message = "switch team";
+    _.currentTeamSnapshot = jest.fn();
+    _.checkOff = jest.fn();
+    _.getTeamCode = jest.fn().mockResolvedValue("11111");
+    _.getUserAnimal = jest.fn().mockResolvedValue("dog");
+    _.getTeamOnSnapshot = jest.fn().mockResolvedValue();
+    setupListener();
+    await new Promise((r) => setTimeout(r, 10));
+    expect(res).toBe("success");
+    expect(_.currentTeamSnapshot).toHaveBeenCalled();
+    expect(_.checkOff).toHaveBeenCalled();
+    expect(_.checkOff).toHaveBeenCalledWith(updateDBParams);
+    expect(currTeamCode).toBe("11111");
+    expect(_.getTeamOnSnapshot).toHaveBeenCalled();
+    // expect(_.)
+  });
+});
+
+describe()
+>>>>>>> Stashed changes:tests/backendTests/userAndTeams.test.js
