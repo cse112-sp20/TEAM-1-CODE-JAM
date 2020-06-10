@@ -857,6 +857,6 @@ describe("test updateLocalStorage()", ()=>{
     expect(localStorageMock.getItem("11111")).toBe(undefined);
     await updateLocalStorage("test.com", "10", "5");
     console.log(store);
-    expect(localStorageMock.getItem("11111")).toBe({["test.com"]: Number(0)});
+    expect(localStorageMock.getItem("11111")).toEqual(JSON.stringify({["test.com"]: Number(0)}));
   });
 });

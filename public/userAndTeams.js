@@ -664,7 +664,7 @@ export async function getAnimalsLeft(teamCode) {
  * @param {string} timeSpend timeSpend on the current website
  */
 export async function updateLocalStorage(tabUrl, timeSpend, threshold) {
-  let teamCode = await getTeamCode();
+  let teamCode = await _.getTeamCode();
   // access to the local storage to get the team code object
   let currData = localStorage.getItem(teamCode);
   // if local storage doesn't have the team code
