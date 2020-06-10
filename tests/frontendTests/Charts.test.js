@@ -4,14 +4,15 @@ import React from "react";
 import { render } from "@testing-library/react";
 import { Router } from "react-router-dom";
 import { createMemoryHistory } from "history";
-import Charts from "../src/components/Charts.js";
+import Charts from "../../src/components/Charts.js";
 
 // Set chrome mock
-import { chrome, sendMessage } from "../__mocks__/chromeMock.js";
+import { chrome, sendMessage } from "../mocks/chromeMock.js";
 global.chrome = chrome;
 
 // Change window.name to valid
-window.name = "not_nodejs";
+// window.name = "not_nodejs";
+window.name = "nodejs";
 
 // Function to render with router
 const renderWithRouter = (
@@ -28,7 +29,7 @@ const renderWithRouter = (
 };
 
 // define testComponent
-const testComponent = <Charts />;
+const chartComponent = <Charts />;
 
 // Test data (change at will)
 const testTeams = [
@@ -54,11 +55,7 @@ describe("<Charts />", () => {
 
       // Get team points
       if (msg.message == "get team points") {
-        response = testTeamPoints;
-      }
-      // Get teams
-      else if (msg.message === "get teams") {
-        response = testTeams;
+        response = [testTeams, testTeamPoints];
       }
       // Switch teams
       else if (msg.message == "switch team") {
@@ -82,19 +79,19 @@ describe("<Charts />", () => {
   // test render
   test("Charts.js react unit tests: test send message, and chart data", () => {
     // Render charts
-    const { getByTestId } = renderWithRouter(testComponent);
+    const { getByTestId } = renderWithRouter(chartComponent);
 
-    // Expect send message to be called twice
-    expect(sendMessage).toHaveBeenCalledTimes(2);
+    // Expect send message to be called once
+    expect(sendMessage).toHaveBeenCalledTimes(1);
 
-    // Expect get teams to be called
-    expect(sendMessage).toHaveBeenCalledWith(
-      {
-        for: "background",
-        message: "get teams",
-      },
-      expect.anything()
-    );
+    // // Expect get teams to be called
+    // expect(sendMessage).toHaveBeenCalledWith(
+    //   {
+    //     for: "background",
+    //     message: "get teams",
+    //   },
+    //   expect.anything()
+    // );
 
     // Expect get team points to be called
     expect(sendMessage).toHaveBeenCalledWith(

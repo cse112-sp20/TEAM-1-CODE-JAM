@@ -11,6 +11,7 @@ export default class SideNav extends Component {
           id="sidenav-background"
           data-position="right"
           data-tooltip="Home"
+          data-testid="SideNav-home"
           to="/"
         >
           {/* <span>Home</span> */}
@@ -21,6 +22,7 @@ export default class SideNav extends Component {
           id="sidenav-background"
           data-position="right"
           data-tooltip="Timeline"
+          data-testid="SideNav-timeline"
           to="/timeline"
         >
           {/* <span>Timeline</span> */}
@@ -31,6 +33,7 @@ export default class SideNav extends Component {
           id="sidenav-background"
           data-position="right"
           data-tooltip="Your Performance"
+          data-testid="SideNav-performance"
           to="/charts"
         >
           {/* <span>Charts</span> */}

@@ -1,4 +1,4 @@
-import { chrome } from "../__mocks__/chromeMock.js";
+import { chrome, addListener } from "../mocks/chromeMock.js";
 global.chrome = chrome;
 import _, {
   getUserInformation,
@@ -43,13 +43,10 @@ import _, {
   userProfile,
   currentTeamInfo,
   updateDBParams,
-  tabUrl,
-  timeSpend,
-  threshold,
-} from "../public/userAndTeams.js";
-import { localStorageMock } from "../__mocks__/localStorageMock.js";
-import { setDB } from "../public/firebaseInit.js";
-import { db, get, set, update } from "../__mocks__/databaseMock.js";
+} from "../../public/userAndTeams.js";
+import { localStorageMock } from "../mocks/testMock.js";
+import { setDB } from "../../public/firebaseInit.js";
+import { db, get, set, update } from "../mocks/databaseMock.js";
 
 //localStorageMock.setItem("test", 2);
 //console.log(store);
@@ -162,7 +159,9 @@ describe("getUserEmail", () => {
   });
 });
 describe("getTeamNames", () => {
-  const getTeamName = _.getTeamName;
+  afterAll(() => {
+    _.getTeamName = getTeamName;
+  });
   test("get valid team names", async () => {
     // let originalFunc = _.getTeamName.bind({});
     let userProfile = {
@@ -223,9 +222,6 @@ describe("getTeamNames", () => {
     expect(result).toEqual([
       { teamCode: "11111", teamName: "jest mock", joinedTime: "1" },
     ]);
-  });
-  afterAll(() => {
-    _.getTeamName = getTeamName;
   });
 });
 describe("getTeamName", () => {
@@ -506,7 +502,7 @@ describe("Reset Team info on a new day", () => {
     expect(teams).toEqual(teams);
   });
   test("check when resetTeamInfo runs correctly", async () => {
-    _.setCurrentTeamCode("11111");
+    _.setTeamCode("11111");
     let allAnimals = _.animals;
     _.setAnimal(["apple", "banana", "pear"]);
 
@@ -849,5 +845,3 @@ describe("setupListener", () => {
     // expect(_.)
   });
 });
-
-//describe()

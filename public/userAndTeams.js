@@ -1,8 +1,8 @@
-/* global firebase chrome sendToDB*/
-import { animals, addAnimal, getAnimal } from "./animalGenerator.js";
+/* global firebase chrome */
+import { animals, addAnimal, getAnimal, setAnimal } from "./animalGenerator.js";
 import { getCurrentUrl } from "./tabs.js";
-// import { sendToDB } from "./githubTracker.js";
 import { db } from "./firebaseInit.js";
+import { sendToDB } from "./githubTracker.js";
 export let currentTeamSnapshot = () => {};
 export let teamNames = [];
 export let currentTeamInfo = {
@@ -10,7 +10,7 @@ export let currentTeamInfo = {
   animalsLeft: [],
   createdTime: undefined,
   creator: undefined,
-  distributedAnimal: [],
+  distributedAnimal: {},
   members: [],
   teamName: "",
   teamPoints: 100,
@@ -75,12 +75,12 @@ export function setupListener() {
         sendResponse({ email: userEmail });
       } else if (request.message === "create team") {
         // create the team on database
-        createTeamOnFirebase(request.teamName, userEmail).then((response) => {
+        _.createTeamOnFirebase(request.teamName, userEmail).then((response) => {
           sendResponse(response);
         });
       } else if (request.message === "join team") {
         // join the team and update the database
-        joinTeamOnFirebase(request.teamCode, userProfile, userEmail).then(
+        _.joinTeamOnFirebase(request.teamCode, userProfile, userEmail).then(
           (response) => {
             sendResponse(response);
           }
@@ -92,24 +92,24 @@ export function setupListener() {
       }
       // VIVIAN
       else if (request.message === "get team points") {
-        getUserDailyPoints().then((res) => {
-          sendResponse(res);
+        _.getUserDailyPoints().then((res) => {
+          sendResponse([teamNames, res]);
         });
       } else if (request.message === "set timeout to delete team") {
         timeoutVars[request.teamCode] = setTimeout(async () => {
-          let teamInfo = await getTeamInformation(request.teamCode);
+          let teamInfo = await _.getTeamInformation(request.teamCode);
           teamInfo = teamInfo.data();
           let userAnimal = teamInfo.distributedAnimal[userEmail];
           let animalsLeft = teamInfo.animalsLeft;
           let distributedAnimal = teamInfo.distributedAnimal;
-          await deleteTeamFromUser(
+          await _.deleteTeamFromUser(
             userEmail,
             request.teamCode,
             userAnimal,
             animalsLeft,
             distributedAnimal
           );
-          await deleteIfNoMembers(request.teamCode);
+          await _.deleteIfNoMembers(request.teamCode);
         }, 4000);
       } else if (request.message === "clear timeout") {
         clearTimeout(timeoutVars[request.teamCode]);
@@ -117,25 +117,25 @@ export function setupListener() {
         sendResponse(currentTeamInfo);
       } else if (request.message === "switch team") {
         (async () => {
-          checkOff(updateDBParams);
-          currentTeamSnapshot();
-          let teamCode = await getTeamCode();
-          setTeamCode(teamCode);
-          userAnimal = await getUserAnimal(userEmail, currTeamCode);
-          getTeamOnSnapshot().then(() => {
+          _.checkOff(updateDBParams);
+          _.currentTeamSnapshot();
+          let teamCode = await _.getTeamCode();
+          _.setTeamCode(teamCode);
+          userAnimal = await _.getUserAnimal(userEmail, currTeamCode);
+          _.getTeamOnSnapshot().then(() => {
             sendResponse("success");
           });
         })();
       } else if (request.message === "toggle check in") {
-        toggleCheckIn(updateDBParams);
+        _.toggleCheckIn(updateDBParams);
       } else if (request.message === "get home info") {
         (async () => {
-          let currUrl = await getCurrentUrl();
+          let currUrl = await _.getCurrentUrl();
           let data = {};
           try {
             let profilePic = currentTeamInfo.distributedAnimal[userEmail];
             data = {
-              isCheckIn: isCheckIn(),
+              isCheckIn: _.isCheckIn(),
               blacklist: blacklist,
               teamInfo: currentTeamInfo,
               currUrl: currUrl,
@@ -157,12 +157,16 @@ export function setupListener() {
 }
 //VIVIAN
 export async function getUserDailyPoints() {
+  let res = {};
   let curDate = getDate();
   let dbTeamPoints = await db.collection("teamPerformance").doc(curDate).get();
   dbTeamPoints = dbTeamPoints.data();
+  if (!(userEmail in dbTeamPoints) || !("totalTeamPoint" in dbTeamPoints))
+    return res;
   let userTeamsPoints = dbTeamPoints[userEmail];
   let allTeamsPoints = dbTeamPoints.totalTeamPoint;
-  let res = {};
+  console.log(userTeamsPoints);
+  console.log(allTeamsPoints);
   for (let team of Object.keys(userTeamsPoints)) {
     res[team] = {
       userPoints: userTeamsPoints[team],
@@ -239,8 +243,10 @@ export function checkDate() {
   ) {
     console.log("reset");
     resetTeamInfo();
-    // currentDate = getDate();
-    createTeamPerformance(currTeamCode, 100, userEmail);
+    // create new for each team
+    for (let teamCode in userProfile.joined_teams) {
+      createTeamPerformance(teamCode, 100, userEmail);
+    }
   }
 }
 
@@ -311,10 +317,10 @@ export async function joinTeamOnFirebase(teamCode, userProfile, userEmail) {
  * @param {string} teamCode the Team code to check
  */
 export async function deleteIfNoMembers(teamCode) {
-  let data = await getTeamInformation(teamCode);
+  let data = await _.getTeamInformation(teamCode);
   data = data.data();
   if (data.members.length === 0) {
-    await deleteTeamEntirely(teamCode);
+    await _.deleteTeamEntirely(teamCode);
     return;
   } else {
     return;
@@ -733,7 +739,7 @@ export async function updateLocalStorage(tabUrl, timeSpend, threshold) {
         .doc(currentDate)
         .set(
           {
-            [userEmail]: userProfile.user_points,
+            [userEmail]: { [currTeamCode]: userPoints },
             totalTeamPoint: { [currTeamCode]: teamPoints },
           },
           { merge: true }
@@ -908,7 +914,6 @@ const _ = {
   getUserAnimals,
   getUserAnimal,
   setTeamCode,
-  setCurrentTeamCode: setTeamCode,
   setCurrentTeamInfo,
   validUserEmail,
   createUser,
@@ -925,6 +930,19 @@ const _ = {
   checkDate,
   getDate,
   updateLocalStorage,
+  deleteIfNoMembers,
+  deleteTeamEntirely,
+  setupListener,
+  getUserDailyPoints,
+  checkOff,
+  getTeamCode,
+  toggleCheckIn,
+  getCurrentUrl,
+  isCheckIn,
+  setUserEmail,
+  deleteTeamFromUser,
+  getTeamOnSnapshot,
+  currentTeamSnapshot,
 };
 
 export default _;
