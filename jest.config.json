@@ -18,7 +18,8 @@
     "<rootDir>/babel.config.js",
     "<rootDir>/out/",
     "<rootDir>/public/LandingPage/js/materialize.js",
-    "<rootDir>/public/LandingPage/js/materialize.min.js"
+    "<rootDir>/public/LandingPage/js/materialize.min.js",
+    "<rootDir>/tests/end2endTests/"
   ],
   "coverageReporters": ["json", "text", "text-summary", "html", "lcov"],
   "coverageThreshold": {

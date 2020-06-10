@@ -33,7 +33,7 @@ export default class Timeline extends Component {
       Math.round((timelineElement.points + Number.EPSILON) * 100) / 100;
 
     let temp = require(`../SVG/${animal}.svg`);
-
+    let i = 0;
     let newElement = (
       <tr key={`tr-${index}`}>
         <td id="time">
@@ -45,6 +45,7 @@ export default class Timeline extends Component {
         </td>
         <td id="thirdElem" style={{ color: `${color}` }}>
           <p
+            data-testid={`timeline-item ${++i}`}
             style={{ fontWeight: 600, textTransform: "capitalize" }}
           >{`${timelineElement.url}`}</p>
 
