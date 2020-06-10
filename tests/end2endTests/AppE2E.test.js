@@ -188,7 +188,7 @@ test(
       "[data-testid='home-teamPoints']",
       (e) => e.innerHTML
     );
-    expect(parseInt(teamPoints)).toBeLessThan(100);
+    expect(parseInt(teamPoints, 10)).toBeLessThan(100);
   },
   TEST_TIMEOUT
 );
@@ -204,7 +204,7 @@ test(
       "[data-testid='home-numberOfMembers']",
       (e) => e.innerHTML
     );
-    expect(parseInt(teamMembers)).toEqual(1);
+    expect(parseInt(teamMembers, 10)).toEqual(1);
   },
   TEST_TIMEOUT
 );
