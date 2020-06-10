@@ -1,11 +1,5 @@
 import { chrome } from "../__mocks__/chromeMock.js";
 global.chrome = chrome;
-<<<<<<< Updated upstream:__tests__/userAndTeams.test.js
-import _, { getDate } from "../public/userAndTeams.js";
-import { localStorageMock } from "../__mocks__/testMock.js";
-import { setDB } from "../public/firebaseInit.js";
-import { db, get, set, update } from "../__mocks__/databaseMock.js";
-=======
 import _, {
   getUserInformation,
   getTeamInformation,
@@ -56,7 +50,6 @@ import _, {
 import { localStorageMock } from "../mocks/testMock.js";
 import { setDB } from "../../public/firebaseInit.js";
 import { db, get, set, update } from "../mocks/databaseMock.js";
->>>>>>> Stashed changes:tests/backendTests/userAndTeams.test.js
 
 //localStorageMock.setItem("test", 2);
 //console.log(store);
@@ -676,8 +669,6 @@ describe("joinTeamOnFirebase", () => {
     expect(teams["11111"].animalsLeft).toEqual(["1", "2", "3"]);
   });
 });
-<<<<<<< Updated upstream:__tests__/userAndTeams.test.js
-=======
 describe("deleteIfNoMembers", () => {
   beforeEach(() => {
     _.getTeamInformation = jest.fn();
@@ -860,4 +851,3 @@ describe("setupListener", () => {
 });
 
 describe()
->>>>>>> Stashed changes:tests/backendTests/userAndTeams.test.js
