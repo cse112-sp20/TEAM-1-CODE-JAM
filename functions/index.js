@@ -15,7 +15,12 @@ app.use(cors({ origin: true }));
 app.get("/", (req, res) => {
   res.send("hello world!");
 });
-// CRUD interface
+/**
+ * Pull all the data from database based on team code
+ * @author Trevor Perez
+ * @param req Request from user. The team code
+ * @param res All the data from that specific team
+ */
 app.get("/:id", (req, res) => {
   const teamsRef = db.collection("teams").doc(req.params.id);
   teamsRef
@@ -35,7 +40,12 @@ app.get("/:id", (req, res) => {
       console.log("Error getting document", err);
     });
 });
-
+/**
+ * Delete team based off of team code
+ * @author Trevor Perez
+ * @param req Request from user. The team code
+ * @param res A deleted team
+ */
 app.delete("/:id", (req, res) => {
   let deleteDoc = db.collection("teams").doc(req.params.id).delete();
   res.json({

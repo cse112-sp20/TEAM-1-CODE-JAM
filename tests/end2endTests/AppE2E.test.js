@@ -1,7 +1,7 @@
 import path from "path";
 import puppeteer from "puppeteer";
 import manifest from "../../build/manifest.json";
-const TEST_TIMEOUT = 500000000; // extend test timeout sinces its E2E
+const TEST_TIMEOUT = 60000; // extend test timeout sinces its E2E
 
 let browser;
 let teamCode;
@@ -28,7 +28,7 @@ const getExtensionId = async () => {
 };
 
 beforeAll(async () => {
-  jest.setTimeout(500000000);
+  jest.setTimeout(60000);
   browser = await puppeteer.launch({
     timeout: 0,
     executablePath: process.env.PUPPETEER_EXEC_PATH,
@@ -62,12 +62,11 @@ afterAll(async () => {
       page.setRequestInterception(false);
     });
     await page.goto(
-      `https://us-central1-chrome-extension-cse-112.cloudfunctions.net/teams/${teamCode}`,
-      { timeout: 0 }
+      `https://us-central1-chrome-extension-cse-112.cloudfunctions.net/teams/${teamCode}`
     );
     await page.close();
     await browser.close();
-    jest.clearAllTimers()
+    jest.clearAllTimers();
   }
 });
 
@@ -85,10 +84,8 @@ test(
   "Launch Extension with no errors",
   async () => {
     const url = `chrome-extension://${extensionId}`;
-    await page.goto(`${url}/index.html`, {
-      timeout: 0,
-    });
-    await page.waitForSelector(".app", { timeout: 0 });
+    await page.goto(`${url}/index.html`);
+    await page.waitForSelector(".app");
     const header = await page.$eval("div>#team-name", (e) => e.innerHTML);
     expect(header).toBe(`Team Activity Tracker`);
   },
@@ -110,7 +107,6 @@ test(
     await page.click('[data-testid="CreateJoinTeam-createbutton"]');
     await page.waitForSelector("[data-testid='team-title']", {
       visible: true,
-      timeout: 0,
     });
     const header = await page.$eval(
       "[data-testid='team-title']",
@@ -124,10 +120,8 @@ test(
   "Join Team",
   async () => {
     const url = `chrome-extension://${extensionId}`;
-    await page.goto(`${url}/index.html`, {
-      timeout: 0,
-    });
-    await page.waitForSelector(".app", { timeout: 0 });
+    await page.goto(`${url}/index.html`);
+    await page.waitForSelector(".app");
     await page.click('[data-testid="SideNav-teams"]');
     const teamName = await page.$eval(
       "[data-testid='team name 1']",
@@ -137,7 +131,6 @@ test(
     await page.click('[data-testid="team name 1"]');
     await page.waitForSelector("[data-testid='team-title']", {
       visible: true,
-      timeout: 0,
     });
     const teamTitle = await page.$eval(
       "[data-testid='team-title']",
@@ -152,19 +145,18 @@ test(
   async () => {
     const url = `chrome-extension://${extensionId}`;
     await page.goto(`${url}/index.html`);
-    await page.waitForSelector(".app", { timeout: 0 });
+    await page.waitForSelector(".app");
     await page.click('[data-testid="checkin-btn"]');
     expect(`puppeteer testing`).toBe(`puppeteer testing`);
     page2 = await browser.newPage();
+    await page2.bringToFront();
     await page2.goto(`https://twitter.com/explore`, {
       waitUntil: "networkidle2",
-      timeout: 0,
     });
-    await page2.bringToFront();
     expect(page2.url()).toBe("https://twitter.com/explore");
     await page2.waitFor(4000);
-    await page.bringToFront();
     await page2.close();
+    await page.bringToFront();
   },
   TEST_TIMEOUT
 );
@@ -174,11 +166,8 @@ test(
     const url = `chrome-extension://${extensionId}`;
     await page.goto(`${url}/index.html`, {
       waitUntil: "networkidle2",
-      timeout: 0,
     });
-    await page.waitForSelector("[data-testid='home-timeline-item 0']", {
-      timeout: 0,
-    });
+    await page.waitForSelector("[data-testid='home-timeline-item 0']");
     const timelineItem = await page.$eval(
       "[data-testid='home-timeline-item 0']",
       (e) => e.innerHTML
@@ -193,11 +182,8 @@ test(
     const url = `chrome-extension://${extensionId}`;
     await page.goto(`${url}/index.html`, {
       waitUntil: "networkidle2",
-      timeout: 0,
     });
-    await page.waitForSelector("[data-testid='home-teamPoints']", {
-      timeout: 0,
-    });
+    await page.waitForSelector("[data-testid='home-teamPoints']", {});
     const teamPoints = await page.$eval(
       "[data-testid='home-teamPoints']",
       (e) => e.innerHTML
@@ -212,11 +198,8 @@ test(
     const url = `chrome-extension://${extensionId}`;
     await page.goto(`${url}/index.html`, {
       waitUntil: "networkidle2",
-      timeout: 0,
     });
-    await page.waitForSelector("[data-testid='home-numberOfMembers']", {
-      timeout: 0,
-    });
+    await page.waitForSelector("[data-testid='home-numberOfMembers']");
     const teamMembers = await page.$eval(
       "[data-testid='home-numberOfMembers']",
       (e) => e.innerHTML
@@ -231,7 +214,6 @@ test(
     const url = `chrome-extension://${extensionId}`;
     await page.goto(`${url}/index.html`, {
       waitUntil: "networkidle2",
-      timeout: 0,
     });
     teamCode = await page.$eval(
       '[data-testid="home-teamCode"]',
@@ -245,10 +227,8 @@ test(
   "Verify timeline tab",
   async () => {
     const url = `chrome-extension://${extensionId}`;
-    await page.goto(`${url}/index.html`, {
-      timeout: 0,
-    });
-    await page.waitForSelector(".app", { timeout: 0 });
+    await page.goto(`${url}/index.html`);
+    await page.waitForSelector(".app");
     await page.click('[data-testid="SideNav-timeline"]');
     const timelineItem = await page.$eval(
       "[data-testid='timeline-item 1']",
@@ -262,10 +242,8 @@ test(
   "Verify performance tab",
   async () => {
     const url = `chrome-extension://${extensionId}`;
-    await page.goto(`${url}/index.html`, {
-      timeout: 0,
-    });
-    await page.waitForSelector(".app", { timeout: 0 });
+    await page.goto(`${url}/index.html`);
+    await page.waitForSelector(".app");
     await page.click('[data-testid="SideNav-performance"]');
     expect(`twitter`).toBe(`twitter`);
   },
