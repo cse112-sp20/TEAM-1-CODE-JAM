@@ -40,7 +40,7 @@ export let updateDBParams = {
  */
 export function setCurrentTeamInfo(dictionary) {
   currentTeamInfo = {
-    currDate: dictionary.curDate,
+    currDate: dictionary.currDate,
     animalsLeft: dictionary.animalsLeft,
     createdTime: dictionary.createdTime,
     creator: dictionary.creator,
@@ -119,7 +119,7 @@ export function setupListener() {
         (async () => {
           _.checkOff(updateDBParams);
           _.currentTeamSnapshot();
-          let teamCode = await _.getTeamCode();
+          let teamCode = await _.getTeamCode(userProfile);
           _.setTeamCode(teamCode);
           userAnimal = await _.getUserAnimal(userEmail, currTeamCode);
           _.getTeamOnSnapshot().then(() => {
@@ -165,8 +165,6 @@ export async function getUserDailyPoints() {
     return res;
   let userTeamsPoints = dbTeamPoints[userEmail];
   let allTeamsPoints = dbTeamPoints.totalTeamPoint;
-  console.log(userTeamsPoints);
-  console.log(allTeamsPoints);
   for (let team of Object.keys(userTeamsPoints)) {
     res[team] = {
       userPoints: userTeamsPoints[team],
@@ -239,14 +237,17 @@ export function checkDate() {
   }
   if (
     currentTeamInfo.currDate !== undefined &&
-    currentTeamInfo.currDate !== dateStr
+    currentTeamInfo.currDate !== dateStr &&
+    currTeamCode !== undefined
   ) {
     console.log("reset");
     resetTeamInfo();
-    // create new for each team
-    for (let teamCode in userProfile.joined_teams) {
-      createTeamPerformance(teamCode, 100, userEmail);
-    }
+    db.collection("users")
+      .doc(userEmail)
+      .update({
+        user_points: { [currTeamCode]: 100 },
+      });
+    createTeamPerformance(currTeamCode, 100, userEmail);
   }
 }
 
@@ -399,29 +400,29 @@ export async function createTeamPerformance(key, points, userEmail) {
  * delete the user doc from DB
  * @param {string} userEmail the user email of the user
  */
-export async function deleteEverythingAboutAUser(userEmail) {
-  let queryCreatedTeam = db
-    .collection("teams")
-    .where("creator", "==", userEmail);
-  let queryJoinedTeam = db
-    .collection("teams")
-    .where("members", "array-contains", userEmail);
-  // do these things parallely
-  await Promise.all([
-    queryCreatedTeam.get().then(function (querySnapshot) {
-      querySnapshot.forEach(function (doc) {
-        deleteTeamEntirely(doc.id);
-      });
-    }),
-    queryJoinedTeam.get().then(function (querySnapshot) {
-      querySnapshot.forEach(function (doc) {
-        deleteTeamFromUser(userEmail, doc.id);
-      });
-    }),
-    db.collection("users").doc(userEmail).delete(),
-  ]);
-  return;
-}
+// export async function deleteEverythingAboutAUser(userEmail) {
+//   let queryCreatedTeam = db
+//     .collection("teams")
+//     .where("creator", "==", userEmail);
+//   let queryJoinedTeam = db
+//     .collection("teams")
+//     .where("members", "array-contains", userEmail);
+//   // do these things parallely
+//   await Promise.all([
+//     queryCreatedTeam.get().then(function (querySnapshot) {
+//       querySnapshot.forEach(function (doc) {
+//         deleteTeamEntirely(doc.id);
+//       });
+//     }),
+//     queryJoinedTeam.get().then(function (querySnapshot) {
+//       querySnapshot.forEach(function (doc) {
+//         deleteTeamFromUser(userEmail, doc.id);
+//       });
+//     }),
+//     db.collection("users").doc(userEmail).delete(),
+//   ]);
+//   return;
+// }
 /**
  *
  * @param {string} userEmail the email of the user
@@ -591,7 +592,7 @@ export function getUserProfile(userEmail) {
       .doc(userEmail)
       .onSnapshot(async function (doc) {
         userProfile = doc.data();
-        teamNames = await getTeamNames(userProfile);
+        teamNames = await _.getTeamNames(userProfile);
         resolve();
       });
   });
@@ -664,7 +665,7 @@ export async function getAnimalsLeft(teamCode) {
  * @param {string} timeSpend timeSpend on the current website
  */
 export async function updateLocalStorage(tabUrl, timeSpend, threshold) {
-  let teamCode = await getTeamCode();
+  let teamCode = await _.getTeamCode(userProfile);
   // access to the local storage to get the team code object
   let currData = localStorage.getItem(teamCode);
   // if local storage doesn't have the team code
@@ -697,20 +698,23 @@ export async function updateLocalStorage(tabUrl, timeSpend, threshold) {
     // update the local storage
     localStorage.setItem(teamCode, currData);
     if (JSON.parse(currData)[tabUrl] % threshold == 0) {
+      //console.log(currData);
+      //console.log(JSON.parse(currData)[tabUrl]);
+      //console.log(threshold);
       let seconds = JSON.parse(currData)[tabUrl] / 1000;
       let score = threshold / (60 * 1000);
       // let today = new Date();
       // let currTime =
       //   today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
       let currTime = new Date().toLocaleTimeString();
-      let currentDate = getDate();
+      let currentDate = _.getDate();
       let teamPoints = currentTeamInfo.teamPoints;
       // we will be using teamCode and userEmail to retrieve userPoints and update these
       teamPoints = teamPoints - score;
       let userPoints = userProfile.user_points[teamCode];
       userPoints = userPoints - score;
 
-      let userAnimal = await getUserAnimal(userEmail, teamCode);
+      let userAnimal = await _.getUserAnimal(userEmail, teamCode);
       db.collection("teams")
         .doc(teamCode)
         .update({
@@ -752,7 +756,7 @@ export async function updateLocalStorage(tabUrl, timeSpend, threshold) {
  * Get the latest information of the current team on database
  */
 export async function getTeamOnSnapshot() {
-  const currentTeam = await getTeamCode();
+  const currentTeam = await _.getTeamCode(userProfile);
   if (currentTeam === undefined) {
     return;
   }
@@ -762,7 +766,6 @@ export async function getTeamOnSnapshot() {
       .doc(currentTeam)
       .onSnapshot(function (doc) {
         if (!doc.exists) {
-          console.log("here");
           resolve();
         }
         currentTeamInfo = doc.data();
@@ -774,7 +777,7 @@ export async function getTeamOnSnapshot() {
         };
         chrome.runtime.sendMessage(msg);
         // check if its day is old
-        checkDate();
+        _.checkDate();
         resolve();
         // return;
       });
@@ -784,9 +787,10 @@ export async function getTeamOnSnapshot() {
 /**
  * Get the team code of the current team
  * @author Youliang Liu
+ * @param userProfile the local copy of user profile from database
  * @returns {string} the promise that contains the team code of the current team
  */
-export function getTeamCode() {
+export function getTeamCode(userProfile) {
   return new Promise(function (resolve) {
     chrome.storage.local.get("prevTeam", function (data) {
       if (data.prevTeam in userProfile.joined_teams) resolve(data.prevTeam);
@@ -829,10 +833,10 @@ export function toggleCheckIn(params) {
  * The timer to update to local storage and database
  */
 export async function myTimer(params) {
-  let currTabUrl = await getCurrentUrl();
+  let currTabUrl = await _.getCurrentUrl();
   if (currTabUrl !== undefined || currTabUrl !== "invalid") {
     if (blacklist.includes(currTabUrl)) {
-      updateLocalStorage(currTabUrl, params.updateInterval, params.threshold);
+      _.updateLocalStorage(currTabUrl, params.updateInterval, params.threshold);
     }
   }
   // resets teams data and creates
@@ -923,7 +927,6 @@ const _ = {
   getAnimalsLeft,
   getAnimal,
   resetTeamInfo,
-  // animals,
   currTeamCode,
   setAnimal,
   animals,
@@ -939,10 +942,12 @@ const _ = {
   toggleCheckIn,
   getCurrentUrl,
   isCheckIn,
+  checkIn,
   setUserEmail,
   deleteTeamFromUser,
   getTeamOnSnapshot,
   currentTeamSnapshot,
+  myTimer,
 };
 
 export default _;

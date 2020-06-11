@@ -32,11 +32,11 @@ export default class Home extends Component {
    *
    */
   componentDidMount = async () => {
-    const profilePics = this.importAll(
-      require.context("../SVG", false, /\.(png|jpe?g|svg)$/)
-    );
-    this.setState({ profilePics: profilePics });
-    var elems = document.querySelectorAll(".dropdown-trigger");
+    // const profilePics = this.importAll(
+    //   require.context("../SVG", false, /\.(png|jpe?g|svg)$/)
+    // );
+    // this.setState({ profilePics: profilePics });
+    let elems = document.querySelectorAll(".dropdown-trigger");
     // M.AutoInit();
     M.Dropdown.init(elems, {
       constrainWidth: false,
@@ -71,29 +71,22 @@ export default class Home extends Component {
         timelineArr: timelineArr,
         profilePic: response.profilePic,
       });
-      chrome.runtime.onMessage.addListener((msg) => {
-        if (msg.for === "team info") {
-          let teamInfo = msg.message;
-          let timelineArr = teamInfo.timeWasted.reverse();
-          if (timelineArr.length > 5) timelineArr = timelineArr.slice(0, 5);
-          let teamPoints = this.roundNumber(teamInfo.teamPoints);
-          this.setState({
-            teamName: teamInfo.teamName,
-            teamMembers: teamInfo.members,
-            teamPoints: teamPoints,
-            timelineArr: timelineArr,
-            profilePic: teamInfo.userAnimal,
-          });
-        }
-      });
     });
-  };
-  /**
-   * map all the current import using r
-   * @param {Object} r the list of thing we want to import
-   */
-  importAll = (r) => {
-    return r.keys().map(r);
+    chrome.runtime.onMessage.addListener((msg) => {
+      if (msg.for === "team info") {
+        let teamInfo = msg.message;
+        let timelineArr = teamInfo.timeWasted.reverse();
+        if (timelineArr.length > 5) timelineArr = timelineArr.slice(0, 5);
+        let teamPoints = this.roundNumber(teamInfo.teamPoints);
+        this.setState({
+          teamName: teamInfo.teamName,
+          teamMembers: teamInfo.members,
+          teamPoints: teamPoints,
+          timelineArr: timelineArr,
+          profilePic: teamInfo.userAnimal,
+        });
+      }
+    });
   };
   /**
    * functinality for the black list button
@@ -174,9 +167,8 @@ export default class Home extends Component {
    * @param {String} website the url link to this timeline element
    * @param {float} points the number of points gain or lost by this website
    */
-  createTimelineItem = (profilePicName, website, points) => {
+  createTimelineItem = (profilePicName, website, points, index) => {
     let isProductive = Number(points) < 0 ? false : true;
-    let timelineCount = 0;
     let profilePic = this.getProfilePic(profilePicName);
     let dotColor;
     let textColor;
@@ -191,6 +183,7 @@ export default class Home extends Component {
     const paddingTop = "11px";
     return (
       <Timeline.Item
+        key={`timeline ${index}`}
         dot={
           <Icon
             id="dot-icon"
@@ -212,7 +205,7 @@ export default class Home extends Component {
           <div id="col" className="col s1"></div>
           <div id="col" className="col s5">
             <p
-              data-testid={`home-timeline-item ${timelineCount++}`}
+              data-testid={`home-timeline-item ${index}`}
               style={{
                 textTransform: "capitalize",
                 fontWeight: 600,
@@ -224,7 +217,7 @@ export default class Home extends Component {
           </div>
           <div id="col" className="col s3">
             <p
-              data-testid={`home-timeline-points`}
+              data-testid={`home-timeline-points ${index}`}
               style={{
                 fontWeight: 600,
                 color: textColor,
@@ -346,6 +339,7 @@ export default class Home extends Component {
           <label>
             Check off
             <input
+              data-testid="checkin-checkbox"
               onChange={this.handleCheckIn}
               checked={this.state.isCheckIn}
               type="checkbox"
@@ -359,11 +353,12 @@ export default class Home extends Component {
     let timeline = (
       <div id="mini-timeline">
         <Timeline>
-          {this.state.timelineArr.map((item) => {
+          {this.state.timelineArr.map((item, index) => {
             return this.createTimelineItem(
               item.animal,
               item.url,
-              this.roundNumber(item.points)
+              this.roundNumber(item.points),
+              index
             );
           })}
         </Timeline>

@@ -1,6 +1,11 @@
-import { chrome, addListener } from "../mocks/chromeMock.js";
+import { chrome, addListener, sendMessage } from "../mocks/chromeMock.js";
 global.chrome = chrome;
 import _, {
+  currentTeamInfo,
+  blacklist,
+  updateDBParams,
+  userProfile,
+  teamNames,
   getUserInformation,
   getTeamInformation,
   randomTeamCode,
@@ -21,7 +26,6 @@ import _, {
   getAnimalsLeft,
   getAnimal,
   resetTeamInfo,
-  // animals,
   currTeamCode,
   setAnimal,
   animals,
@@ -39,17 +43,56 @@ import _, {
   isCheckIn,
   setUserEmail,
   deleteTeamFromUser,
-  teamNames,
-  userProfile,
-  currentTeamInfo,
-  updateDBParams,
+  getTeamOnSnapshot,
+  currentTeamSnapshot,
 } from "../../public/userAndTeams.js";
-import { localStorageMock } from "../mocks/testMock.js";
+import { localStorageMock, store } from "../mocks/testMock.js";
 import { setDB } from "../../public/firebaseInit.js";
-import { db, get, set, update } from "../mocks/databaseMock.js";
+import { db, get, set, update, onSnapshot } from "../mocks/databaseMock.js";
 
 //localStorageMock.setItem("test", 2);
 //console.log(store);
+const cleanup = () => {
+  _.getUserInformation = getUserInformation;
+  _.getTeamInformation = getTeamInformation;
+  _.randomTeamCode = randomTeamCode;
+  _.isTeamCodeUnique = isTeamCodeUnique;
+  _.generateRandomTeamCode = generateRandomTeamCode;
+  _.getUserEmail = getUserEmail;
+  _.getTeamNames = getTeamNames;
+  _.getTeamName = getTeamName;
+  _.getUserAnimals = getUserAnimals;
+  _.getUserAnimal = getUserAnimal;
+  _.setTeamCode = setTeamCode;
+  _.setCurrentTeamInfo = setCurrentTeamInfo;
+  _.validUserEmail = validUserEmail;
+  _.createUser = createUser;
+  _.getUserProfile = getUserProfile;
+  _.createTeamOnFirebase = createTeamOnFirebase;
+  _.joinTeamOnFirebase = joinTeamOnFirebase;
+  _.getAnimalsLeft = getAnimalsLeft;
+  _.getAnimal = getAnimal;
+  _.resetTeamInfo = resetTeamInfo;
+  _.currTeamCode = currTeamCode;
+  _.setAnimal = setAnimal;
+  _.animals = animals;
+  _.checkDate = checkDate;
+  _.getDate = getDate;
+  _.updateLocalStorage = updateLocalStorage;
+  _.deleteIfNoMembers = deleteIfNoMembers;
+  _.deleteTeamEntirely = deleteTeamEntirely;
+  _.setupListener = setupListener;
+  _.getUserDailyPoints = getUserDailyPoints;
+  _.checkOff = checkOff;
+  _.getTeamCode = getTeamCode;
+  _.toggleCheckIn = toggleCheckIn;
+  _.getCurrentUrl = getCurrentUrl;
+  _.isCheckIn = isCheckIn;
+  _.setUserEmail = setUserEmail;
+  _.deleteTeamFromUser = deleteTeamFromUser;
+  _.getTeamOnSnapshot = getTeamOnSnapshot;
+  _.currentTeamSnapshot = currentTeamSnapshot;
+};
 
 let userEmail = "test@gmail.com";
 // let dummyEmail = "test2@gmail.com";
@@ -564,6 +607,9 @@ describe("Reset Team info on a new day", () => {
 });
 
 describe("testing checkDate()", () => {
+  afterAll(() => {
+    localStorageMock.clear();
+  });
   test("checkDate for empty localStorage", () => {
     _.checkDate();
     let date = _.getDate();
@@ -587,7 +633,7 @@ describe("testing checkDate()", () => {
     localStorageMock.setItem("toBeCleared", "value");
     expect(localStorageMock.getItem("toBeCleared")).toBe("value");
     _.checkDate();
-    expect(localStorageMock.getItem("toBeCleared")).toBe(null);
+    expect(localStorageMock.getItem("toBeCleared")).toBe(undefined);
   });
 });
 
@@ -613,13 +659,6 @@ describe("joinTeamOnFirebase", () => {
     _.isTeamCodeUnique.mockRestore();
   });
   test("join team success", async () => {
-    global.firebase = {
-      firestore: {
-        FieldValue: {
-          arrayUnion: jest.fn(),
-        },
-      },
-    };
     let teams = {
       11111: {
         members: ["test2@gmail.com"],
@@ -710,13 +749,7 @@ describe("setupListener", () => {
   };
   let res;
   afterAll(() => {
-    _.createTeamOnFirebase = createTeamOnFirebase;
-    _.joinTeamOnFirebase = joinTeamOnFirebase;
-    _.getUserDailyPoints = getUserDailyPoints;
-    _.getTeamInformation = getTeamInformation;
-    _.deleteTeamFromUser = deleteTeamFromUser;
-    _.deleteIfNoMembers = deleteIfNoMembers;
-    _.checkOff = checkOff;
+    cleanup();
   });
   beforeEach(() => {
     // set the userEmail on global field
@@ -842,6 +875,337 @@ describe("setupListener", () => {
     expect(_.checkOff).toHaveBeenCalledWith(updateDBParams);
     expect(currTeamCode).toBe("11111");
     expect(_.getTeamOnSnapshot).toHaveBeenCalled();
-    // expect(_.)
+  });
+  test("toggle check in", async () => {
+    request.message = "toggle check in";
+    _.toggleCheckIn = jest.fn();
+    setupListener();
+    expect(_.toggleCheckIn).toHaveBeenCalled();
+    expect(_.toggleCheckIn).toHaveBeenCalledWith(updateDBParams);
+  });
+  test("get home info", async () => {
+    request.message = "get home info";
+    _.isCheckIn = jest.fn().mockReturnValueOnce(true);
+    _.getCurrentUrl = jest.fn().mockResolvedValueOnce("facebook");
+    let teamInfo = {
+      currDate: "now",
+      animalsLeft: [],
+      createdTime: "now",
+      creator: userEmail,
+      distributedAnimal: { [userEmail]: "profilePic" },
+      members: [],
+      teamName: "",
+      teamPoints: 100,
+      timeWasted: [],
+    };
+    _.setCurrentTeamInfo(teamInfo);
+    _.setTeamCode("99999");
+    setupListener();
+
+    await new Promise((r) => setTimeout(r, 10));
+    expect(res).toEqual({
+      isCheckIn: true,
+      blacklist: blacklist,
+      teamInfo: teamInfo,
+      currUrl: "facebook",
+      currTeamCode: "99999",
+      profilePic: "profilePic",
+    });
+    expect(_.getCurrentUrl).toHaveBeenCalled();
+    expect(_.isCheckIn).toHaveBeenCalled();
+  });
+});
+describe("getUserDailyPoints", () => {
+  test("get valid daily points", async () => {
+    let currentDate = getDate();
+    get.mockResolvedValueOnce({
+      data: () => {
+        return {
+          [userEmail]: {
+            11111: 100,
+            22222: 99,
+          },
+          totalTeamPoint: {
+            11111: 100,
+            22222: 100,
+            33333: 50,
+          },
+        };
+      },
+    });
+    const res = await _.getUserDailyPoints();
+    expect(db.collection).toHaveBeenCalled();
+    expect(db.collection).toHaveBeenLastCalledWith("teamPerformance");
+    expect(db.collection("teamPerformance").doc).toHaveBeenLastCalledWith(
+      currentDate
+    );
+    expect(res).toEqual({
+      11111: {
+        userPoints: 100,
+        teamPoints: 100,
+      },
+      22222: {
+        userPoints: 99,
+        teamPoints: 100,
+      },
+    });
+  });
+});
+describe("getTeamOnSnapshot", () => {
+  afterAll(() => {
+    cleanup();
+  });
+  test("get valid team", async () => {
+    _.getTeamCode = jest.fn().mockResolvedValue("12345");
+    let teamData = {
+      currDate: "test",
+      animalsLeft: [],
+      createdTime: "testing",
+      creator: userEmail,
+      distributedAnimal: { [userEmail]: "profilePic" },
+      members: [userEmail, "test member"],
+      teamName: "test team name",
+      teamPoints: 100,
+      timeWasted: [],
+    };
+    onSnapshot.mockImplementationOnce((callback) => {
+      let doc = {
+        exists: true,
+        data: () => {
+          return teamData;
+        },
+      };
+      callback(doc);
+    });
+    _.checkDate = jest.fn();
+    await _.getTeamOnSnapshot();
+    expect(db.collection).toHaveBeenCalled();
+    expect(db.collection).toHaveBeenCalledWith("teams");
+    expect(db.collection("teams").doc).toHaveBeenCalledWith("12345");
+    expect(db.collection("teams").doc("12345").onSnapshot).toHaveBeenCalled();
+    expect(currentTeamInfo).toEqual(teamData);
+    expect(sendMessage).toHaveBeenCalled();
+    expect(sendMessage).toHaveBeenCalledWith({
+      for: "team info",
+      message: teamData,
+    });
+    expect(_.checkDate).toHaveBeenCalled();
+  });
+});
+describe("getUserProfile", () => {
+  afterAll(() => {
+    cleanup();
+  });
+  test("get user profile", async () => {
+    _.getTeamNames = jest.fn().mockResolvedValueOnce("success");
+    const userData = {
+      joined_teams: {
+        11111: "now",
+      },
+      user_points: {
+        11111: 100,
+      },
+    };
+    onSnapshot.mockImplementationOnce((callback) => {
+      let doc = {
+        data: () => {
+          return userData;
+        },
+      };
+      callback(doc);
+    });
+    await _.getUserProfile();
+    expect(db.collection).toHaveBeenCalledWith("users");
+    expect(db.collection("users").doc).toHaveBeenCalledWith(userEmail);
+    expect(userProfile).toEqual(userData);
+    expect(_.getTeamNames).toHaveBeenCalled();
+    expect(_.getTeamNames).toHaveBeenCalledWith(userProfile);
+    expect(teamNames).toEqual("success");
+  });
+});
+
+describe("test updateLocalStorage()", () => {
+  afterAll(() => {
+    cleanup();
+    localStorageMock.clear();
+  });
+  test("If localStorage doesn't have the teamCode", async () => {
+    _.getTeamCode = jest.fn().mockResolvedValue("11111");
+    expect(localStorageMock.getItem("11111")).toBe(undefined);
+    await updateLocalStorage("test_1.com", "10", 5);
+    expect(localStorageMock.getItem("11111")).toEqual(
+      JSON.stringify({ ["test_1.com"]: Number(0) })
+    );
+  });
+  test("LocalStorage contains the teamCode, user visted a new url", async () => {
+    _.getUserAnimal = jest.fn().mockResolvedValue("dog");
+    await updateLocalStorage("test_2.com", "10", 5);
+    expect(localStorageMock.getItem("11111")).toEqual(
+      JSON.stringify({
+        ["test_1.com"]: Number(0),
+        ["test_2.com"]: Number(0),
+      })
+    );
+  });
+  test("Team localStorage has the time for current url", async () => {
+    db.collection.mockClear();
+    await updateLocalStorage("test_1.com", "10", 5);
+    expect(localStorageMock.getItem("11111")).toEqual(
+      JSON.stringify({
+        ["test_1.com"]: Number(10),
+        ["test_2.com"]: Number(0),
+      })
+    );
+    expect(_.getUserAnimal).toHaveBeenCalled();
+    expect(db.collection).toHaveBeenCalled();
+    expect(db.collection).toHaveBeenCalledWith("teams");
+    expect(db.collection).toHaveBeenCalledWith("users");
+    expect(db.collection).toHaveBeenCalledWith("teamPerformance");
+    expect(db.collection("teams").doc).toHaveBeenCalled();
+    expect(db.collection("users").doc).toHaveBeenCalled();
+    expect(db.collection("teamPerformance").doc).toHaveBeenCalled();
+    expect(db.collection("teams").doc).toHaveBeenCalledWith("11111");
+  });
+});
+
+describe("Test the checkIn and CheckOff function", () => {
+  afterAll(() => {
+    localStorageMock.clear();
+  });
+  test("isCheckIn when data is undefined", () => {
+    _.isCheckIn();
+    expect(localStorageMock.getItem("check in")).toEqual("false");
+  });
+  test("checkIn on localStorage", () => {
+    _.checkIn(updateDBParams);
+    expect(localStorageMock.getItem("check in")).toEqual("true");
+  });
+  test("checkOut on localStorage", () => {
+    _.checkOff(updateDBParams);
+    expect(localStorageMock.getItem("check in")).toEqual("false");
+  });
+  test("test toggleCheckIn on localStorage", () => {
+    _.toggleCheckIn(updateDBParams);
+    expect(localStorageMock.getItem("check in")).toEqual("true");
+    _.toggleCheckIn(updateDBParams);
+    expect(localStorageMock.getItem("check in")).toEqual("false");
+  });
+});
+
+describe("Test getTeamCode function", () => {
+  afterAll(() => {
+    cleanup();
+  });
+  test("test undefined teamcode", async () => {
+    chrome.storage.local.get.mockImplementation((str, callback) => {
+      if (str === "prevTeam") {
+        let data = {
+          prevTeam: "11111",
+        };
+        callback(data);
+      }
+    });
+    let userProfile = {
+      joined_teams: {},
+    };
+    const res = await _.getTeamCode(userProfile);
+    expect(res).toBe(undefined);
+    expect(chrome.storage.local.get).toHaveBeenCalled();
+    expect(chrome.storage.local.get).toHaveBeenCalledWith(
+      "prevTeam",
+      expect.anything()
+    );
+  });
+  test("test valid teamcode", async () => {
+    let userProfile = {
+      joined_teams: {
+        11111: "now",
+      },
+    };
+    const res = await _.getTeamCode(userProfile);
+    expect(res).toBe("11111");
+    expect(chrome.storage.local.get).toHaveBeenCalled();
+    expect(chrome.storage.local.get).toHaveBeenCalledWith(
+      "prevTeam",
+      expect.anything()
+    );
+  });
+});
+describe("myTimer", () => {
+  afterAll(() => {
+    cleanup();
+  });
+  test("myTimer with invalid url", () => {
+    _.getCurrentUrl = jest.fn().mockResolvedValueOnce(undefined);
+    _.updateLocalStorage = jest.fn();
+    _.myTimer();
+    expect(_.getCurrentUrl).toHaveBeenCalled();
+    expect(_.updateLocalStorage).not.toHaveBeenCalled();
+  });
+  test("myTimer with valid url but not in black list", () => {
+    _.getCurrentUrl = jest.fn().mockResolvedValueOnce("ucsd");
+    _.updateLocalStorage = jest.fn();
+    _.myTimer();
+    expect(_.getCurrentUrl).toHaveBeenCalled();
+    expect(_.updateLocalStorage).not.toHaveBeenCalled();
+  });
+  test("myTimer with valid url but in black list", async () => {
+    _.getCurrentUrl = jest.fn().mockResolvedValueOnce("facebook");
+    _.updateLocalStorage = jest.fn();
+    await _.myTimer(updateDBParams);
+    expect(_.getCurrentUrl).toHaveBeenCalled();
+    expect(_.updateLocalStorage).toHaveBeenCalled();
+    expect(_.updateLocalStorage).toHaveBeenCalledWith(
+      "facebook",
+      updateDBParams.updateInterval,
+      updateDBParams.threshold
+    );
+  });
+});
+describe("deleteTeamFromUser", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+  test("delete team from a user", () => {
+    let distributedAnimal = {
+      [userEmail]: "cat",
+    };
+    let animalsLeft = ["chicken", "pork"];
+    let userAnimal = ["cat"];
+    let teamCode = "11111";
+    let userRes = {};
+    let teamRes = {};
+    update.mockImplementationOnce((dictionary) => {
+      return new Promise((resolve) => {
+        userRes = dictionary;
+        resolve();
+      });
+    });
+    update.mockImplementationOnce((dictionary) => {
+      return new Promise((resolve) => {
+        teamRes = dictionary;
+        resolve();
+      });
+    });
+    _.deleteTeamFromUser(
+      userEmail,
+      teamCode,
+      userAnimal,
+      animalsLeft,
+      distributedAnimal
+    );
+    expect(db.collection).toHaveBeenCalled();
+    expect(db.collection).toHaveBeenCalledWith("users");
+    expect(db.collection("users").doc).toHaveBeenCalledWith(userEmail);
+    expect(db.collection).toHaveBeenCalledWith("teams");
+    expect(db.collection("teams").doc).toHaveBeenCalledWith(teamCode);
+    expect(firebase.firestore.FieldValue.delete).toHaveBeenCalled();
+    expect(firebase.firestore.FieldValue.arrayRemove).toHaveBeenCalled();
+    expect("joined_teams.11111" in userRes).toBe(true);
+    expect("members" in teamRes).toBe(true);
+    expect("distributedAnimal" in teamRes).toBe(true);
+    expect("animalsLeft" in teamRes).toBe(true);
+    expect(teamRes.distributedAnimal).toEqual(distributedAnimal);
+    expect(teamRes.animalsLeft).toEqual(animalsLeft);
   });
 });
