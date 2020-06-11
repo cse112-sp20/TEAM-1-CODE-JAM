@@ -32,8 +32,8 @@
   "coverageReporters": ["json", "text", "text-summary", "html", "lcov"],
   "coverageThreshold": {
     "global": {
-      "lines": 20,
-      "statements": 20
+      "lines": 90,
+      "statements": 90
     }
   },
   "verbose": false
