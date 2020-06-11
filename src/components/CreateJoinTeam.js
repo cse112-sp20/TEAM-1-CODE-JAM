@@ -98,6 +98,10 @@ class CreateJoinTeam extends Component {
     });
   };
 
+  /**
+   * render the join team component
+   * @author : Karl Wang
+   */
   render() {
     return (
       <div>
@@ -154,6 +158,7 @@ class CreateJoinTeam extends Component {
                   id="teamCode"
                   type="text"
                   className="validate"
+                  data-testid="CreateJoinTeam-joininput"
                 />
                 <label htmlFor="teamCode">Team Code</label>
               </div>
@@ -165,6 +170,7 @@ class CreateJoinTeam extends Component {
                 <button
                   id="joinButton"
                   className="waves-effect waves-light btn-large red accent-1"
+                  data-testid="CreateJoinTeam-joinbutton"
                 >
                   Join
                 </button>

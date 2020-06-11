@@ -7,6 +7,8 @@
     "@testing-library/user-event": "^7.1.2",
     "babel-polyfill": "^6.26.0",
     "chart.js": "^2.9.3",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
     "firebase": "^7.14.4",
     "firebase-admin": "^8.12.1",
     "identity-obj-proxy": "^3.0.0",
@@ -27,7 +29,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "jest --colors",
-    "test:coverage": "jest --coverage --colors --config=jest.config.json",
+    "test:coverage": "jest --coverage --colors --config=jest.config.json --testPathIgnorePatterns tests/end2endTests",
     "test1": "react-scripts test",
     "eject": "react-scripts eject",
     "eslint:github-action": "node ./node_modules/eslint/bin/eslint . --ignore-path .gitignore",
@@ -37,7 +39,7 @@
     "flow": "flow",
     "lint:fix": "eslint . --fix",
     "prettier": "prettier --write .",
-    "jscpd": "npx jscpd public src __test__ __end2endTest__"
+    "jscpd": "npx jscpd public src tests"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -72,19 +74,19 @@
     "eslint-plugin-standard": "^4.0.1",
     "flow-bin": "^0.126.1",
     "htmlhint": "^0.14.0",
-    "jest-canvas-mock": "^2.2.0",
     "jest-puppeteer": "^4.4.0",
     "jscpd": "^3.3.0-rc.8",
     "jsdoc": "^3.6.4",
     "prettier": "2.0.5",
-    "puppeteer": "^3.1.0",
+    "puppeteer": "^1.20.0",
     "react-test-renderer": "^16.13.1",
     "stylelint": "^13.5.0",
     "stylelint-config-standard": "^20.0.0"
   },
   "jest": {
     "moduleNameMapper": {
-      "\\.(css|less|scss|sass)$": "identity-obj-proxy"
+      "\\.(css|less|scss|sass)$": "identity-obj-proxy",
+      "\\.(png|svg|pdf|jpg|jpeg)$": "<rootDir>/tests/mocks/chromeMock.js"
     }
   }
 }
