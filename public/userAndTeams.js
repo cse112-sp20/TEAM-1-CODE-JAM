@@ -40,7 +40,7 @@ export let updateDBParams = {
  */
 export function setCurrentTeamInfo(dictionary) {
   currentTeamInfo = {
-    currDate: dictionary.curDate,
+    currDate: dictionary.currDate,
     animalsLeft: dictionary.animalsLeft,
     createdTime: dictionary.createdTime,
     creator: dictionary.creator,
@@ -165,8 +165,6 @@ export async function getUserDailyPoints() {
     return res;
   let userTeamsPoints = dbTeamPoints[userEmail];
   let allTeamsPoints = dbTeamPoints.totalTeamPoint;
-  console.log(userTeamsPoints);
-  console.log(allTeamsPoints);
   for (let team of Object.keys(userTeamsPoints)) {
     res[team] = {
       userPoints: userTeamsPoints[team],
@@ -239,14 +237,17 @@ export function checkDate() {
   }
   if (
     currentTeamInfo.currDate !== undefined &&
-    currentTeamInfo.currDate !== dateStr
+    currentTeamInfo.currDate !== dateStr &&
+    currTeamCode !== undefined
   ) {
     console.log("reset");
     resetTeamInfo();
-    // create new for each team
-    for (let teamCode in userProfile.joined_teams) {
-      createTeamPerformance(teamCode, 100, userEmail);
-    }
+    db.collection("users")
+      .doc(userEmail)
+      .update({
+        user_points: { [currTeamCode]: 100 },
+      });
+    createTeamPerformance(currTeamCode, 100, userEmail);
   }
 }
 
@@ -591,7 +592,7 @@ export function getUserProfile(userEmail) {
       .doc(userEmail)
       .onSnapshot(async function (doc) {
         userProfile = doc.data();
-        teamNames = await getTeamNames(userProfile);
+        teamNames = await _.getTeamNames(userProfile);
         resolve();
       });
   });
@@ -756,7 +757,7 @@ export async function updateLocalStorage(tabUrl, timeSpend, threshold) {
  * Get the latest information of the current team on database
  */
 export async function getTeamOnSnapshot() {
-  const currentTeam = await getTeamCode();
+  const currentTeam = await _.getTeamCode();
   if (currentTeam === undefined) {
     return;
   }
@@ -766,7 +767,6 @@ export async function getTeamOnSnapshot() {
       .doc(currentTeam)
       .onSnapshot(function (doc) {
         if (!doc.exists) {
-          console.log("here");
           resolve();
         }
         currentTeamInfo = doc.data();
@@ -778,7 +778,7 @@ export async function getTeamOnSnapshot() {
         };
         chrome.runtime.sendMessage(msg);
         // check if its day is old
-        checkDate();
+        _.checkDate();
         resolve();
         // return;
       });
@@ -927,7 +927,6 @@ const _ = {
   getAnimalsLeft,
   getAnimal,
   resetTeamInfo,
-  // animals,
   currTeamCode,
   setAnimal,
   animals,
