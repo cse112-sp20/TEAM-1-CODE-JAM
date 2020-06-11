@@ -25,7 +25,8 @@
     "<rootDir>/tests/mocks/",
     "<rootDir>/src/index.js",
     "<rootDir>/src/App.js",
-    "<rootDir>/functions/"
+    "<rootDir>/functions/",
+    "<rootDir>/docs/js"
   ],
   "coverageReporters": ["json", "text", "text-summary", "html", "lcov"],
   "coverageThreshold": {
