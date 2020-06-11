@@ -6,6 +6,8 @@ on:
       - master
       - develop
       - staging
+  push:
+    branches:
       - feat/githubPages_trevor
 jobs:
   Stylelint-Eslint-Prettier:
