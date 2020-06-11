@@ -98,6 +98,10 @@ class CreateJoinTeam extends Component {
     });
   };
 
+  /**
+   * render the join team component
+   * @author : Karl Wang
+   */
   render() {
     return (
       <div>

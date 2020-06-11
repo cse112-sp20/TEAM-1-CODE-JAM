@@ -5,6 +5,11 @@ import { Timeline, Icon, Button } from "rsuite";
 import "./Home.css";
 
 export default class Home extends Component {
+  /**
+   * set all the current state for the home component
+   * @author Karl Wang
+   * @param {Obejct} props the list of atrributes to set this component
+   */
   constructor(props) {
     super(props);
     this.state = {
@@ -83,6 +88,11 @@ export default class Home extends Component {
       }
     });
   };
+  /**
+   * functinality for the black list button
+   * in the home page
+   * @author : Karl Wang
+   */
   onClickBlacklistButton = () => {
     if (!this.state.isInBlacklist) {
       this.setState({
@@ -96,6 +106,10 @@ export default class Home extends Component {
     let elems = document.querySelectorAll(".tooltipped");
     M.Tooltip.init(elems, {});
   };
+
+  /**
+   * Create the black list button in the home page
+   */
   createBlacklistButton = () => {
     let appearance = "ghost";
     let id = "blacklist-button";
@@ -129,6 +143,12 @@ export default class Home extends Component {
       </Button>
     );
   };
+
+  /**
+   * Check In functinality in the home page,
+   * enable the website tracking
+   * @author : Karl Wang
+   */
   handleCheckIn = () => {
     this.setState({
       isCheckIn: !this.state.isCheckIn,
@@ -139,6 +159,14 @@ export default class Home extends Component {
     };
     chrome.runtime.sendMessage(msg);
   };
+
+  /**
+   * create a single timeline element for the timeline
+   * displayed at the home screen
+   * @param {String} profilePicName the profile picture of the current user
+   * @param {String} website the url link to this timeline element
+   * @param {float} points the number of points gain or lost by this website
+   */
   createTimelineItem = (profilePicName, website, points, index) => {
     let isProductive = Number(points) < 0 ? false : true;
     let profilePic = this.getProfilePic(profilePicName);
@@ -202,9 +230,18 @@ export default class Home extends Component {
       </Timeline.Item>
     );
   };
+  /**
+   * round the current number
+   * @param {int} num number to round
+   */
   roundNumber = (num) => {
     return Math.round((num + Number.EPSILON) * 100) / 100;
   };
+
+  /**
+   * get the current profile pic for user
+   * @param {String} profilePic name of profile picture
+   */
   getProfilePic = (profilePic) => {
     if (profilePic == undefined) {
       profilePic = "Predator";
@@ -212,6 +249,9 @@ export default class Home extends Component {
     return require("../images/emojis/" + profilePic + ".svg");
   };
 
+  /**
+   * render the home component
+   */
   render() {
     let profilePic = this.getProfilePic(this.state.profilePic);
     let leftSide = (

@@ -7,6 +7,11 @@ import { withRouter } from "react-router-dom";
 import PropTypes from "prop-types";
 
 class Teams extends Component {
+  /**
+   * initialize team list and display the tabs of teams
+   * @author: Karl Wang
+   * @param {Obejct} props list of attributes the set the component with
+   */
   constructor(props) {
     super(props);
     this.state = {
@@ -14,10 +19,19 @@ class Teams extends Component {
       tabsInstance: undefined,
     };
   }
+  /**
+   * Unmount this component
+   * @author: Karl Wang
+   */
   componentWillUnmount = () => {
     M.Toast.dismissAll();
   };
 
+  /**
+   * Mount this Component, set up the query, and wait
+   * for user input in the team menu
+   * @author: Karl Wang
+   */
   componentDidMount = () => {
     M.AutoInit();
     this.getTeams();
@@ -57,6 +71,11 @@ class Teams extends Component {
       }
     });
   };
+
+  /**
+   * get the list of teams and re render them
+   * @author: Karl Wang
+   */
   getTeams = () => {
     let msg = { for: "background", message: "get teams" };
     chrome.runtime.sendMessage(msg, (response) => {
@@ -76,6 +95,10 @@ class Teams extends Component {
   onClickTeam = (teamCode) => {
     chrome.storage.local.set({ prevTeam: teamCode }, () => this.redirect());
   };
+  /**
+   * Redirect user to their team home page
+   * @author: Karl Wang
+   */
   redirect = () => {
     let msg = {
       for: "background",
@@ -87,6 +110,11 @@ class Teams extends Component {
       }
     });
   };
+  /**
+   * remove the current team from the user list
+   * of teams
+   * @param {string} team team name to remove
+   */
   onRemoveTeam = (team) => {
     team.visable = false;
     this.setState({
@@ -107,6 +135,10 @@ class Teams extends Component {
     chrome.runtime.sendMessage(msg);
   };
 
+  /**
+   * render the teams menu
+   * @author: Karl Wang
+   */
   render() {
     return (
       <div className="row">

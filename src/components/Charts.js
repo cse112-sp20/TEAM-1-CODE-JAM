@@ -3,6 +3,12 @@ import React, { Component } from "react";
 import { Doughnut } from "react-chartjs-2";
 import "./Charts.css";
 export default class Charts extends Component {
+  /**
+   * Set teams, points, and chart data for
+   * a team
+   * @author : Vivian lee
+   * @param {Object} props list of attributes
+   */
   constructor(props) {
     super(props);
     this.state = {
@@ -19,11 +25,20 @@ export default class Charts extends Component {
       chartData: "",
     };
   }
-  // load data from function getChartData() into this.state.chartData
+
+  /**
+   * load data from function getChartData() into this.state.chartData
+   * @author: Vivian Lee
+   */
   componentDidMount = async () => {
     this.getBackgroundData();
     this.getChartData();
   };
+
+  /**
+   * get the current background data and re-render the chart
+   * @author: Vivian Lee
+   */
   getBackgroundData() {
     // variable to hold finished parsed array for all team info
     let teamInfo = [];
@@ -52,27 +67,12 @@ export default class Charts extends Component {
         points: teamData,
       });
     });
-
-    // let msg2 = {
-    //   for: "background",
-    //   message: "get team points",
-    // };
-
-    // // ask the background for team information
-    // chrome.runtime.sendMessage(msg2, (response) => {
-    //   if (response == undefined) {
-    //     return;
-    //   }
-    //   for (let [key, value] of Object.entries(response)) {
-    //     teamData[key] = value;
-    //   }
-
-    //   this.setState({
-    //     points: teamData,
-    //   });
-    // });
   }
-  // function to insert data into chart
+
+  /**
+   * function to insert data into chart
+   * @author : Vivian Lee
+   */
   getChartData() {
     this.setState({
       // replace object in chartData with Firebase data
@@ -92,6 +92,11 @@ export default class Charts extends Component {
       },
     });
   }
+
+  /**
+   * Renders the chart
+   * @author: Vivian Lee
+   */
   render() {
     let data = [];
     let testArray = {
