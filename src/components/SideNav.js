@@ -3,6 +3,10 @@ import { NavLink } from "react-router-dom";
 import "./SideNav.css";
 
 export default class SideNav extends Component {
+  /**
+   * Render the sidebar of the app
+   * @author: Karl Wang
+   */
   render() {
     return (
       <div className="SideNav">
