@@ -698,9 +698,9 @@ export async function updateLocalStorage(tabUrl, timeSpend, threshold) {
     // update the local storage
     localStorage.setItem(teamCode, currData);
     if (JSON.parse(currData)[tabUrl] % threshold == 0) {
-      console.log(currData);
-      console.log(JSON.parse(currData)[tabUrl]);
-      console.log(threshold);
+      //console.log(currData);
+      //console.log(JSON.parse(currData)[tabUrl]);
+      //console.log(threshold);
       let seconds = JSON.parse(currData)[tabUrl] / 1000;
       let score = threshold / (60 * 1000);
       // let today = new Date();

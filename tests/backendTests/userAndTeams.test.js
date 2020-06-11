@@ -851,15 +851,12 @@ describe("setupListener", () => {
 
 describe("test updateLocalStorage()", ()=>{
   test("If localStorage doesn't have the teamCode", async ()=>{
-    //expect(localStorageMock.setItem).toBeCalledTimes(0);
     _.getTeamCode = jest.fn().mockResolvedValue("11111");
     expect(localStorageMock.getItem("11111")).toBe(undefined);
     await updateLocalStorage("test_1.com", "10", 5);
     expect(localStorageMock.getItem("11111")).toEqual(JSON.stringify({["test_1.com"]: Number(0)}));
   });
   test("LocalStorage contains the teamCode, user visted a new url", async ()=>{
-    //console.log(store);
-    //_.getTeamCode = jest.fn().mockResolvedValue("11111");
     _.getUserAnimal = jest.fn().mockResolvedValue("dog");
     await updateLocalStorage("test_2.com", "10", 5);
     expect(localStorageMock.getItem("11111")).toEqual(JSON.stringify({
@@ -868,6 +865,7 @@ describe("test updateLocalStorage()", ()=>{
     }));
   });
   test("Team localStorage has the time for current url", async()=>{
+    db.collection.mockClear();
     await updateLocalStorage("test_1.com", "10", 5);
     expect(localStorageMock.getItem("11111")).toEqual(JSON.stringify({
       ["test_1.com"]: Number(10),
