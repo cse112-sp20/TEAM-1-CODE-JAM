@@ -31,6 +31,7 @@ With the sudden changes to our everyday lives, remote work is now more prevalent
 # Demo
 👉 Watch it <a href="https://share.getcloudapp.com/mXuAo7j0">here</a>.
 <br>
+<img src="docs/img/addTeamDemo.gif">
 <img src="docs/img/demo.gif">
 
 ## Installation
@@ -69,6 +70,10 @@ Build app
 ```sh
 $ npm run build
 ```
+
+### Chrome store deployment
+Go to chrome://extensions, have the developer mode enabled and click Load unpacked
+Select the build folder
 
 ## Features:
 * Team Timeline
