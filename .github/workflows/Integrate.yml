@@ -6,6 +6,7 @@ on:
       - master
       - develop
       - staging
+      - feat/githubPages_trevor
 jobs:
   Stylelint-Eslint-Prettier:
     runs-on: ubuntu-latest
