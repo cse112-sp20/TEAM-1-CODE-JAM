@@ -29,8 +29,9 @@ To promote productivity :rocket:, we introduce [Team Activity Tracker Chrome Ext
 With the sudden changes to our everyday lives, remote work is now more prevalent in our everyday lives. Despite holding the same responsibility, remote work proposes new challenges to productivity. The difference in environment can be a huge factor that affects one’s concentration and task management. Working at home opens doors to limitless distractions such as Youtube, Facebook, and other social media platforms that constantly seek our attention. We are in a situation where team accountability is at an all time high when the only thing standing between your teammates is a screen. 
 
 # Demo
-👉 Watch it <a href="https://share.getcloudapp.com/mXuAo7j0">here</a>.
+👉 Watch it <a href="https://share.getcloudapp.com/rRuln2xE">here</a>.
 <br>
+<img src="docs/img/addTeamDemo.gif">
 <img src="docs/img/demo.gif">
 
 ## Installation
@@ -69,6 +70,10 @@ Build app
 ```sh
 $ npm run build
 ```
+
+### Chrome store deployment
+Go to chrome://extensions, have the developer mode enabled and click Load unpacked
+Select the build folder
 
 ## Features:
 * Team Timeline
