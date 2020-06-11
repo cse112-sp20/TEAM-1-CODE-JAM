@@ -1,6 +1,7 @@
 # Team Activity Tracker
 
 ![Continuous Integration](https://github.com/cse112-sp20/TEAM-1-CODE-JAM/workflows/Continuous%20Integration/badge.svg)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/b27c758188a14dc8af226deaee965073)](https://www.codacy.com/gh/cse112-sp20/TEAM-1-CODE-JAM?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=cse112-sp20/TEAM-1-CODE-JAM&amp;utm_campaign=Badge_Grade)
 
 :star: Star us on GitHub — it helps!
 
