@@ -119,7 +119,7 @@ export function setupListener() {
         (async () => {
           _.checkOff(updateDBParams);
           _.currentTeamSnapshot();
-          let teamCode = await _.getTeamCode();
+          let teamCode = await _.getTeamCode(userProfile);
           _.setTeamCode(teamCode);
           userAnimal = await _.getUserAnimal(userEmail, currTeamCode);
           _.getTeamOnSnapshot().then(() => {
@@ -400,29 +400,29 @@ export async function createTeamPerformance(key, points, userEmail) {
  * delete the user doc from DB
  * @param {string} userEmail the user email of the user
  */
-export async function deleteEverythingAboutAUser(userEmail) {
-  let queryCreatedTeam = db
-    .collection("teams")
-    .where("creator", "==", userEmail);
-  let queryJoinedTeam = db
-    .collection("teams")
-    .where("members", "array-contains", userEmail);
-  // do these things parallely
-  await Promise.all([
-    queryCreatedTeam.get().then(function (querySnapshot) {
-      querySnapshot.forEach(function (doc) {
-        deleteTeamEntirely(doc.id);
-      });
-    }),
-    queryJoinedTeam.get().then(function (querySnapshot) {
-      querySnapshot.forEach(function (doc) {
-        deleteTeamFromUser(userEmail, doc.id);
-      });
-    }),
-    db.collection("users").doc(userEmail).delete(),
-  ]);
-  return;
-}
+// export async function deleteEverythingAboutAUser(userEmail) {
+//   let queryCreatedTeam = db
+//     .collection("teams")
+//     .where("creator", "==", userEmail);
+//   let queryJoinedTeam = db
+//     .collection("teams")
+//     .where("members", "array-contains", userEmail);
+//   // do these things parallely
+//   await Promise.all([
+//     queryCreatedTeam.get().then(function (querySnapshot) {
+//       querySnapshot.forEach(function (doc) {
+//         deleteTeamEntirely(doc.id);
+//       });
+//     }),
+//     queryJoinedTeam.get().then(function (querySnapshot) {
+//       querySnapshot.forEach(function (doc) {
+//         deleteTeamFromUser(userEmail, doc.id);
+//       });
+//     }),
+//     db.collection("users").doc(userEmail).delete(),
+//   ]);
+//   return;
+// }
 /**
  *
  * @param {string} userEmail the email of the user
@@ -665,7 +665,7 @@ export async function getAnimalsLeft(teamCode) {
  * @param {string} timeSpend timeSpend on the current website
  */
 export async function updateLocalStorage(tabUrl, timeSpend, threshold) {
-  let teamCode = await _.getTeamCode();
+  let teamCode = await _.getTeamCode(userProfile);
   // access to the local storage to get the team code object
   let currData = localStorage.getItem(teamCode);
   // if local storage doesn't have the team code
@@ -678,7 +678,6 @@ export async function updateLocalStorage(tabUrl, timeSpend, threshold) {
   }
   // local storage contains the team code
   else {
-
     currData = JSON.parse(currData);
     let newTime;
     // user visited a new url not in team localstorage
@@ -757,7 +756,7 @@ export async function updateLocalStorage(tabUrl, timeSpend, threshold) {
  * Get the latest information of the current team on database
  */
 export async function getTeamOnSnapshot() {
-  const currentTeam = await _.getTeamCode();
+  const currentTeam = await _.getTeamCode(userProfile);
   if (currentTeam === undefined) {
     return;
   }
@@ -788,9 +787,10 @@ export async function getTeamOnSnapshot() {
 /**
  * Get the team code of the current team
  * @author Youliang Liu
+ * @param userProfile the local copy of user profile from database
  * @returns {string} the promise that contains the team code of the current team
  */
-export function getTeamCode() {
+export function getTeamCode(userProfile) {
   return new Promise(function (resolve) {
     chrome.storage.local.get("prevTeam", function (data) {
       if (data.prevTeam in userProfile.joined_teams) resolve(data.prevTeam);
@@ -833,10 +833,10 @@ export function toggleCheckIn(params) {
  * The timer to update to local storage and database
  */
 export async function myTimer(params) {
-  let currTabUrl = await getCurrentUrl();
+  let currTabUrl = await _.getCurrentUrl();
   if (currTabUrl !== undefined || currTabUrl !== "invalid") {
     if (blacklist.includes(currTabUrl)) {
-      updateLocalStorage(currTabUrl, params.updateInterval, params.threshold);
+      _.updateLocalStorage(currTabUrl, params.updateInterval, params.threshold);
     }
   }
   // resets teams data and creates
@@ -943,11 +943,11 @@ const _ = {
   getCurrentUrl,
   isCheckIn,
   checkIn,
-  checkOff,
   setUserEmail,
   deleteTeamFromUser,
   getTeamOnSnapshot,
   currentTeamSnapshot,
+  myTimer,
 };
 
 export default _;

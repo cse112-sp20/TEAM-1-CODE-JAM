@@ -1,3 +1,12 @@
+global.firebase = {
+  firestore: {
+    FieldValue: {
+      arrayUnion: jest.fn(),
+      arrayRemove: jest.fn(),
+      delete: jest.fn(),
+    },
+  },
+};
 export let set = jest.fn();
 export let get = jest.fn();
 export let update = jest.fn();
@@ -20,12 +29,4 @@ export let collection = jest.fn(() => {
 });
 export let db = {
   collection: collection,
-};
-
-global.firebase = {
-  firestore: {
-    FieldValue: {
-      arrayUnion: jest.fn(),
-    },
-  },
 };

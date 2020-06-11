@@ -27,11 +27,11 @@ export default class Home extends Component {
    *
    */
   componentDidMount = async () => {
-    const profilePics = this.importAll(
-      require.context("../SVG", false, /\.(png|jpe?g|svg)$/)
-    );
-    this.setState({ profilePics: profilePics });
-    var elems = document.querySelectorAll(".dropdown-trigger");
+    // const profilePics = this.importAll(
+    //   require.context("../SVG", false, /\.(png|jpe?g|svg)$/)
+    // );
+    // this.setState({ profilePics: profilePics });
+    let elems = document.querySelectorAll(".dropdown-trigger");
     // M.AutoInit();
     M.Dropdown.init(elems, {
       constrainWidth: false,
@@ -82,9 +82,6 @@ export default class Home extends Component {
         });
       }
     });
-  };
-  importAll = (r) => {
-    return r.keys().map(r);
   };
   onClickBlacklistButton = () => {
     if (!this.state.isInBlacklist) {
@@ -142,9 +139,8 @@ export default class Home extends Component {
     };
     chrome.runtime.sendMessage(msg);
   };
-  createTimelineItem = (profilePicName, website, points) => {
+  createTimelineItem = (profilePicName, website, points, index) => {
     let isProductive = Number(points) < 0 ? false : true;
-    let timelineCount = 0;
     let profilePic = this.getProfilePic(profilePicName);
     let dotColor;
     let textColor;
@@ -171,15 +167,16 @@ export default class Home extends Component {
         <div id="example" className="row">
           <div id="col" className="col s1"></div>
           <div id="col" className="col s2">
-            <img 
+            <img
               data-testid={`home-timeline-pic`}
-              src={profilePic} 
-              className="circle" />
+              src={profilePic}
+              className="circle"
+            />
           </div>
           <div id="col" className="col s1"></div>
           <div id="col" className="col s5">
             <p
-              data-testid={`home-timeline-item ${timelineCount++}`}
+              data-testid={`home-timeline-item ${index}`}
               style={{
                 textTransform: "capitalize",
                 fontWeight: 600,
@@ -191,7 +188,7 @@ export default class Home extends Component {
           </div>
           <div id="col" className="col s3">
             <p
-            data-testid={`home-timeline-points`}
+              data-testid={`home-timeline-points ${index}`}
               style={{
                 fontWeight: 600,
                 color: textColor,
@@ -234,10 +231,7 @@ export default class Home extends Component {
         <div className="divider"></div>
         <div className="row">
           <div id="col" className="col s4">
-            <p 
-              data-testid={`home-teamCode`}
-              id="top" 
-              className="center-align">
+            <p data-testid={`home-teamCode`} id="top" className="center-align">
               {this.state.teamCode}
             </p>
             <p
@@ -248,10 +242,11 @@ export default class Home extends Component {
             </p>
           </div>
           <div id="col" className="col s4">
-            <p 
+            <p
               data-testid={`home-numberOfMembers`}
-              id="top" 
-              className="center-align">
+              id="top"
+              className="center-align"
+            >
               {this.state.teamMembers.length}
             </p>
             <p
@@ -274,10 +269,11 @@ export default class Home extends Component {
           </div>
 
           <div id="col" className="col s4">
-            <p 
+            <p
               data-testid={`home-teamPoints`}
-              id="top" 
-              className="center-align">
+              id="top"
+              className="center-align"
+            >
               {this.state.teamPoints}
             </p>
             <p
@@ -291,20 +287,14 @@ export default class Home extends Component {
       </div>
     );
     let addToBlackList = (
-      <div 
-        data-testid={`home-blacklist`}
-        id="col" 
-        className="col s6">
+      <div data-testid={`home-blacklist`} id="col" className="col s6">
         {this.createBlacklistButton()}
       </div>
     );
     let checkIn = (
       <div id="col" className="col s6">
         {/* <span className="left black-text">Check In</span> */}
-        <div 
-          data-testid="checkin-btn"
-          id="checkin" 
-          className="switch right">
+        <div data-testid="checkin-btn" id="checkin" className="switch right">
           <label>
             Check off
             <input
@@ -321,11 +311,12 @@ export default class Home extends Component {
     let timeline = (
       <div id="mini-timeline">
         <Timeline>
-          {this.state.timelineArr.map((item) => {
+          {this.state.timelineArr.map((item, index) => {
             return this.createTimelineItem(
               item.animal,
               item.url,
-              this.roundNumber(item.points)
+              this.roundNumber(item.points),
+              index
             );
           })}
         </Timeline>
