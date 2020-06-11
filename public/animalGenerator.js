@@ -1,6 +1,6 @@
 export let animals = [
   "airbaloon",
-         "android",
+  "android",
   "arcade",
   "basket",
   "bean",
