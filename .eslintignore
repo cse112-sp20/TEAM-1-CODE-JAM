@@ -3,6 +3,6 @@ build/
 coverage/
 node_modules/
 out/
-doc/
+docs/
 tests/
 src/
