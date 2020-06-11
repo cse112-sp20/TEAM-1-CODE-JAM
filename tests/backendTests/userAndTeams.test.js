@@ -1032,6 +1032,10 @@ describe("getUserProfile", () => {
 });
 
 describe("test updateLocalStorage()", ()=>{
+  afterAll(()=>{
+    cleanup();
+    localStorageMock.clear();
+  });
   test("If localStorage doesn't have the teamCode", async ()=>{
     _.getTeamCode = jest.fn().mockResolvedValue("11111");
     expect(localStorageMock.getItem("11111")).toBe(undefined);
@@ -1064,4 +1068,38 @@ describe("test updateLocalStorage()", ()=>{
     expect(db.collection("teams").doc).toHaveBeenCalledWith("11111");
   });
   
+});
+
+describe("Test the checkIn and CheckOff function", ()=>{
+  afterAll(()=>{
+    localStorageMock.clear();
+  });
+  test("isCheckIn when data is undefined", ()=>{
+    _.isCheckIn();
+    expect(localStorageMock.getItem("check in")).toEqual("false");
+  });
+  test("checkIn on localStorage", () => {
+    _.checkIn(updateDBParams);
+    expect(localStorageMock.getItem("check in")).toEqual("true");
+  });
+  test("checkOut on localStorage", ()=>{
+    _.checkOff(updateDBParams);
+    expect(localStorageMock.getItem("check in")).toEqual("false");
+  });
+  test("test toggleCheckIn on localStorage", ()=>{
+    _.toggleCheckIn(updateDBParams);
+    expect(localStorageMock.getItem('check in')).toEqual("true");
+    _.toggleCheckIn(updateDBParams);
+    expect(localStorageMock.getItem('check in')).toEqual("false");
+  });
+
+});
+
+describe("Test getTeamCode function", ()=>{
+  afterAll(()=>{
+    cleanup();
+  });
+  test("mock getTeamCode function", ()=>{
+    
+  });
 });

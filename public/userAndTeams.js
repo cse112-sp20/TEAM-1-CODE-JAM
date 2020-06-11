@@ -942,6 +942,8 @@ const _ = {
   toggleCheckIn,
   getCurrentUrl,
   isCheckIn,
+  checkIn,
+  checkOff,
   setUserEmail,
   deleteTeamFromUser,
   getTeamOnSnapshot,
