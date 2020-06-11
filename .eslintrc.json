@@ -32,7 +32,8 @@
         "ecmaFeatures": {
             "jsx": true,
             "modules": true
-        }
+        },
+        "allowImportExportEverywhere":true
     },
     "settings": {
         "react": {

@@ -1,6 +1,4 @@
-const chrome = require("sinon-chrome");
-window.chrome = chrome;
-
+/*global chrome*/
 /**
  * For the original code please visit:
  * www.github.com/GoogleChrome/chrome-app-samples/tree/master/samples/github-auth
@@ -23,6 +21,12 @@ let signin_button;
 let revoke_button;
 
 let tokenFetcher = (function () {
+  try {
+    let { chrome } = require("../tests/mocks/chromeMock.js");
+    global.chrome = chrome;
+  } catch (err) {
+    console.log(err);
+  }
   // Replace clientId and clientSecret with values obtained by you for your
   // application https://github.com/settings/applications.
   let clientId = "825ffe9603a27981677a";

@@ -1,6 +1,6 @@
 import React from "react";
 import "babel-polyfill";
-import SideNav from "../src/components/SideNav";
+import SideNav from "../../src/components/SideNav";
 import { render, fireEvent, screen } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 import { Router } from "react-router-dom";

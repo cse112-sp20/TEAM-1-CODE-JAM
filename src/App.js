@@ -25,7 +25,7 @@ class App extends Component {
               <SideNav></SideNav>
             </div>
             {/* This is where the real component is at */}
-            <div className="col s11" id="component">
+            <div className="col s11" id="home-component component">
               <Switch>
                 {/* follow the following examples for adding new component */}
                 <Route
