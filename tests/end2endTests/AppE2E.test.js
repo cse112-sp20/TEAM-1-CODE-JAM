@@ -1,7 +1,7 @@
 import path from "path";
 import puppeteer from "puppeteer";
 import manifest from "../../build/manifest.json";
-const TEST_TIMEOUT = 80000; // extend test timeout sinces its E2E
+const TEST_TIMEOUT = 100000; // extend test timeout sinces its E2E
 
 let browser;
 let teamCode;
