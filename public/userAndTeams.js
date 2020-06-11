@@ -677,6 +677,7 @@ export async function updateLocalStorage(tabUrl, timeSpend, threshold) {
   }
   // local storage contains the team code
   else {
+
     currData = JSON.parse(currData);
     let newTime;
     // user visited a new url not in team localstorage
@@ -697,20 +698,23 @@ export async function updateLocalStorage(tabUrl, timeSpend, threshold) {
     // update the local storage
     localStorage.setItem(teamCode, currData);
     if (JSON.parse(currData)[tabUrl] % threshold == 0) {
+      console.log(currData);
+      console.log(JSON.parse(currData)[tabUrl]);
+      console.log(threshold);
       let seconds = JSON.parse(currData)[tabUrl] / 1000;
       let score = threshold / (60 * 1000);
       // let today = new Date();
       // let currTime =
       //   today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
       let currTime = new Date().toLocaleTimeString();
-      let currentDate = getDate();
+      let currentDate = _.getDate();
       let teamPoints = currentTeamInfo.teamPoints;
       // we will be using teamCode and userEmail to retrieve userPoints and update these
       teamPoints = teamPoints - score;
       let userPoints = userProfile.user_points[teamCode];
       userPoints = userPoints - score;
 
-      let userAnimal = await getUserAnimal(userEmail, teamCode);
+      let userAnimal = await _.getUserAnimal(userEmail, teamCode);
       db.collection("teams")
         .doc(teamCode)
         .update({
