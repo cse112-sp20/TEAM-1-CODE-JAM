@@ -5,6 +5,11 @@ import { Timeline, Icon, Button } from "rsuite";
 import "./Home.css";
 
 export default class Home extends Component {
+  /**
+   * set all the current state for the home component
+   * @author Karl Wang
+   * @param {Obejct} props the list of atrributes to set this component
+   */
   constructor(props) {
     super(props);
     this.state = {
@@ -27,11 +32,11 @@ export default class Home extends Component {
    *
    */
   componentDidMount = async () => {
-    const profilePics = this.importAll(
-      require.context("../SVG", false, /\.(png|jpe?g|svg)$/)
-    );
-    this.setState({ profilePics: profilePics });
-    var elems = document.querySelectorAll(".dropdown-trigger");
+    // const profilePics = this.importAll(
+    //   require.context("../SVG", false, /\.(png|jpe?g|svg)$/)
+    // );
+    // this.setState({ profilePics: profilePics });
+    let elems = document.querySelectorAll(".dropdown-trigger");
     // M.AutoInit();
     M.Dropdown.init(elems, {
       constrainWidth: false,
@@ -66,26 +71,28 @@ export default class Home extends Component {
         timelineArr: timelineArr,
         profilePic: response.profilePic,
       });
-      chrome.runtime.onMessage.addListener((msg) => {
-        if (msg.for === "team info") {
-          let teamInfo = msg.message;
-          let timelineArr = teamInfo.timeWasted.reverse();
-          if (timelineArr.length > 5) timelineArr = timelineArr.slice(0, 5);
-          let teamPoints = this.roundNumber(teamInfo.teamPoints);
-          this.setState({
-            teamName: teamInfo.teamName,
-            teamMembers: teamInfo.members,
-            teamPoints: teamPoints,
-            timelineArr: timelineArr,
-            profilePic: teamInfo.userAnimal,
-          });
-        }
-      });
+    });
+    chrome.runtime.onMessage.addListener((msg) => {
+      if (msg.for === "team info") {
+        let teamInfo = msg.message;
+        let timelineArr = teamInfo.timeWasted.reverse();
+        if (timelineArr.length > 5) timelineArr = timelineArr.slice(0, 5);
+        let teamPoints = this.roundNumber(teamInfo.teamPoints);
+        this.setState({
+          teamName: teamInfo.teamName,
+          teamMembers: teamInfo.members,
+          teamPoints: teamPoints,
+          timelineArr: timelineArr,
+          profilePic: teamInfo.userAnimal,
+        });
+      }
     });
   };
-  importAll = (r) => {
-    return r.keys().map(r);
-  };
+  /**
+   * functinality for the black list button
+   * in the home page
+   * @author : Karl Wang
+   */
   onClickBlacklistButton = () => {
     if (!this.state.isInBlacklist) {
       this.setState({
@@ -99,6 +106,10 @@ export default class Home extends Component {
     let elems = document.querySelectorAll(".tooltipped");
     M.Tooltip.init(elems, {});
   };
+
+  /**
+   * Create the black list button in the home page
+   */
   createBlacklistButton = () => {
     let appearance = "ghost";
     let id = "blacklist-button";
@@ -132,6 +143,12 @@ export default class Home extends Component {
       </Button>
     );
   };
+
+  /**
+   * Check In functinality in the home page,
+   * enable the website tracking
+   * @author : Karl Wang
+   */
   handleCheckIn = () => {
     this.setState({
       isCheckIn: !this.state.isCheckIn,
@@ -142,7 +159,15 @@ export default class Home extends Component {
     };
     chrome.runtime.sendMessage(msg);
   };
-  createTimelineItem = (profilePicName, website, points) => {
+
+  /**
+   * create a single timeline element for the timeline
+   * displayed at the home screen
+   * @param {String} profilePicName the profile picture of the current user
+   * @param {String} website the url link to this timeline element
+   * @param {float} points the number of points gain or lost by this website
+   */
+  createTimelineItem = (profilePicName, website, points, index) => {
     let isProductive = Number(points) < 0 ? false : true;
     let profilePic = this.getProfilePic(profilePicName);
     let dotColor;
@@ -158,6 +183,7 @@ export default class Home extends Component {
     const paddingTop = "11px";
     return (
       <Timeline.Item
+        key={`timeline ${index}`}
         dot={
           <Icon
             id="dot-icon"
@@ -170,11 +196,16 @@ export default class Home extends Component {
         <div id="example" className="row">
           <div id="col" className="col s1"></div>
           <div id="col" className="col s2">
-            <img src={profilePic} className="circle" />
+            <img
+              data-testid={`home-timeline-pic`}
+              src={profilePic}
+              className="circle"
+            />
           </div>
           <div id="col" className="col s1"></div>
           <div id="col" className="col s5">
             <p
+              data-testid={`home-timeline-item ${index}`}
               style={{
                 textTransform: "capitalize",
                 fontWeight: 600,
@@ -186,6 +217,7 @@ export default class Home extends Component {
           </div>
           <div id="col" className="col s3">
             <p
+              data-testid={`home-timeline-points ${index}`}
               style={{
                 fontWeight: 600,
                 color: textColor,
@@ -199,9 +231,18 @@ export default class Home extends Component {
       </Timeline.Item>
     );
   };
+  /**
+   * round the current number
+   * @param {int} num number to round
+   */
   roundNumber = (num) => {
     return Math.round((num + Number.EPSILON) * 100) / 100;
   };
+
+  /**
+   * get the current profile pic for user
+   * @param {String} profilePic name of profile picture
+   */
   getProfilePic = (profilePic) => {
     if (profilePic == undefined) {
       profilePic = "Predator";
@@ -209,6 +250,9 @@ export default class Home extends Component {
     return require("../images/emojis/" + profilePic + ".svg");
   };
 
+  /**
+   * render the home component
+   */
   render() {
     let profilePic = this.getProfilePic(this.state.profilePic);
     let leftSide = (
@@ -219,6 +263,7 @@ export default class Home extends Component {
     let rightSide = (
       <div className="col s8">
         <span
+          data-testid="team-title"
           id="title"
           className="truncate card-title black-text center-align"
         >
@@ -227,7 +272,7 @@ export default class Home extends Component {
         <div className="divider"></div>
         <div className="row">
           <div id="col" className="col s4">
-            <p id="top" className="center-align">
+            <p data-testid={`home-teamCode`} id="top" className="center-align">
               {this.state.teamCode}
             </p>
             <p
@@ -238,7 +283,11 @@ export default class Home extends Component {
             </p>
           </div>
           <div id="col" className="col s4">
-            <p id="top" className="center-align">
+            <p
+              data-testid={`home-numberOfMembers`}
+              id="top"
+              className="center-align"
+            >
               {this.state.teamMembers.length}
             </p>
             <p
@@ -261,7 +310,11 @@ export default class Home extends Component {
           </div>
 
           <div id="col" className="col s4">
-            <p id="top" className="center-align">
+            <p
+              data-testid={`home-teamPoints`}
+              id="top"
+              className="center-align"
+            >
               {this.state.teamPoints}
             </p>
             <p
@@ -275,17 +328,18 @@ export default class Home extends Component {
       </div>
     );
     let addToBlackList = (
-      <div id="col" className="col s6">
+      <div data-testid={`home-blacklist`} id="col" className="col s6">
         {this.createBlacklistButton()}
       </div>
     );
     let checkIn = (
       <div id="col" className="col s6">
         {/* <span className="left black-text">Check In</span> */}
-        <div id="checkin" className="switch right">
+        <div data-testid="checkin-btn" id="checkin" className="switch right">
           <label>
             Check off
             <input
+              data-testid="checkin-checkbox"
               onChange={this.handleCheckIn}
               checked={this.state.isCheckIn}
               type="checkbox"
@@ -299,11 +353,12 @@ export default class Home extends Component {
     let timeline = (
       <div id="mini-timeline">
         <Timeline>
-          {this.state.timelineArr.map((item) => {
+          {this.state.timelineArr.map((item, index) => {
             return this.createTimelineItem(
               item.animal,
               item.url,
-              this.roundNumber(item.points)
+              this.roundNumber(item.points),
+              index
             );
           })}
         </Timeline>
