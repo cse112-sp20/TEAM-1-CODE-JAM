@@ -1,112 +1,123 @@
-## React Chrome Extension
+# Team Activity Tracker
 
-### Installation
+![Continuous Integration](https://github.com/cse112-sp20/TEAM-1-CODE-JAM/workflows/Continuous%20Integration/badge.svg)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/b27c758188a14dc8af226deaee965073)](https://www.codacy.com/gh/cse112-sp20/TEAM-1-CODE-JAM?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=cse112-sp20/TEAM-1-CODE-JAM&amp;utm_campaign=Badge_Grade)
 
-1. Clone the repository
-2. In the same folder as **package.json**, run **npm i** (It is best to get the latest version of NodeJS)
-3. Do a **npm run build**
-4. Go to <a>chrome://extensions</a>, have the developer mode enabled and click **Load unpacked**
-5. Select the **build** folder
+:star: Star us on GitHub — it helps!
 
+<h1 align="center">
+  <br>
+  <img src="docs/img/teamLogo.png" alt="Team Activity Tracker">
+</h1>
 
+<h4 align="center">A Google Chrome Extension Team Activity Tracker based on <a href="https://reactjs.org/" target="_blank">React</a>.</h4>
+<p align="center">
+  <a href="#about">About</a> •
+  <a href="#demo">Demo</a> •
+  <a href="#installation">Installation</a> •
+  <a href="#Features">Features</a> •
+  <a href="#related">Related</a> •
+  <a href="#contributing">Contributing</a> •
+  <a href="#links">External Links</a> •
+  <a href="https://github.com/cse112-sp20/TEAM-1-CODE-JAM/wiki">Wiki</a> •
+  <a href="#team">Team</a>
+</p>
 
-### Writing Code
+# About
+To promote productivity :rocket:, we introduce [Team Activity Tracker Chrome Extension](https://chrome.google.com/webstore/) to monitor team activity :computer: as a reinforcement for avoiding distractions and procrastination. A chrome extension that installs in less than five minutes :raised_hands:.
 
-1. All the code should be written and created in **/src/components**
+With the sudden changes to our everyday lives, remote work is now more prevalent in our everyday lives. Despite holding the same responsibility, remote work proposes new challenges to productivity. The difference in environment can be a huge factor that affects one’s concentration and task management. Working at home opens doors to limitless distractions such as Youtube, Facebook, and other social media platforms that constantly seek our attention. We are in a situation where team accountability is at an all time high when the only thing standing between your teammates is a screen. 
 
-2. In the new file, you can use the template below
+# Demo
+👉 Watch it <a href="https://share.getcloudapp.com/mXuAo7j0">here</a>.
+<br>
+<img src="docs/img/demo.gif">
 
-   ```react
-   import React, { Component } from 'react'
-   
-   export default class Example extends Component {
-       render() {
-           return (
-               <div>
-                   
-               </div>
-           )
-       }
-   }
-   
-   ```
+## Installation
+### Chrome Extension Store
+coming soon :stuck_out_tongue_closed_eyes:
 
-3. In **App.js**, first import the component, create a new route under \<Switch> tag. 
+### For developers
+Clone the source locally:
 
-   ```react
-   import Example from "./components/Example.js"
-   ...
-   ...
-   <Switch>
-     ...
-    	// your route here
-     <Route path="/yoururl" component={Example}></Route>
-   </Switch>
-   ```
-
-4. Then go to **SideNav.js** in components folder, add your \<Link> tag in the div.
-
-   ```react
-   <Link className="grey darken-3 waves-effect waves-light card-panel center-align" to="/yoururl">
-             <span>Example</span>
-   </Link>
-   ```
-
-5. Everytime you want to reflect changes on chrome extension, you have to run **npm run build**, do that.
-
-6. Your new component should be on the side navbar, you can click it to see your component
-
-### Edit Background.js
-
-Background.js needs to be edited in public folder. How npm run build works is bundle everything in src folder and move the public folder into build folder.
-
-### Testing
-
-All tests should be written under **\__tests__** folder. Preferbably with the ***example.test.js*** naming scheme. To run test simply run **npm test**. To run a individual test, run **npm test -- example**
-
-### Commit Guideline
-
-The following guide line is from <a href="https://www.freecodecamp.org/news/writing-good-commit-messages-a-practical-guide/">freecodecamp</a>
-
+```sh
+$ git clone https://github.com/cse112-sp20/TEAM-1-CODE-JAM
+$ cd TEAM-1-CODE-JAM
 ```
-git commit -m "Subject" -m "Description..."
+If you're on Debian or Ubuntu, you'll also need to install
+`nodejs-legacy`:
+
+Use your package manager to install `npm`.
+```sh
+$ sudo apt-get install npm nodejs-legacy
 ```
 
+Install project dependencies:
 
-
-1. **Specify the type of commit:**
-
-- feat: The new feature you're adding to a particular application
-- fix: A bug fix
-- style: Feature and updates related to styling
-- refactor: Refactoring a specific section of the codebase
-- test: Everything related to testing
-- docs: Everything related to documentation
-- chore: Regular code maintenance.[ You can also use emojis to represent commit types]
-
-2. **Separate the subject from the body with a blank line**
-
-3. **Your commit message should not contain any whitespace errors**
-
-4. **Remove unnecessary punctuation marks**
-
-5. **Do not end the subject line with a period**
-
-6. **Capitalize the subject line and each paragraph**
-
-7. **Use the imperative mood in the subject line**
-
-8. **Use the body to explain what changes you have made and why you made them.**
-
-9. **Do not assume the reviewer understands what the original problem was, ensure you add it.**
-
-10. **Do not think your code is self-explanatory**
-
-11. **Follow the commit convention defined by your team**
-
-An example of a commit message would be 
-
+```sh
+$ npm install
 ```
-git commit -m "docs: add the commit guideline in readme" -m "The guideline in the readme serves as a unifed style for github commits. From now on, every commit should follow the guideline"
+Start the app:
+
+```sh
+$ npm start
 ```
 
+### Build installers
+
+Build app
+```sh
+$ npm run build
+```
+
+## Features:
+* Team Timeline
+    * Elements: Current team activity in color coded points and urls of site members are on. Anonymous labeling of team members to prevent calling out any individual in a team. 
+    * Purpose: Boost team productivity by negatively reinforcing members that get distracted on blacklisted sites ( Facebook, Youtube, etc. ) and positively reinforcing productive members with positive points. Total team and individual points are subtracted or added by visiting various sites. 
+* Self Monitoring
+    * Elements: Charts of the current day’s activity that shows the performance of an individual against each of their teams. 
+    * Purpose: Accessible self reflection that enables room for improvement. Be the best version of your self by self reflecting and check where you stand amongst your teammates. Are you crushing the competition? Show off your stats to your boss for that killer raise.
+* Check in / checkout
+    * Elements: Switch that serves as a check in.
+    * Purpose: Stop procrastinating and stay focused in the workplace by tracking negative websites using Team activity tracker's Work Mode. During self given break time, users can switch off so that it does not affect team points. 
+* Easily add / Create/ Delete teams
+    * Elements: Add button that allows for joining and creating teams
+    * Purpose: Multiple team monitoring 
+* Current Display of Team Points, Members, etc
+    * Elements: team points, name, members, current site user is on
+    * Purpose: give insight on details of each team
+
+## Built with
+- [React](https://reactjs.org/)
+- [Firebase](https://firebase.google.com/)
+- [Jest](https://jestjs.io/)
+- [Puppeteer](https://pptr.dev/)
+- [React Testing Library](https://testing-library.com/)
+
+## Related
+- [BlockSite](https://blocksite.co/)
+
+## Contributing
+Please take a look at our [contributing](https://github.com/cse112-sp20/TEAM-1-CODE-JAM/wiki) guidelines if you're interested in helping! :tada:
+
+## Links
+* [Web site](#)
+* [Documentation](https://github.com/cse112-sp20/TEAM-1-CODE-JAM/wiki)
+* [Project Management](https://3.basecamp.com/4479372/)
+* [Issue tracker](https://github.com/cse112-sp20/TEAM-1-CODE-JAM/issues)
+* [Source code](https://github.com/cse112-sp20/TEAM-1-CODE-JAM)
+
+## Team
+* Karl Wang
+* Brian Aguirre
+* William Lui
+* Ivy Cheng
+* Youliang Liu
+* Xiang Liu
+* Gen Barcenas
+* Vivian Lee
+* Howard Wang
+* Edgar Matias
+* Haaris Tahir-Kheli
+* Connor Frank
+* Trevor Perez
