@@ -15,6 +15,7 @@
     "<rootDir>/src/setupTests.js",
     "<rootDir>/public/firebaseInit.js",
     "<rootDir>/public/github-oauth.js",
+    "<rootDir>/public/githubTracker.js",
     "<rootDir>/public/background.js",
     "<rootDir>/public/js",
     "<rootDir>/src/serviceWorker.js",

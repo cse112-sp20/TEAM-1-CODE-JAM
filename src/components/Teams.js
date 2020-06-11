@@ -164,6 +164,7 @@ class Teams extends Component {
               </button>
               {/* delete button */}
               <button
+                data-testid={"remove-btn " + (index + 1)}
                 className="btn-floating btn-small waves-effect waves-light red accent-2"
                 id="delete"
                 onClick={this.onRemoveTeam.bind(this, team)}

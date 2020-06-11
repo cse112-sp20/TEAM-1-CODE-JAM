@@ -183,6 +183,7 @@ export default class Home extends Component {
     const paddingTop = "11px";
     return (
       <Timeline.Item
+        key={`timeline ${index}`}
         dot={
           <Icon
             id="dot-icon"
@@ -338,6 +339,7 @@ export default class Home extends Component {
           <label>
             Check off
             <input
+              data-testid="checkin-checkbox"
               onChange={this.handleCheckIn}
               checked={this.state.isCheckIn}
               type="checkbox"

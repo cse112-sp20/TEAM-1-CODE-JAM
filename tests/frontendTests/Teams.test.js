@@ -12,17 +12,17 @@ describe("<Teams />", () => {
     sendMessage.mockImplementationOnce((msg, callback) => {
       let response = [
         {
-          teamCode: 11111,
+          teamCode: "11111",
           teamName: "test 1",
           joinedTime: "yesterday",
         },
         {
-          teamCode: 22222,
+          teamCode: "22222",
           teamName: "test 2",
           joinedTime: "yesterday",
         },
         {
-          teamCode: 33333,
+          teamCode: "33333",
           teamName: "test 3",
           joinedTime: "now",
         },
@@ -55,7 +55,7 @@ describe("<Teams />", () => {
       expect.anything()
     );
   });
-  test("Test clicking on a team", async () => {
+  test("Test clicking on a team", () => {
     const history = createMemoryHistory();
     const { getByText } = render(
       <Router history={history}>
@@ -72,7 +72,7 @@ describe("<Teams />", () => {
       callback();
     });
     fireEvent.click(getByText(/test 1/i));
-    expect(chromeStorage).toEqual({ prevTeam: 11111 });
+    expect(chromeStorage).toEqual({ prevTeam: "11111" });
     expect(sendMessage).toHaveBeenCalledTimes(2);
     expect(sendMessage).toHaveBeenCalledWith(
       {
@@ -83,5 +83,19 @@ describe("<Teams />", () => {
     );
     expect(history.location.pathname).toBe("/");
     expect(history.length).toBe(2);
+  });
+  test("Test removing team", () => {
+    const history = createMemoryHistory();
+    const { getByText, getByTestId, queryByTestId } = render(
+      <Router history={history}>
+        <Route path="/" component={Teams}></Route>
+      </Router>
+    );
+    let removeBtn1 = getByTestId("remove-btn 1");
+    expect(removeBtn1).toBeTruthy();
+    fireEvent.click(removeBtn1);
+    expect(queryByTestId("remove-btn 1")).toBeFalsy();
+    fireEvent.click(getByText(/Undo/i));
+    expect(queryByTestId("remove-btn 1")).toBeTruthy();
   });
 });

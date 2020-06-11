@@ -1,13 +1,13 @@
 // Import testing library
 import "@testing-library/jest-dom";
 import React from "react";
-import { render } from "@testing-library/react";
+import { render, fireEvent } from "@testing-library/react";
 import { Router } from "react-router-dom";
 import { createMemoryHistory } from "history";
 import Home from "../../src/components/Home.js";
 
 // Set chrome mock
-import { chrome, sendMessage } from "../mocks/chromeMock.js";
+import { chrome, sendMessage, addListener } from "../mocks/chromeMock.js";
 global.chrome = chrome;
 
 // Change window.name to valid
@@ -102,16 +102,13 @@ describe("<Home />", () => {
       let response;
 
       // Get home info
-      if (msg.message == "get home info") {
+      if (msg.message === "get home info") {
         response = JSON.parse(JSON.stringify(homeInfo));
       }
-      // Switch teams
-      //   else if (msg.message == "switch team") {
-      //     response = "success";
-      //   }
       // Not recognized
       else {
         response = undefined;
+        return;
       }
 
       // Return response
@@ -127,7 +124,7 @@ describe("<Home />", () => {
   // test render
   test("Home.js should render the element on the home page", () => {
     // Render Home
-    const { getByTestId } = render(homeComponent);
+    const { getByTestId, getByText } = render(homeComponent);
 
     // Expect send message to be called once
     expect(sendMessage).toHaveBeenCalledTimes(1);
@@ -166,19 +163,83 @@ describe("<Home />", () => {
       expect(parseInt(points.textContent, 10)).toBe(timelineArr[i].points);
     }
 
-    // Get the chart data from the screen
-    // const chartTestId = "chart-container";
-    // const testArray = getByTestId(chartTestId);
+    let checkBox = getByTestId("checkin-checkbox");
+    expect(checkBox.checked).toBe(false);
+    fireEvent.click(checkBox);
+    expect(checkBox.checked).toBe(true);
+    expect(sendMessage).toHaveBeenCalledTimes(2);
 
-    // // Check that chart data is an attribute
-    // expect(testArray.hasAttribute("chartdata")).toBe(true);
-
-    // // Check that chart data is not null if test data exists
-    // if (testTeams.length) {
-    //   expect(testArray.getAttribute("chartdata")).toBeDefined();
-    // }
-
-    // // Check if at least one chart is rendered
-    // expect(testArray.childElementCount).toBe(testTeams.length);
+    fireEvent.click(getByText(/UCSD/i));
+  });
+  test("should listen for new change", () => {
+    let teamInfo = {
+      currDate: "now",
+      animalsLeft: ["cat", "dog"],
+      createdTime: "now",
+      creator: "Alice",
+      members: ["Alice", "Bob", "Calin"],
+      teamName: "test home page",
+      teamPoints: 100,
+      timeWasted: [
+        {
+          animal: "bones",
+          points: 10,
+          time: 15,
+          url: "github",
+          user: "Alice",
+        },
+        {
+          animal: "cat",
+          points: -2,
+          time: 20,
+          url: "stackoverflow",
+          user: "Bob",
+        },
+        {
+          animal: "dog",
+          points: 5,
+          time: 25,
+          url: "github",
+          user: "Calin",
+        },
+        {
+          animal: "chicken",
+          points: 5,
+          time: 15,
+          url: "ucsd",
+          user: "Bob",
+        },
+        {
+          animal: "pig",
+          points: -1,
+          time: 15,
+          url: "myspace",
+          user: "Alice",
+        },
+        {
+          animal: "horse",
+          points: -1,
+          time: 15,
+          url: "myspace",
+          user: "test6@gmail.com",
+        },
+      ],
+    };
+    addListener.mockImplementationOnce((callback) => {
+      let msg = {
+        for: "team info",
+        message: JSON.parse(JSON.stringify(teamInfo)),
+      };
+      callback(msg);
+    });
+    const { getByTestId } = render(homeComponent);
+    let timelineArr = teamInfo.timeWasted.reverse();
+    if (timelineArr.length > 5) timelineArr = timelineArr.slice(0, 5);
+    for (let i = 0; i < 5; i++) {
+      let website = getByTestId(`home-timeline-item ${i}`);
+      expect(website.textContent).toBe(timelineArr[i].url);
+      let points = getByTestId(`home-timeline-points ${i}`);
+      expect(parseInt(points.textContent, 10)).toBe(timelineArr[i].points);
+    }
   });
 });

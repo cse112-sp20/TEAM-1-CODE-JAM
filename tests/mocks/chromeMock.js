@@ -18,10 +18,14 @@ let identity = {
 let onMessage = {
   addListener,
 };
+
+export let query = jest.fn();
+
 // Define a tab
 let tabs = {
   create: pushTabs,
   pages: openTabs,
+  query: query,
 };
 
 let runtime = {
