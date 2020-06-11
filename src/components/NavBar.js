@@ -4,14 +4,27 @@ import M from "materialize-css";
 import "./NavBar.css";
 
 export default class NavBar extends Component {
+  /**
+   * Init the current component
+   * @author : Karl Wang
+   */
   componentDidMount() {
     M.AutoInit();
   }
 
+  /**
+   * Create the setting page and set
+   * the url to popup.html
+   * @author : Karl Wang
+   */
   openSettingsPage = () => {
     chrome.tabs.create({ url: "/popup.html" });
   };
 
+  /**
+   * render the navbar component
+   * @author : Karl Wang
+   */
   render() {
     return (
       <div>

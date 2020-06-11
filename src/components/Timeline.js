@@ -88,6 +88,9 @@ export default class Timeline extends Component {
     });
   };
 
+  /**
+   * render the timeline component
+   */
   render() {
     return (
       <div

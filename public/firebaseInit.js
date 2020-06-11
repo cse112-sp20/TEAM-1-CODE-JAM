@@ -19,6 +19,10 @@ export function initializeFirebase() {
   setDB(firebase.firestore());
 }
 
+/**
+ * set the current database for mocking
+ * @author Karl Wang
+ */
 export function setDB(database) {
   db = database;
 }
