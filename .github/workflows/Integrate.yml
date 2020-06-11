@@ -9,6 +9,7 @@ on:
   push:
     branches:
       - feat/githubPages_trevor
+      - demo-pipeline
 jobs:
   Stylelint-Eslint-Prettier:
     runs-on: ubuntu-latest
